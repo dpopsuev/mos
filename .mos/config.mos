@@ -15,7 +15,7 @@ config {
 
   project "contracts" {
     prefix = "CON"
-    sequence = 245
+    sequence = 247
     default = true
   }
 
