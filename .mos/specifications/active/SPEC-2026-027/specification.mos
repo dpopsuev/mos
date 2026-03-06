@@ -2,7 +2,7 @@ specification "SPEC-2026-027" {
   title = "Contract System: closing the Plan mode gaps"
   status = "active"
   enforcement = "warn"
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-002"
 
   feature "Durable storage" {
 

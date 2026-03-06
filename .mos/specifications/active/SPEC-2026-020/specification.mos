@@ -11,7 +11,7 @@ specification "SPEC-2026-020" {
 
   feature "Supersession chain" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-003"
   state = "desired"
   group = "ceremony"
 }

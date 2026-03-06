@@ -11,7 +11,7 @@ specification "SPEC-2026-025" {
 
   feature "Lock visibility and release" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-004"
 
   spec {
     include "moslib/vcs"

@@ -82,5 +82,6 @@ Every Mos primitive should trace to at least one pillar. Core primitives (like F
       verified_by = "linter"
     }
   }
+  derives_from = "NEED-2026-001"
 }
 

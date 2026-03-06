@@ -14,7 +14,7 @@ specification "SPEC-2026-017" {
 
   feature "Rule resolution with contract amendments" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-003"
   state = "desired"
   group = "ceremony"
 }

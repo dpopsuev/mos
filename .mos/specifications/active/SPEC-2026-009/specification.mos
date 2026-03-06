@@ -14,7 +14,7 @@ specification "SPEC-2026-009" {
 
   feature "Sync level binding" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-003"
   state = "desired"
   group = "federation"
 }

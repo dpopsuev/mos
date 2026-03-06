@@ -14,7 +14,7 @@ specification "SPEC-2026-023" {
 
   feature "New project inherits org DNA" {
   }
-  justifies = "NEED-2026-002"
+  satisfies = "NEED-2026-002"
 
   spec {
     include "cmd/mos"

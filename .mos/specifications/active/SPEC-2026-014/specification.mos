@@ -20,7 +20,7 @@ specification "SPEC-2026-014" {
       }
     }
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-001"
 
   spec {
     include "moslib/topology"

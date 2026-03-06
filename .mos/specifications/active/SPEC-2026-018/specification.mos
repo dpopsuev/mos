@@ -14,7 +14,7 @@ specification "SPEC-2026-018" {
 
   feature "Sandbox experimentation" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-003"
   state = "desired"
   group = "ceremony"
 }

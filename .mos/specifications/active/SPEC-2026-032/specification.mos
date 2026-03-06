@@ -21,7 +21,7 @@ specification "SPEC-2026-032" {
     text = "Validates Mos's harness-first approach to governance. LangChain's PreCompletionChecklistMiddleware is analogous to Mos's harness run — mechanical verification against defined criteria before work is accepted. Their trace-driven improvement loop parallels Mos's audit command. Their emphasis on 'context engineering on behalf of agents' validates Mos's Console First principle: the CLI is the API. Key insight for Mos: agents benefit enormously from knowing their evaluation criteria upfront. Mos contracts with Gherkin scenarios serve exactly this purpose — they tell the agent what 'done' looks like before work begins."
   }
   slug = "case-study-langchain-agents"
-  justifies = "NEED-2026-002"
+  satisfies = "NEED-2026-002"
   group = "research"
   state = "current"
 }

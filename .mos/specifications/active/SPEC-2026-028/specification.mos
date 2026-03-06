@@ -2,7 +2,7 @@ specification "SPEC-2026-028" {
   title = "Agent-Ready Governance Gate — CLI Surface Specification"
   status = "active"
   slug = "agent-ready-gate-cli"
-  justifies = "NEED-2026-002"
+  satisfies = "NEED-2026-002"
   addresses = ["C1", "C2", "C3", "C4", "C5"]
   enforcement = "warn"
   created_at = 2026-03-04T09:40:00Z

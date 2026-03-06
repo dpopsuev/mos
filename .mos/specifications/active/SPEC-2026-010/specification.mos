@@ -14,7 +14,7 @@ specification "SPEC-2026-010" {
 
   feature "Conflict resolution" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-001"
   state = "desired"
   group = "federation"
 }

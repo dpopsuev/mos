@@ -17,7 +17,7 @@ specification "SPEC-2026-012" {
 
   feature "Advisory plus Red quadrant" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-005"
 
   spec {
     include "moslib/harness"

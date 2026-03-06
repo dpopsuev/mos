@@ -1,0 +1,39 @@
+contract "FEAT-2026-004" {
+  title = "Lint rule spec-on-originating -- warn when specs directly satisfy the originating need while derived needs exist"
+  status = "active"
+  priority = "high"
+  justifies = "NEED-2026-002"
+  created_at = 2026-03-06T17:00:00Z
+  updated_at = 2026-03-06T17:00:00Z
+
+  feature "Lint rule to prevent re-parenting ceremony accumulation" {
+
+    scenario "Warn when spec satisfies originating need" {
+      given = "NEED-2026-001 is marked originating = true and has 4 derived needs"
+      and = "SPEC-2026-099 has satisfies = NEED-2026-001"
+      when = "mos lint is run"
+      then = "A warning is emitted: SPEC-2026-099 directly satisfies originating need NEED-2026-001 -- consider a derived need"
+    }
+
+    scenario "No warning when no derived needs exist" {
+      given = "Only one need exists (the originating need) with no derived needs"
+      and = "SPEC-2026-001 satisfies that need"
+      when = "mos lint is run"
+      then = "No spec-on-originating warning is emitted"
+    }
+
+    scenario "No warning when spec satisfies a derived need" {
+      given = "SPEC-2026-003 has satisfies = NEED-2026-003 (a derived need)"
+      when = "mos lint is run"
+      then = "No spec-on-originating warning is emitted for SPEC-2026-003"
+    }
+
+    scenario "Specs that genuinely belong on originating need are suppressible" {
+      given = "SPEC-2026-002 intentionally satisfies NEED-2026-001 directly"
+      and = "The spec has a suppress = spec-on-originating annotation"
+      when = "mos lint is run"
+      then = "No warning is emitted for SPEC-2026-002"
+    }
+  }
+}
+

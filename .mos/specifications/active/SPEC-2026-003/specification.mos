@@ -3,7 +3,7 @@ specification "SPEC-2026-003" {
   status = "active"
   addresses = "C2"
   enforcement = "warn"
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-003"
   slug = "traceability-graph"
 
   spec {

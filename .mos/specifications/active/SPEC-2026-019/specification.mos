@@ -17,7 +17,7 @@ specification "SPEC-2026-019" {
 
   feature "Commit-linked drift velocity" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-005"
 
   spec {
     include "moslib/linter"

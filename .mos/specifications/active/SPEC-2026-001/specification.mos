@@ -83,7 +83,7 @@ mos store migrate -- convert between backends (e.g., fsstore -> git)"""
 - The audit-log policy MUST survive store migrations.
 - Nested stores (store-within-store) are deferred to a future spec."""
   }
-  justifies = "NEED-2026-004"
+  satisfies = "NEED-2026-004"
   addresses = "C5"
   slug = "objectstore-layer"
 

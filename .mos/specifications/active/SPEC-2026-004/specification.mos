@@ -3,7 +3,7 @@ specification "SPEC-2026-004" {
   status = "active"
   addresses = "C3"
   enforcement = "disabled"
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-001"
   slug = "transition-gates"
 
   spec {

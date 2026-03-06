@@ -162,7 +162,12 @@ config {
       acceptance {
       }
 
-      preamble {
+      originating {
+      }
+
+      derives_from {
+        link = true
+        ref_kind = "need"
       }
     }
 
@@ -171,7 +176,7 @@ config {
       archive_states = ["retired"]
 
       expects_downstream {
-        via = "justifies"
+        via = "satisfies"
         after = "validated"
         severity = "warn"
       }
@@ -199,7 +204,7 @@ config {
         required = true
       }
 
-      justifies {
+      satisfies {
         link = true
         ref_kind = "need"
       }
@@ -231,6 +236,10 @@ config {
       }
 
       group {
+      }
+
+      verification_method {
+        enum = ["analysis", "demonstration", "inspection", "test"]
       }
 
       status {

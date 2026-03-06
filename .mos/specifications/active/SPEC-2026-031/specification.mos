@@ -21,7 +21,7 @@ specification "SPEC-2026-031" {
     text = "Directly validates Mos's contract-and-scenario model. Anthropic's feature list with pass/fail status maps to Mos contracts with scenario done/pending tracking. Their progress file maps to Mos's history/ledger. Their incremental-progress-with-clean-handoff philosophy matches Mos's sprint model — planned, executed, verified via CLI. Key gap they identified: agents need a structured 'getting started' protocol. Mos's 'mos status' (CON-2026-111) addresses exactly this."
   }
   slug = "case-study-anthropic-harness"
-  justifies = "NEED-2026-002"
+  satisfies = "NEED-2026-002"
   group = "research"
   state = "current"
 }

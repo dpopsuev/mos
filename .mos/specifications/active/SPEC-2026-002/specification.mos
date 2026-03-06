@@ -3,7 +3,7 @@ specification "SPEC-2026-002" {
   status = "active"
   addresses = "C1"
   enforcement = "warn"
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-001"
   slug = "lifecycle-chain"
 
   spec {

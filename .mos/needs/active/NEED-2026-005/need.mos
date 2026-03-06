@@ -136,5 +136,6 @@ Tier 3 — AI agent via Context Mesh. Because Mos exposes the full artifact grap
 
 The tiers map to the manifesto Gate/Advisory distinction: Tier 1 and 2 produce Gates (mechanical, deterministic, errors). Tier 3 produces Advisories (interpretive, judgment-based, warnings). All three tiers feed the Integrity Index."""
   }
+  derives_from = "NEED-2026-001"
 }
 

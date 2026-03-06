@@ -3,7 +3,7 @@ specification "SPEC-2026-005" {
   status = "active"
   addresses = "C4"
   enforcement = "disabled"
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-001"
   slug = "cross-repo-federation"
 
   spec {

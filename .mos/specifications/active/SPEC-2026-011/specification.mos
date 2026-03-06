@@ -14,7 +14,7 @@ specification "SPEC-2026-011" {
 
   feature "Pure .mos mode" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-001"
   state = "desired"
   group = "federation"
 }

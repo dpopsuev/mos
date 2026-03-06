@@ -1,7 +1,7 @@
 need "NEED-2026-001" {
   title = "Mechanically enforceable lifecycle traceability"
   status = "validated"
-  preamble = "true"
+  originating = "true"
   sensation = "In distributed, multi-stakeholder systems, the sources of truth (needs, specifications, architecture, code, documentation) are fragmented across different tools with no mechanically enforceable traceability between them. The governance graph -- who decided what, why, when, and why not -- is either implicit, scattered, or absent. When the chain breaks, accountability is impossible, drift is undetectable, and warnings go unconnected to the failures they predicted."
   urgency = "critical"
 

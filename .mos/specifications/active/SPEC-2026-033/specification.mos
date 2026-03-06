@@ -1,7 +1,7 @@
 specification "SPEC-2026-033" {
   status = "active"
   title = "Artifact Mutation Audit Trail"
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-003"
   addresses = "C5"
   slug = "governance-audit-trail"
 

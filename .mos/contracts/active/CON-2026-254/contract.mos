@@ -1,0 +1,32 @@
+contract "CON-2026-254" {
+  title = "mos query --where field=value filtering"
+  status = "active"
+  created_at = 2026-03-06T17:30:00Z
+  updated_at = 2026-03-06T17:30:00Z
+  goal = "Add --where flag to mos query so agents can filter artifacts by any field value without shell glue"
+  justifies = "SPEC-2026-028"
+  kind = "feature"
+  sprint = "SPR-2026-042"
+
+  feature "Field-based artifact filtering" {
+
+    scenario "Filter specs by satisfies target" {
+      given = "28 specifications exist satisfying 5 different needs"
+      when = "mos query --kind specification --where satisfies=NEED-2026-001 is run"
+      then = "Only specs whose satisfies field equals NEED-2026-001 are returned"
+    }
+
+    scenario "Filter needs by derives_from" {
+      given = "5 needs exist, 4 derived from NEED-2026-001"
+      when = "mos query --kind need --where derives_from=NEED-2026-001 is run"
+      then = "Only the 4 derived needs are returned"
+    }
+
+    scenario "Multiple --where flags combine as AND" {
+      given = "Specs with various statuses and satisfies targets"
+      when = "mos query --kind specification --where satisfies=NEED-2026-002 --where status=active is run"
+      then = "Only specs matching both conditions are returned"
+    }
+  }
+}
+

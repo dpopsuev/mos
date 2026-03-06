@@ -85,5 +85,6 @@ which backend is active."""
       verified_by = "harness"
     }
   }
+  derives_from = "NEED-2026-001"
 }
 

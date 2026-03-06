@@ -62,5 +62,6 @@ need "NEED-2026-002" {
   section "PoC Gate" {
     text = "An AI agent can: (1) run mos status to orient, (2) read a contract to understand acceptance criteria, (3) discover commands via --help, (4) execute work and verify via mos lint and mos harness run, (5) leave .mos/ in a clean state for the next session. When all five criteria pass, the PoC is complete."
   }
+  derives_from = "NEED-2026-001"
 }
 

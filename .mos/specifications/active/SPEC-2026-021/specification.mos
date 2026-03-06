@@ -14,7 +14,7 @@ specification "SPEC-2026-021" {
 
   feature "Asterisk stress test" {
   }
-  justifies = "NEED-2026-001"
+  satisfies = "NEED-2026-002"
   state = "desired"
   group = "agent"
 }

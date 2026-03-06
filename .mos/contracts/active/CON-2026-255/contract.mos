@@ -1,0 +1,32 @@
+contract "CON-2026-255" {
+  title = "mos query rich text output with titles and links"
+  status = "active"
+  created_at = 2026-03-06T17:30:00Z
+  updated_at = 2026-03-06T17:30:00Z
+  goal = "Make mos query default text output include titles and key fields so agents never need JSON parsing or grep pipelines"
+  justifies = "SPEC-2026-028"
+  kind = "feature"
+  sprint = "SPR-2026-042"
+
+  feature "Rich text output for mos query" {
+
+    scenario "Default text includes ID and title" {
+      given = "Artifacts exist in the governance tree"
+      when = "mos query --kind need is run"
+      then = "Each line shows ID and title, e.g. 'NEED-2026-001  Mechanically enforceable lifecycle traceability'"
+    }
+
+    scenario "Verbose mode includes key metadata" {
+      given = "Specs exist with satisfies, status, and other fields"
+      when = "mos query --kind specification -v is run"
+      then = "Each entry shows ID, title, status, satisfies in columnar format without JSON parsing"
+    }
+
+    scenario "Format flag for structured output" {
+      given = "Artifacts exist"
+      when = "mos query --kind need --format json is run"
+      then = "Full JSON output is returned for programmatic consumption"
+    }
+  }
+}
+

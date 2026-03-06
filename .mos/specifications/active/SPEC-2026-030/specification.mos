@@ -21,7 +21,7 @@ specification "SPEC-2026-030" {
     text = "Strong validation of Mos's core thesis. OpenAI independently discovered that governance artifacts (rules, architecture docs, plans, quality grades) must be versioned, structured, mechanically validated, and co-located with code. Their docs/ structure mirrors Mos's .mos/ directory. Their custom linters mirror Mos's linter. Their 'golden principles' are analogous to Mos rules. Their exec plans are analogous to Mos contracts. Key difference: OpenAI built bespoke tooling; Mos aims to provide a reusable, domain-agnostic governance framework."
   }
   slug = "case-study-openai-codex"
-  justifies = "NEED-2026-002"
+  satisfies = "NEED-2026-002"
   group = "research"
   state = "current"
 }
