@@ -1,0 +1,7 @@
+sprint "SPR-2026-040" {
+  status = "complete"
+  title = "VCS Deep Stress Suite"
+  goal = "Stress test VCS with history depth, incremental commits, and clone transport to find degradation curves"
+  contracts = "CON-2026-248,CON-2026-249,CON-2026-250"
+}
+

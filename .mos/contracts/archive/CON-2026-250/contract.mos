@@ -1,0 +1,32 @@
+contract "CON-2026-250" {
+  title = "VCS Clone and Transport Stress"
+  status = "complete"
+  created_at = 2026-03-06T15:01:04Z
+  updated_at = 2026-03-06T15:01:04Z
+  goal = "Benchmark local clone of repos with deep commit history (50, 500 commits) and report disk size growth to quantify transport cost"
+  justifies = "NEED-2026-004"
+  kind = "feature"
+
+  feature "Clone cost scales with history depth" {
+
+    scenario "Local clone at 50 commits" {
+      given = "a Kubernetes-scale repo with 50 commits"
+      when = "vcs.Clone is called to a local directory"
+      then = "clone time and destination disk size are reported"
+    }
+
+    scenario "Local clone at 500 commits" {
+      given = "a Kubernetes-scale repo with 500 commits"
+      when = "vcs.Clone is called to a local directory"
+      then = "clone time and destination disk size are reported"
+    }
+
+    scenario "Disk size growth is reported" {
+      given = "repos at 50 and 500 commit depths"
+      when = "disk sizes are compared"
+      then = "size ratio and per-commit overhead are logged"
+    }
+  }
+  sprint = "SPR-2026-040"
+}
+
