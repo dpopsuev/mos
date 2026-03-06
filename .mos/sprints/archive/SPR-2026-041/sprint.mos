@@ -1,0 +1,7 @@
+sprint "SPR-2026-041" {
+  status = "complete"
+  title = "Governance Collaboration & Merge Correctness"
+  goal = "Prove that concurrent governance changes, merge mechanics, and branch workflows work correctly end-to-end through a forge"
+  contracts = "CON-2026-251,CON-2026-252,CON-2026-253"
+}
+

@@ -1,0 +1,38 @@
+contract "CON-2026-253" {
+  title = "Forge-Based Governance Branch Workflow"
+  status = "complete"
+  created_at = 2026-03-06T15:17:46Z
+  updated_at = 2026-03-06T15:17:46Z
+  goal = "Test the full branch workflow: create governance branch, push to forge, main advances independently, pull/merge to reconcile, verify artifacts reflect both change sets"
+  justifies = "NEED-2026-004"
+  kind = "feature"
+
+  feature "Branch-based governance workflow through a forge" {
+
+    scenario "Feature branch pushed to forge independently" {
+      given = "a developer creates a governance branch and adds a new contract"
+      when = "the branch is pushed to the forge"
+      then = "the forge has both refs/mos/heads/main and refs/mos/heads/feature"
+    }
+
+    scenario "Main advances while feature branch is open" {
+      given = "feature branch is on the forge"
+      when = "another developer commits a new rule to main and pushes"
+      then = "main and feature have diverged on the forge"
+    }
+
+    scenario "Feature branch reconciled with upstream main" {
+      given = "main and feature have diverged"
+      when = "the feature developer pulls main and merges locally"
+      then = "the feature branch contains both the new rule and the new contract"
+    }
+
+    scenario "Merged feature pushed back to forge" {
+      given = "the feature branch has been reconciled with main"
+      when = "the feature branch is merged into main and pushed"
+      then = "the forge main contains all governance artifacts from both branches"
+    }
+  }
+  sprint = "SPR-2026-041"
+}
+
