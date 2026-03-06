@@ -1,0 +1,19 @@
+contract "CON-2026-108" {
+  title = "CON-2026-108"
+  status = "abandoned"
+  created_at = 2026-03-03T21:19:19Z
+  updated_at = 2026-03-03T21:29:11Z
+  name = "Warm Start: zero-context bootstrap"
+  slug = "warm-start"
+  description = "No developer, no agent, and no project should ever begin from zero context. This contract implements the orchestrated onboarding flow: when a new participant (human or agent) joins an existing project, the system assembles all context pieces in sequence — Cabinet loads personal state, MOTD displays the collective north star, standing rules activate, vocabulary is available, the Declaration is readable, inherited organizational DNA applies. The warm start is the proof that Constitution eliminates cold starts. Manifesto Section 2."
+
+  feature "Developer onboarding sequence" {
+  }
+
+  feature "Agent warm start" {
+  }
+
+  feature "New project inherits org DNA" {
+  }
+}
+

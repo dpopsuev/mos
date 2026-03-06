@@ -1,0 +1,103 @@
+contract "CON-2026-141" {
+  title = "Integrity Index: cross-vector quality scoring"
+  status = "complete"
+  slug = "integrity-index"
+  justifies = "NEED-2026-005"
+  depends_on = "CON-2026-138"
+  kind = "feature"
+  goal = "Aggregate scores from all six quadrants (3 vectors x 2 modes) into an observable Integrity Index. The index is a per-scope number (project, package, file) that trends over time. Surfaced via mos audit and the Macro TUI as a fog-of-war overlay: high index = illuminated, low index = fogged. The Integrity Index is the scalar projection of the full state vector -- a single number summarizing position in governance state space. Consumed from commit state snapshots (CON-2026-217 Phase 0) rather than recomputed from scratch. Velocity is the first derivative: the rate of index change per commit, sprint, or time window. Positive velocity = converging on desired state. Stall = near-zero velocity over K commits."
+
+  feature "Score aggregation" {
+
+    scenario "mos audit reports Integrity Index per package" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a project with functional, structural, and performance checks configured
+      }
+      when {
+        mos audit computes the Integrity Index
+      }
+      then {
+        each package gets a score from 0 to 100 based on coverage across all six quadrants
+      }
+    }
+
+    scenario "missing vector coverage lowers the index" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a package with 100 percent functional coverage but no structural or performance checks
+      }
+      when {
+        mos audit computes the Integrity Index
+      }
+      then {
+        the package scores at most 33 percent reflecting one-third vector coverage
+      }
+    }
+  }
+
+  feature "Trend tracking and velocity" {
+
+    scenario "Integrity Index is stored per commit for trend analysis" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        the VCS has 5 commits each with computed Integrity Index
+      }
+      when {
+        mos audit --trend is run
+      }
+      then {
+        a per-commit trend line is displayed showing index direction
+      }
+    }
+
+    scenario "velocity is computed from consecutive snapshots" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        the VCS has 10 commits with snapshots
+      }
+      when {
+        mos audit --velocity is run
+      }
+      then {
+        per-axis velocity is displayed showing convergence rate toward the desired state
+      }
+    }
+
+    scenario "sprint velocity summarizes distance closed during a sprint" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a sprint with first and last commit snapshots available
+      }
+      when {
+        mos audit --velocity --sprint SPR-ID is run
+      }
+      then {
+        the delta between sprint start and end is reported per axis
+      }
+    }
+
+    scenario "ETA is estimated from current velocity" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        distance to goal is 30 on the functional axis
+        velocity is minus 3 per commit over the last 10 commits
+      }
+      when {
+        mos audit --velocity is run
+      }
+      then {
+        estimated commits to functional completion is approximately 10
+      }
+    }
+  }
+  batch = "BAT-2026-007"
+  sprint = "SPR-2026-033"
+}
+

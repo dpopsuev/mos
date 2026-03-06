@@ -1,0 +1,140 @@
+need "NEED-2026-005" {
+  title = "Three Vectors of Software Quality"
+  status = "identified"
+  slug = "quality-vectors"
+  urgency = "critical"
+  sensation = "Software quality is measured along three orthogonal vectors — Functional (does it meet the spec?), Structural (is it logically divided?), and Performance (is it efficient?) — each verified in two modes: Blue Team (positive, proving invariants hold) and Red Team (adversarial, probing that invariants resist violation). Security and Robustness are not separate vectors but the Red Team column applied across all three. Mos must provide batteries-included measurement for all six quadrants while allowing custom-made configurations per project. The unifying insight: every commit is a displacement vector in a multi-dimensional quality state space defined by these axes. The commit history is a trajectory from current state toward desired state. The harness defines the feasible region (thresholds as constraint boundaries). Velocity is the rate of convergence. The three vectors are the coordinate axes of this space."
+
+  scope {
+    includes = [
+      "Functional vector: harness, Gherkin scenarios, acceptance criteria, test matrix, mutation testing",
+      "Structural vector: nesting depth, fan-out, cohesion, LOC, symbols-per-type, bidirectional thresholds",
+      "Performance vector: benchmark runner, regression detection, complexity analysis, profiling hooks",
+      "Blue Team mode: benevolent verification proving invariants hold",
+      "Red Team mode: adversarial verification probing invariant resistance",
+      "Integrity Index: cross-vector scoring combining all six quadrants",
+      "Configurable quality rules DSL: per-vector metrics, thresholds, include/exclude patterns, per-language support",
+      "Tier 1: built-in zero-dependency defaults for each vector",
+      "Tier 2: external binary integration via harness command in rule DSL",
+      "Tier 3: AI agent verification via Context Mesh traversal (advisory mode)",
+    ]
+    excludes = [
+      "domain-specific test logic (belongs to consumers)",
+      "runtime APM or production monitoring (belongs to observability layer)",
+      "manual code review process (human governance, not mechanical)",
+    ]
+  }
+
+  section "The Three Vectors" {
+    text = """
+Every software defect is a failure in exactly one of three vectors:
+
+1. Functional: the system does not do what the specification says (or does what it says it should not). Measured by tests, acceptance criteria, Gherkin scenarios.
+
+2. Structural: the system is not logically divided, mixes concerns, or has excessive complexity. Measured by static analysis metrics (nesting depth, fan-out, cohesion, LOC, symbols per type).
+
+3. Performance: the system is not algorithmically or data-structure efficient. Measured by benchmarks, profiling, complexity analysis.
+
+The vectors are orthogonal: fixing a Structural problem (extract a helper) can create a Performance problem (extra allocations). Fixing a Performance problem (inline everything) can create a Structural one. The three form a triangle of tension that a good quality system must surface."""
+  }
+
+  section "Blue Team and Red Team" {
+    text = """
+Each vector is verified in two modes, producing six quadrants:
+
+- Functional Blue: tests pass, spec is met.
+- Functional Red: fuzz testing, mutation testing find spec violations.
+- Structural Blue: metrics are within thresholds (ceiling and floor).
+- Structural Red: adversarial review finds hidden coupling, abstraction hell.
+- Performance Blue: benchmarks pass, no regressions.
+- Performance Red: load testing, chaos testing find degradation paths.
+
+Security and Robustness are not a fourth vector. They are the Red Team column applied across all three vectors. A buffer overflow is Functional Red (violates the spec). A god-object with 40 methods is Structural Red. An O(n^3) sort is Performance Red."""
+  }
+
+  section "Commits as Vectors" {
+    text = """
+The three vectors define a coordinate system. Each commit produces a displacement in this space:
+
+  V[functional]  = scenarios_passing(n+1) - scenarios_passing(n)
+  V[structural]  = structural_violations(n+1) - structural_violations(n)
+  V[performance] = benchmark_regressions(n+1) - benchmark_regressions(n)
+
+The desired state is the origin: zero violations, all scenarios passing, no regressions. Distance to goal is the L1 norm across all axes. Velocity is the rate of distance reduction per commit (or per sprint, or per day).
+
+The harness thresholds define a feasible region: a commit that would push any axis beyond its ceiling (or below its floor) is rejected by the pre-commit gate. This is a constraint surface. For AI agents, a rejected commit is a gradient signal: the proposed displacement violated constraints, recalculate.
+
+This framing unifies the gradient cache (CON-2026-217), integrity index (CON-2026-141), drift tracking (SPEC-2026-019), and trajectory analysis (CON-2026-228) into a single coherent model. The commit state snapshot is the position measurement. The displacement vector is the commit delta. The trajectory is the commit history. The velocity is the first derivative. The harness is the boundary."""
+  }
+
+  section "Batteries Included" {
+    text = """
+Mos ships opinionated defaults for all six quadrants — zero-config out of the box — while allowing full customization via the rule DSL. Every metric, threshold, include/exclude pattern, and language-specific indent style is configurable in .mos/rules/mechanical/.
+
+The structural linter rule already exists (flatten-nesting). This NEED extends the pattern to cover all three vectors systematically.
+
+This is Tier 1. Tier 2 (external tools) and Tier 3 (AI agent) extend coverage without replacing the built-in floor."""
+  }
+
+  acceptance {
+
+    criterion "C1" {
+      description = "Mos provides at least one batteries-included check per vector (Functional, Structural, Performance) that works with zero configuration"
+      verified_by = "harness"
+    }
+
+    criterion "C2" {
+      description = "Each vector supports both Blue Team and Red Team verification modes"
+      verified_by = "harness"
+    }
+
+    criterion "C3" {
+      description = "All quality metrics are configurable via the Mos rule DSL with per-project overrides"
+      verified_by = "harness"
+    }
+
+    criterion "C4" {
+      description = "An Integrity Index aggregates scores across all six quadrants into a single observable metric"
+      verified_by = "audit"
+    }
+
+    criterion "C5" {
+      description = "The quality system is language-agnostic by default with language-specific extensions declared in configuration"
+      verified_by = "harness"
+    }
+
+    criterion "C6" {
+      description = "mos ci runs all three vectors automatically and reports pass/fail per quadrant"
+      verified_by = "harness"
+    }
+
+    criterion "C7" {
+      description = "Rules support three tiers of verification: built-in defaults, external binary invocation via harness command, and AI agent advisory analysis via Context Mesh"
+      verified_by = "harness"
+    }
+
+    criterion "C8" {
+      description = "Each commit stores a state snapshot capturing position across all quality axes, enabling displacement vector computation between consecutive commits"
+      verified_by = "harness"
+    }
+
+    criterion "C9" {
+      description = "Velocity toward the desired state is computable per axis, per sprint, and as an aggregate, with stall and regression detection"
+      verified_by = "audit"
+    }
+  }
+
+  section "Three Tiers of Verification" {
+    text = """
+Each vector is served by three tiers of tooling, progressively more powerful:
+
+Tier 1 — Built-in minimal defaults. Pure Go, zero external dependencies. Nesting-depth scanner, basic static metrics, go test runner, go benchmark runner. Works out of the box on mos ci. The floor: every project gets something for free.
+
+Tier 2 — External tool integration. The rule DSL harness command field calls any binary: Semgrep, Trivy, gosec, SonarQube, OWASP ZAP, pytest, cargo bench. Mos orchestrates them and captures output as Diagnostics in the same format as Tier 1. The project declares what to call; Mos handles when and how to report.
+
+Tier 3 — AI agent via Context Mesh. Because Mos exposes the full artifact graph (contracts, specs, authority chains, trust boundaries, dependency DAG) through typed edges and traversal primitives, an AI agent can reason about quality in ways no static tool can. Does this change violate the spirit of a specification? Is the delegation chain valid for this authority-restricted operation? Do these co-changing files belong in the same package? Tier 3 is interpretive and advisory — it produces warnings, not errors — and leverages the Context Mesh as its primary input.
+
+The tiers map to the manifesto Gate/Advisory distinction: Tier 1 and 2 produce Gates (mechanical, deterministic, errors). Tier 3 produces Advisories (interpretive, judgment-based, warnings). All three tiers feed the Integrity Index."""
+  }
+}
+

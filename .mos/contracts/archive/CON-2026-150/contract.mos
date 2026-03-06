@@ -1,0 +1,33 @@
+contract "CON-2026-150" {
+  title = "Formalize Mos DSL grammar as ANTLR spec"
+  status = "complete"
+  created_at = 2026-03-04T16:59:28Z
+  updated_at = 2026-03-04T16:59:28Z
+  goal = "Write MosDSL.g4 with lexer modes for step-text, cross-validate against hand-written parser via property tests. The grammar serves as documentation, test oracle, and foundation for multi-language parser generation (TypeScript for forge, TreeSitter for editors). Use antlr-ng (npm i -g antlr-ng) as the parser generator tool -- TypeScript rewrite of ANTLR4, no Java dependency, generates Go and TypeScript from the same .g4. Use antlr4-go/antlr as the Go runtime dependency. The .g4 grammar is tool-agnostic: zero lock-in between antlr-ng and classic ANTLR4."
+  sprint = "SPR-2026-010"
+  kind = "feature"
+
+  acceptance {
+
+    criterion "grammar-file-exists" {
+      description = "moslib/dsl/MosDSL.g4 exists with clean lexer/parser separation"
+    }
+
+    criterion "step-text-lexer-mode" {
+      description = "Step-text handled via ANTLR lexer mode pushMode/popMode, not parser predicates"
+    }
+
+    criterion "keyword-i18n-documented" {
+      description = "i18n keyword translation documented as preprocessing layer in grammar comments"
+    }
+
+    criterion "go-reference-parser" {
+      description = "antlr4 generates a Go reference parser that compiles and runs"
+    }
+
+    criterion "cross-validation-test" {
+      description = "Property-based test generates valid inputs, confirms both parsers accept them"
+    }
+  }
+}
+

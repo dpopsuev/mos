@@ -1,0 +1,11 @@
+contract "CON-2026-205" {
+  title = "ARCH-desired artifact + structural drift detection"
+  status = "complete"
+  created_at = 2026-03-05T13:08:13Z
+  updated_at = 2026-03-05T13:08:13Z
+  goal = "Create an ARCH-desired artifact type (or extend architecture with a desired_state block). Implement drift detection in mos audit that compares ARCH-auto (current import graph) against ARCH-desired (approved architecture). Warn on edges that exist in auto but violate desired layer rules. Populate ARCH-desired with the 3-tool decomposition (Govern/Insight/Guard, Layer 0-3, golden rule)."
+  priority = "p1"
+  depends_on = "CON-2026-195"
+  sprint = "SPR-2026-017"
+}
+

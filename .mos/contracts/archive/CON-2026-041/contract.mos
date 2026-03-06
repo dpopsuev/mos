@@ -1,0 +1,81 @@
+contract "CON-2026-041" {
+  title = "Need Transition Guards"
+  status = "complete"
+  goal = "Gate validated-to-addressed transition on needs: all acceptance criteria must be addressed by specs with verified scenarios. Ungated judgment transitions for identified-to-validated and addressed-to-retired. Composes expects_downstream and criterion-coverage primitives."
+
+  feature "Need transition guards" {
+
+    scenario "Transition to addressed blocked with uncovered criteria" {
+      status = "done"
+      given {
+        a need NEED-001 at status validated with criteria sub-10-min and no-regression
+        only sub-10-min is addressed by a verified specification
+      }
+      when {
+        the user runs mos need edit NEED-001 status addressed
+      }
+      then {
+        the transition is rejected
+        the error message lists no-regression as uncovered
+      }
+    }
+
+    scenario "Transition to addressed succeeds when all criteria covered and verified" {
+      status = "done"
+      given {
+        a need NEED-001 at status validated with criteria sub-10-min and no-regression
+        both criteria are addressed by specifications with verified scenarios
+      }
+      when {
+        the user runs mos need edit NEED-001 status addressed
+      }
+      then {
+        the transition succeeds
+        the need status is now addressed
+      }
+    }
+
+    scenario "Judgment transitions are ungated" {
+      status = "done"
+      given {
+        a need NEED-001 at status identified
+      }
+      when {
+        the user runs mos need edit NEED-001 status validated
+      }
+      then {
+        the transition succeeds with no gate evaluation
+        no acceptance criteria are required
+      }
+    }
+
+    scenario "Retirement transition is ungated" {
+      status = "done"
+      given {
+        a need NEED-001 at status addressed
+      }
+      when {
+        the user runs mos need edit NEED-001 status retired
+      }
+      then {
+        the transition succeeds with no gate evaluation
+      }
+    }
+
+    scenario "Gate failure message is actionable" {
+      status = "done"
+      given {
+        a need with three criteria where one is uncovered and one is unverified
+      }
+      when {
+        the transition to addressed is attempted
+      }
+      then {
+        the error message lists each criterion with its status
+        covered and verified criteria show a pass indicator
+        uncovered and unverified criteria show a fail indicator with the reason
+      }
+    }
+  }
+}
+

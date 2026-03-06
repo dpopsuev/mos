@@ -1,0 +1,470 @@
+config {
+
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  governance {
+    model = "bdfl"
+    scope = "cabinet"
+  }
+
+  project "contracts" {
+    prefix = "CON"
+    sequence = 245
+    default = true
+  }
+
+  project "bugs" {
+    prefix = "BUG"
+    sequence = 23
+  }
+
+  project "specifications" {
+    prefix = "SPEC"
+    sequence = 28
+  }
+
+  project "binders" {
+    prefix = "BND"
+    sequence = 0
+  }
+
+  project "needs" {
+    prefix = "NEED"
+    sequence = 0
+  }
+
+  project "architectures" {
+    prefix = "ARCH"
+    sequence = 0
+  }
+
+  project "docs" {
+    prefix = "DOC"
+    sequence = 0
+  }
+
+  project "sprints" {
+    prefix = "SPR"
+    sequence = 4
+  }
+
+  artifact_type "sprint" {
+    directory = "sprints"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      goal {
+        required = true
+      }
+
+      start_date {
+      }
+
+      end_date {
+      }
+
+      contracts {
+        link = true
+        ref_kind = "contract"
+      }
+
+      slug {
+      }
+
+      status {
+        required = true
+        enum = [
+          "planned",
+          "active",
+          "complete",
+          "closed",
+          "abandoned",
+          "duplicate",
+          "cancelled",
+        ]
+      }
+    }
+
+    lifecycle {
+      active_states = ["planned", "active"]
+      archive_states = ["complete", "closed", "abandoned", "duplicate", "cancelled"]
+    }
+  }
+
+  artifact_type "contract" {
+    directory = "contracts"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      status {
+        required = true
+        enum = [
+          "draft",
+          "active",
+          "complete",
+          "cancelled",
+          "abandoned",
+          "closed",
+          "duplicate",
+        ]
+      }
+    }
+
+    lifecycle {
+      active_states = ["draft", "active"]
+      archive_states = ["complete", "cancelled", "abandoned", "closed", "duplicate"]
+    }
+  }
+
+  artifact_type "need" {
+    directory = "needs"
+    ledger = true
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      sensation {
+        required = true
+      }
+
+      urgency {
+        enum = ["critical", "high", "medium", "low"]
+      }
+
+      stakeholders {
+      }
+
+      slug {
+      }
+
+      status {
+        required = true
+        enum = ["identified", "validated", "addressed", "retired"]
+      }
+
+      acceptance {
+      }
+
+      preamble {
+      }
+    }
+
+    lifecycle {
+      active_states = ["identified", "validated", "addressed"]
+      archive_states = ["retired"]
+
+      expects_downstream {
+        via = "justifies"
+        after = "validated"
+        severity = "warn"
+      }
+
+      transition "validated" {
+        to = "addressed"
+        gate = "criteria_coverage"
+      }
+
+      urgency_propagation {
+        critical = "error"
+        high = "warn"
+        medium = "info"
+        low = "ignore"
+      }
+    }
+  }
+
+  artifact_type "specification" {
+    directory = "specifications"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      justifies {
+        link = true
+        ref_kind = "need"
+      }
+
+      addresses {
+      }
+
+      enforcement {
+        enum = ["disabled", "warn", "error"]
+      }
+
+      slug {
+      }
+
+      description {
+      }
+
+      name {
+      }
+
+      created_at {
+      }
+
+      updated_at {
+      }
+
+      state {
+        enum = ["current", "desired", "both"]
+      }
+
+      group {
+      }
+
+      status {
+        required = true
+        enum = ["candidate", "draft", "active", "superseded", "retired"]
+      }
+    }
+
+    lifecycle {
+      active_states = ["candidate", "draft", "active"]
+      archive_states = ["superseded", "retired"]
+    }
+  }
+
+  artifact_type "architecture" {
+    directory = "architectures"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      implements {
+        link = true
+        ref_kind = "specification"
+      }
+
+      slug {
+      }
+
+      status {
+        required = true
+        enum = ["draft", "active", "superseded", "retired"]
+      }
+    }
+
+    lifecycle {
+      active_states = ["draft", "active"]
+      archive_states = ["superseded", "retired"]
+    }
+  }
+
+  project "batches" {
+    prefix = "BAT"
+    sequence = 6
+  }
+
+  artifact_type "batch" {
+    directory = "batches"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      goal {
+        required = true
+      }
+
+      justifies {
+        link = true
+      }
+
+      depends_on {
+        link = true
+        ref_kind = "batch"
+      }
+
+      sprint {
+        link = true
+        ref_kind = "sprint"
+      }
+
+      priority {
+        enum = ["critical", "high", "medium", "low"]
+      }
+
+      promoted_to {
+        link = true
+        ref_kind = "sprint"
+      }
+
+      slug {
+      }
+
+      status {
+        required = true
+        enum = ["planned", "ready", "promoted", "cancelled"]
+      }
+    }
+
+    lifecycle {
+      active_states = ["planned", "ready"]
+      archive_states = ["promoted", "cancelled"]
+    }
+  }
+
+  artifact_type "doc" {
+    directory = "docs"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      kind {
+        enum = ["api-reference", "runbook", "adr", "onboarding", "generated"]
+      }
+
+      documents {
+        link = true
+      }
+
+      slug {
+      }
+
+      source {
+      }
+
+      generated_by {
+        link = true
+      }
+
+      status {
+        required = true
+        enum = ["draft", "active", "superseded", "retired"]
+      }
+    }
+
+    lifecycle {
+      active_states = ["draft", "active"]
+      archive_states = ["superseded", "retired"]
+    }
+  }
+
+  artifact_type "binder" {
+    directory = "binders"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      status {
+        required = true
+        enum = ["draft", "active", "superseded", "retired"]
+      }
+    }
+
+    lifecycle {
+      active_states = ["active"]
+      archive_states = ["archived"]
+    }
+  }
+
+  project "directives" {
+    prefix = "DIR"
+    sequence = 0
+  }
+
+  artifact_type "directive" {
+    directory = "directives"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      status {
+        required = true
+        enum = ["declared", "active", "achieved", "superseded"]
+      }
+
+      text {
+      }
+
+      set_by {
+      }
+
+      slug {
+      }
+    }
+
+    lifecycle {
+      active_states = ["declared", "active"]
+      archive_states = ["achieved", "superseded"]
+    }
+  }
+
+  project "watches" {
+    prefix = "WATCH"
+    sequence = 0
+  }
+
+  artifact_type "watch" {
+    directory = "watches"
+
+    fields {
+
+      title {
+        required = true
+      }
+
+      status {
+        required = true
+        enum = ["active", "triggered", "expired", "dismissed"]
+      }
+
+      text {
+      }
+
+      target {
+        link = true
+      }
+
+      expires {
+      }
+
+      trigger {
+      }
+
+      slug {
+      }
+    }
+
+    lifecycle {
+      active_states = ["active"]
+      archive_states = ["triggered", "expired", "dismissed"]
+    }
+  }
+}
+

@@ -1,0 +1,197 @@
+contract "CON-2026-001" {
+  title = "TUI & Git Compatibility"
+  status = "complete"
+  goal = "Mos can see its own code in a TUI and prove Git compatibility in a simulated multi-user actor system."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Scanner parsing, model constructors, linter rule evaluation, LSP completions, testkit component isolation"
+    }
+
+    integration {
+      applies = true
+      rationale = "Scanner -> model pipeline, linter -> LSP diagnostics, forge -> gitcompat verification"
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API in this phase -- all consumers are internal (cmd/cst/, cmd/cst-tui/)"
+    }
+
+    e2e {
+      applies = true
+      rationale = "Multi-user governance scenario (create, amend, ratify) via testkit/world; cst survey -> cst-tui pipeline against real Go source"
+    }
+
+    concurrency {
+      applies = true
+      rationale = "Actor message bus (testkit/network), partition injection, deterministic clock, multi-user concurrent push"
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundaries in this phase -- identity model exists in schema but is not yet enforced at runtime"
+    }
+  }
+
+  feature "Phase 1 -- Test Infrastructure, Survey, and TUI" {
+
+    scenario "Git compatibility proven" {
+      given {
+        the testkit gitcompat suite
+      }
+      when {
+        identical operations are run with "git" and "con"
+      }
+      then {
+        the results are byte-for-byte identical
+        "git fsck" accepts all objects produced by "con"
+      }
+    }
+
+    scenario "In-process forge operational" {
+      given {
+        an in-process go-git forge
+      }
+      when {
+        a user clones, pushes, and fetches
+      }
+      then {
+        all operations succeed over HTTP smart protocol
+        refs/cst/* namespace is supported
+      }
+    }
+
+    scenario "Containerized forge operational" {
+      given {
+        a Gitea container via testcontainers-go
+      }
+      when {
+        a user creates a repo, pushes via SSH, and fetches via HTTP
+      }
+      then {
+        all operations succeed against the real Gitea instance
+      }
+    }
+
+    scenario "Multi-user governance end-to-end" {
+      given {
+        3 simulated users (alice, bob, charlie) with ephemeral ED25519 keys
+        an in-process forge
+      }
+      when {
+        alice initializes a project and creates a rule
+        bob clones, creates a bill to amend the rule, and pushes
+        alice pulls, ratifies the bill, and pushes
+        charlie pulls
+      }
+      then {
+        the rule version is 2 for all users
+        the history chain has 4 entries
+      }
+    }
+
+    scenario "Event propagation with partition" {
+      given {
+        2 users connected to the event bus
+      }
+      when {
+        a network partition isolates user bob
+        alice pushes a governance event
+        the partition is lifted
+        bob re-syncs
+      }
+      then {
+        alice receives the event
+        bob does not receive the event
+        bob receives the event
+      }
+    }
+
+    scenario "Survey scans Go source" {
+      given {
+        the mos/ Go module
+      }
+      when {
+        "mos survey ." is executed
+      }
+      then {
+        the output contains packages: moslib/survey, moslib/model, moslib/linter, moslib/lsp
+        the output contains symbols from each package
+        the import graph shows moslib/survey depends on moslib/model
+      }
+    }
+
+    scenario "Linter passes on valid artifacts" {
+      given {
+        a .cst/ directory with a valid rule TOML file
+      }
+      when {
+        "mos lint" is executed
+      }
+      then {
+        no errors are reported
+      }
+    }
+
+    scenario "Linter reports errors on malformed artifacts" {
+      given {
+        a .cst/ directory with a malformed rule TOML file
+      }
+      when {
+        "mos lint" is executed
+      }
+      then {
+        errors are reported with file, line, severity, and message
+      }
+    }
+
+    scenario "LSP provides intelligence" {
+      given {
+        the Mos LSP server running
+      }
+      when {
+        editing a .cst/*.toml file in an LSP-compatible editor
+      }
+      then {
+        schema-aware completions are offered for TOML fields
+        embedded Gherkin syntax is highlighted
+        lint diagnostics appear in real time
+      }
+    }
+
+    scenario "TUI renders module structure" {
+      given {
+        "mos survey ." has been run against mos/
+      }
+      when {
+        "cst-tui" is launched
+      }
+      then {
+        the module tree panel shows packages, files, and symbols
+        the import graph panel shows dependencies for the selected package
+        navigation (expand, collapse, select) works
+      }
+    }
+
+    scenario "Dog-food gate" {
+      given {
+        all tools built in this contract
+      }
+      when {
+        pointed at the mos/ repository itself
+      }
+      then {
+        "mos survey" correctly parses Mos's own source
+        "cst-tui" renders Mos's own module tree
+        "mos lint" is ready to validate .cst/ artifacts
+        "mos lsp" provides intelligence for .cst/ files
+        the gitcompat suite passes
+        a 3-user governance scenario passes end-to-end
+      }
+    }
+  }
+}
+

@@ -1,0 +1,7 @@
+sprint "SPR-2026-019" {
+  status = "complete"
+  title = "Enforcement Layer: Perf thresholds + Spec verification"
+  goal = "Implement enforcement layer with performance thresholds and spec verification."
+  contracts = "CON-2026-206,CON-2026-207"
+}
+

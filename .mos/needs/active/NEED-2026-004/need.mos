@@ -1,0 +1,89 @@
+need "NEED-2026-004" {
+  status = "identified"
+  title = "Git Masquerading"
+  slug = "git-masquerading"
+  urgency = "critical"
+  sensation = "Every governance artifact Mos manages today sits outside Git's object model, making git push a partial snapshot. Git Masquerading eliminates this gap: .git/ becomes the single source of truth for both code and governance. Forges display Mos history natively. No special server, no second blob store, no sync drift."
+
+  scope {
+    includes = [
+      "ObjectStore interface abstraction with pluggable backends",
+      "GitStore backend: store governance blobs/trees/commits as Git objects in .git/objects/",
+      "Ref management: governance refs under refs/mos/* in .git/",
+      "FSStore backend: plain .mos/ filesystem storage for pure-mos mode",
+      "SQLiteStore backend: single-file transactional storage",
+      "EncryptedStore backend: tamper-proof signed archives",
+      "Backend selection via config flag at repo creation",
+      "Runtime migration between backends via mos vcs migrate",
+      "go-git as the Git plumbing library (no shelling out)",
+    ]
+    excludes = [
+      "Custom forge UI extensions",
+      "Git server implementation",
+      "Remote collaboration protocol (covered by separate contracts)",
+      "Branch/merge semantics (separate sprint scope)",
+    ]
+  }
+
+  section "Principle" {
+    text = """
+Git Masquerading means Mos acts as a well-behaved Git citizen. Governance
+objects are written as native Git blobs and trees. Governance commits are
+Git commits. Governance refs live under refs/mos/ in .git/refs/.
+
+From a forge perspective, the repository is a standard Git repo with
+additional ref namespaces. git push transports governance history alongside
+code history automatically. No special protocols, no sidecar stores."""
+  }
+
+  section "Backend Configurability" {
+    text = """
+The storage backend is a configuration flag, not an architectural decision.
+A project can start with FSStore (human-readable .mos/ files), migrate to
+GitStore when forge integration matters, or use SQLiteStore for compact
+portable archives. Migration is lossless and reversible via mos vcs migrate.
+
+The ObjectStore interface ensures all governance operations are backend-agnostic.
+CLI commands, linters, harness, and audit work identically regardless of
+which backend is active."""
+  }
+
+  acceptance {
+
+    criterion "C1" {
+      description = "An ObjectStore interface exists with Write, Read, Index, Pack, Unpack, Verify methods"
+      verified_by = "harness"
+    }
+
+    criterion "C2" {
+      description = "GitStore backend writes governance artifacts as Git blobs/trees in .git/objects/ and manages refs under refs/mos/*"
+      verified_by = "harness"
+    }
+
+    criterion "C3" {
+      description = "FSStore backend persists artifacts as plain .mos files with no external dependencies"
+      verified_by = "harness"
+    }
+
+    criterion "C4" {
+      description = "Backend selection is configurable via object_store.backend in config.mos"
+      verified_by = "harness"
+    }
+
+    criterion "C5" {
+      description = "mos vcs migrate converts between backends losslessly and reversibly"
+      verified_by = "harness"
+    }
+
+    criterion "C6" {
+      description = "All governance CLI commands work identically across all backends"
+      verified_by = "harness"
+    }
+
+    criterion "C7" {
+      description = "git push transports governance refs alongside code refs when using GitStore"
+      verified_by = "harness"
+    }
+  }
+}
+

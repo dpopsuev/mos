@@ -1,0 +1,224 @@
+contract "CON-2026-023" {
+  title = "Custom Artifact Types (CRD)"
+  status = "complete"
+  goal = "New artifact kinds can be defined entirely from config.mos without Go code changes -- the parser, governance engine, linter, CLI, and directory layout all operate from a schema registry, making contract and rule the first two entries in a user-extensible catalog. First target consumers: specification and binder (CON-2026-024)."
+  depends_on = ["CON-2026-022"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Schema registry parsing, field validation against schema, lifecycle state machine, directory resolver, generic CRUD operations."
+    }
+
+    integration {
+      applies = true
+      rationale = "Define custom artifact type in config.mos, create/update/delete instances, lint validates against schema, graph includes custom artifacts."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Full round-trip: define artifact_type in config.mos, create instances via CLI, list/show/graph, lint validates, fmt preserves."
+    }
+
+    concurrency {
+      applies = true
+      rationale = "Schema registry must be safe for concurrent reads during multi-agent lint/harness runs."
+    }
+
+    security {
+      applies = true
+      rationale = "Custom artifact types must not allow field injection, path traversal in directory names, or bypass of seal/lock primitives."
+    }
+  }
+
+  feature "Schema Registry" {
+
+    scenario "Define a custom artifact type in config.mos" {
+      status = "done"
+      given {
+        a config.mos file exists
+      }
+      when {
+        an artifact_type block is added with fields, lifecycle, and directory definitions
+      }
+      then {
+        mos lint validates the artifact_type definition
+        the new kind is available in allMachineKeywords at runtime
+        no Go code change or recompilation is required
+      }
+    }
+
+    scenario "Built-in types are defined as default registry entries" {
+      status = "done"
+      given {
+        no artifact_type blocks exist in config.mos
+      }
+      when {
+        mos starts up
+      }
+      then {
+        contract and rule are registered with their current hardcoded schemas
+        behavior is identical to pre-CRD system
+      }
+    }
+
+    scenario "Override built-in type fields" {
+      status = "done"
+      given {
+        config.mos defines an artifact_type "contract" with an extended field set
+      }
+      when {
+        mos lint runs
+      }
+      then {
+        the extended fields are accepted
+        original required fields are still enforced
+      }
+    }
+  }
+
+  feature "Generic CRUD" {
+
+    scenario "Create instance of custom artifact type" {
+      status = "done"
+      given {
+        config.mos defines artifact_type "initiative" with title and status fields
+      }
+      when {
+        mos initiative create INIT-001 --title "Q3 Platform" is executed
+      }
+      then {
+        the file is created at .mos/initiatives/active/INIT-001/initiative.mos
+        the artifact block uses the "initiative" keyword
+      }
+    }
+
+    scenario "Apply and edit work for custom types" {
+      status = "done"
+      given {
+        a custom artifact type "initiative" is registered
+      }
+      when {
+        mos initiative apply -f initiative.mos is executed
+      }
+      then {
+        the Artifact interface handles it generically
+        no type-specific Go code is invoked
+      }
+    }
+
+    scenario "Delete custom artifact instance" {
+      status = "done"
+      given {
+        an initiative INIT-001 exists
+      }
+      when {
+        mos initiative delete INIT-001 is executed
+      }
+      then {
+        the artifact directory is removed
+        parent references from other artifacts are not broken
+      }
+    }
+  }
+
+  feature "Dynamic Linter Validation" {
+
+    scenario "Linter validates against schema-defined fields" {
+      status = "done"
+      given {
+        artifact_type "initiative" defines title as required and priority as optional with enum values
+      }
+      when {
+        an initiative file is missing title or has an invalid priority value
+      }
+      then {
+        mos lint reports specific schema violations
+        the error message references the artifact_type definition
+      }
+    }
+
+    scenario "Unknown fields produce warnings" {
+      status = "done"
+      given {
+        a schema-defined artifact type with known fields
+      }
+      when {
+        an instance contains a field not in the schema
+      }
+      then {
+        a warning diagnostic is emitted (not an error)
+        the file is still parseable and usable
+      }
+    }
+  }
+
+  feature "Lifecycle State Machine" {
+
+    scenario "Custom lifecycle states per artifact type" {
+      status = "done"
+      given {
+        artifact_type "initiative" defines lifecycle with states: proposed, approved, in-progress, delivered, retired
+      }
+      when {
+        mos initiative status INIT-001 proposed is executed
+      }
+      then {
+        the status is set to "proposed"
+        the initiative is placed in the directory corresponding to active_states
+      }
+    }
+
+    scenario "Reject invalid status transition" {
+      status = "done"
+      given {
+        artifact_type "initiative" defines lifecycle states
+      }
+      when {
+        an invalid status value is provided
+      }
+      then {
+        the operation fails with an error listing valid states
+      }
+    }
+  }
+
+  feature "Backward Compatibility" {
+
+    scenario "Existing contracts and rules work unchanged" {
+      status = "done"
+      given {
+        a .mos/ directory with existing contracts and rules
+        no artifact_type blocks in config.mos
+      }
+      when {
+        mos lint, mos contract list, mos rule list are executed
+      }
+      then {
+        all commands produce identical output to pre-CRD behavior
+        no migration is required
+      }
+    }
+
+    scenario "Gradual adoption" {
+      status = "done"
+      given {
+        existing contracts and rules coexist with a new custom artifact_type "initiative"
+      }
+      when {
+        mos graph or mos list is executed
+      }
+      then {
+        all artifact types are shown together
+        dependency edges can cross artifact type boundaries
+      }
+    }
+  }
+}
+

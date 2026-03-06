@@ -1,0 +1,132 @@
+contract "CON-2026-044" {
+  title = "Tick Clock & Deterministic Bus"
+  status = "deferred"
+  created_at = 2026-03-03T14:47:26Z
+  updated_at = 2026-03-03T19:10:45Z
+  goal = "Deterministic virtual time (TickClock) and tick-based message bus (TickBus) replacing real-time delays with integer tick counts. No time.Sleep, fully reproducible."
+  labels = ["dogfood", "simulation", "dunix"]
+  parent = "CON-2026-029"
+
+  feature "TickClock deterministic time" {
+
+    scenario "Clock advances by one tick" {
+      status = "pending"
+      given {
+        a TickClock initialized at tick 0
+      }
+      when {
+        Advance() is called once
+      }
+      then {
+        Current() returns 1
+        no wall-clock time passes
+      }
+    }
+
+    scenario "Clock advances by N ticks" {
+      status = "pending"
+      given {
+        a TickClock at tick 0 with tick-to-day ratio of 1
+      }
+      when {
+        AdvanceN(365) is called
+      }
+      then {
+        Current() returns 365
+        Day() returns year-1 day-0
+      }
+    }
+
+    scenario "Tick-to-time mapping" {
+      status = "pending"
+      given {
+        a TickClock configured with 1 tick = 1 day
+      }
+      when {
+        the clock is at tick 1825
+      }
+      then {
+        Year() returns 5
+        the clock can convert to SimDate(year=5, day=0)
+      }
+    }
+
+    scenario "Time compression for smoke tests" {
+      status = "pending"
+      given {
+        a TickClock configured with compression factor 10
+      }
+      when {
+        AdvanceN(365) is called
+      }
+      then {
+        Current() returns 365 (ticks are still ticks)
+        Year() returns 10 (compressed mapping)
+      }
+    }
+  }
+
+  feature "TickBus deterministic delay" {
+
+    scenario "Immediate message delivery" {
+      status = "pending"
+      given {
+        a TickBus with two endpoints at delay 0
+      }
+      when {
+        endpoint A sends a message at tick 5
+      }
+      then {
+        endpoint B receives the message at tick 5
+      }
+    }
+
+    scenario "Delayed message delivery" {
+      status = "pending"
+      given {
+        a TickBus with Earth-Mars delay of 14 ticks
+      }
+      when {
+        Earth sends a message at tick 100
+      }
+      then {
+        Mars receives the message at tick 114
+        the message is not visible at tick 113
+      }
+    }
+
+    scenario "Variable delay per site pair" {
+      status = "pending"
+      given {
+        a TickBus with latency matrix:
+        Earth-Luna = 1 tick
+        Earth-Mars = 14 ticks
+        Earth-Triton = 280 ticks
+      }
+      when {
+        Earth broadcasts a message at tick 0
+      }
+      then {
+        Luna receives at tick 1
+        Mars receives at tick 14
+        Triton receives at tick 280
+      }
+    }
+
+    scenario "Message ordering is deterministic" {
+      status = "pending"
+      given {
+        a TickBus with seeded RNG
+      }
+      when {
+        100 messages are sent across 5 site pairs in the same tick
+      }
+      then {
+        replaying the same seed produces identical delivery order
+      }
+    }
+  }
+  batch = "BAT-2026-002"
+  slug = "tick-clock-bus"
+}
+

@@ -1,0 +1,11 @@
+contract "BUG-2026-010" {
+  title = "Missing CLI command: create sprint/batch/need via verb-first create"
+  status = "complete"
+  created_at = 2026-03-04T15:15:27Z
+  updated_at = 2026-03-04T15:15:27Z
+  goal = "mos create --kind sprint returns 'kind sprint not yet supported via verb-first create'. Same for batch, need, and other non-core artifact types. The verb-first create command only supports contract, rule, specification, and binder. All artifact types registered in config.mos should be creatable via mos create --kind <type>. Workaround: mos rule apply --file with a hand-written .mos file, which defeats the purpose of the CLI."
+  kind = "bug"
+  justifies = "NEED-2026-002"
+  sprint = "SPR-2026-008"
+}
+

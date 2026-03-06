@@ -1,0 +1,13 @@
+contract "CON-2026-076" {
+  title = "Git parity: push"
+  status = "complete"
+  created_at = 2026-03-03T18:57:56Z
+  updated_at = 2026-03-03T19:11:01Z
+  goal = "Send local governance commits to a remote repository. Negotiation, pack transfer, ref update. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-push"
+  depends_on = "CON-2026-075"
+}
+

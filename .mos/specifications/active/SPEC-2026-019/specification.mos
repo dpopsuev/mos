@@ -1,0 +1,29 @@
+specification "SPEC-2026-019" {
+  title = "Drift Tracking and Integrity Index"
+  status = "active"
+  enforcement = "disabled"
+  name = "Drift Tracking and Integrity Index"
+  slug = "spec-drift-tracking-integrity-index"
+  description = "Per-scope measurement of the gap between Desired State (specifications, architecture, rules) and Concrete State (code, docs, reality). Drift is quantified as failing Gherkin scenario count at every resolution level. The Integrity Index aggregates trust boundary coverage, test coverage, and specification compliance into a single number per scope — improving or degrading over time. The Index is the Trust Thread from the Manifesto: security and quality as cross-cutting, quantifiable data layers, not separate disciplines. Drift is not just a point-in-time measurement — it has velocity. By linking drift counts to commit state snapshots (CON-2026-217), drift becomes a time-series: growing, shrinking, or stalled. Drift velocity is the rate of change of the gap between desired and concrete state. Positive drift velocity means the project is accumulating debt faster than it resolves it."
+
+  feature "Per-scope drift measurement" {
+  }
+
+  feature "Integrity Index aggregation" {
+  }
+
+  feature "Recursive drift visibility" {
+  }
+
+  feature "Commit-linked drift velocity" {
+  }
+  justifies = "NEED-2026-001"
+
+  spec {
+    include "moslib/linter"
+    include "moslib/governance"
+  }
+  state = "current"
+  group = "linter"
+}
+

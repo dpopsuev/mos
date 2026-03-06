@@ -1,0 +1,144 @@
+specification "SPEC-2026-001" {
+  title = "ObjectStore Layer"
+  status = "active"
+  enforcement = "disabled"
+
+  section "overview" {
+    text = """
+The object store is mos's storage backend. It separates policy (what integrity
+guarantees are enforced) from mechanism (how artifacts are persisted).
+
+Goals:
+  1. Prevent agents from mutating artifacts outside the canonical CLI.
+  2. Provide content-addressable deduplication for space efficiency.
+  3. Support a full pack/unpack cycle for human inspection and editing.
+  4. Allow end-users to choose backends via config; ship sane defaults."""
+  }
+
+  section "primitives" {
+    text = """
+StoreWriter  -- write(artifact_bytes) -> content_hash
+StoreReader  -- read(content_hash) -> artifact_bytes
+StoreIndex   -- maps artifact_id -> content_hash (+ metadata: kind, status)
+Packer       -- pack(fs_tree) -> object store (idempotent)
+Unpacker     -- unpack(object store) -> fs_tree (for human editing)
+Verifier     -- verify(object store) -> []IntegrityError (tamper detection)"""
+  }
+
+  section "policy" {
+    text = """
+Policies are orthogonal to adapters. Each can be toggled independently:
+
+tamper-detect:
+  On every CLI read, verify hash matches index. Warn on mismatch.
+  Default: enabled (BlobStore, SQLiteStore), disabled (FSStore).
+
+write-lock:
+  Only the mos CLI can write to the object store.
+  Enforced via file permissions (BlobStore: read-only blobs),
+  or DB WAL locks (SQLiteStore).
+  FSStore: best-effort via .mos/.lock sentinel; not enforced.
+  Default: enabled (BlobStore, SQLiteStore), disabled (FSStore).
+
+audit-log:
+  Append-only log of all mutations at .mos/store/audit.log.
+  Records: timestamp, actor (user/agent), operation, artifact_id, hash.
+  Default: enabled for all adapters."""
+  }
+
+  section "configuration" {
+    text = """
+config.mos gains a top-level object_store block:
+
+  object_store {
+    backend  = "fsstore"            // "fsstore" | "blobstore" | "sqlite" | "git"
+    policies = ["audit-log"]        // list of enabled policy names
+
+    blobstore {                     // backend-specific tuning
+      hash_algorithm = "sha256"
+      delta_compression = false
+    }
+  }
+
+Sane defaults:
+  PoC phase: backend = "fsstore", policies = ["audit-log"]
+  Post-PoC: backend = "git", policies = ["tamper-detect", "write-lock", "audit-log"]"""
+  }
+
+  section "lifecycle" {
+    text = """
+mos store pack    -- snapshot current fs_tree into object store
+mos store unpack  -- materialize object store contents to fs_tree for editing
+mos store verify  -- check integrity, report tampered artifacts
+mos store status  -- show backend, policies, artifact counts, disk usage
+mos store migrate -- convert between backends (e.g., fsstore -> git)"""
+  }
+
+  section "constraints" {
+    text = """
+- The object store MUST NOT change artifact semantics. An artifact unpacked from
+  the store is byte-identical to its original.
+- The object store MUST support incremental pack (only changed artifacts).
+- Migration between backends MUST be lossless and reversible.
+- The audit-log policy MUST survive store migrations.
+- Nested stores (store-within-store) are deferred to a future spec."""
+  }
+  justifies = "NEED-2026-004"
+  addresses = "C5"
+  slug = "objectstore-layer"
+
+  section "adapters" {
+    text = """
+Five backend adapters implement the primitives above:
+
+1. FSStore (default for PoC)
+   Stores artifacts as plain .mos files under .mos/<kind>/active|archive/.
+   No tamper protection, no dedup. Fully human-readable at rest.
+   pack/unpack are no-ops; verify always returns ok.
+
+2. BlobStore (recommended default post-PoC for pure-mos mode)
+   Content-addressable blob store under .mos/store/objects/ (Git-style
+   two-char prefix sharding: ab/cdef1234...).
+   Index file at .mos/store/index.mos maps artifact IDs to hashes.
+   SHA-256 hashes; delta compression optional in future.
+   pack() hashes each artifact file, writes blobs, updates index.
+   unpack() materializes the full fs_tree from index + blobs.
+   verify() re-hashes blobs and compares to index.
+
+3. GitStore (Git Masquerading — recommended default post-PoC)
+   Uses .git/objects/ as the content-addressable store via go-git.
+   Refs stored under refs/mos/* in .git/.
+   Forges see a standard git repo. git push transports governance
+   history automatically. No .mos/store/ directory at all.
+   pack() hashes artifacts into .git/objects/ as git blobs/trees.
+   unpack() materializes from git tree objects.
+   verify() checks git object integrity.
+
+4. SQLiteStore
+   Single .mos/store.db file with tables: artifacts, blobs, metadata.
+   Compact, transactional, portable.
+   pack/unpack serialize to/from the DB.
+   verify() checks internal consistency and row hashes.
+
+5. EncryptedStore (signature-based tamper-proof storage)
+   Stores artifacts as encrypted, signed archive files under
+   .mos/store/archives/<content_hash>.enc.
+   Each archive is signed with the committer's SSH key via allowed_signers.
+   Encryption uses age (https://age-encryption.org) with recipient keys
+   derived from the project's allowed_signers file.
+   pack() encrypts + signs each artifact, writes archive, updates index.
+   unpack() verifies signature, decrypts archive, materializes fs_tree.
+   verify() checks signature validity, decryption integrity, and hash match.
+   Tamper detection is inherent: invalid signatures reject on unpack.
+   Default policies: tamper-detect = always (via signatures),
+   write-lock = enforced (only valid signers can produce archives),
+   audit-log = enabled."""
+  }
+
+  spec {
+    include "moslib/governance"
+  }
+  state = "current"
+  group = "governance"
+}
+

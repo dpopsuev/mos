@@ -1,0 +1,25 @@
+contract "CON-2026-167" {
+  title = "Resolve when keyword ambiguity in ANTLR grammar"
+  status = "complete"
+  created_at = 2026-03-04T18:44:41Z
+  updated_at = 2026-03-04T18:44:41Z
+  goal = "Fix the when ambiguity: in rules when is a block name with structured fields, in scenarios when is a step-text keyword. The ANTLR grammar currently skips files with the block-name usage. Either introduce a parser predicate, a preprocessing step, or rename the rule-block keyword. The formalized grammar must accept 243/243 real .mos files, not 242/243."
+  kind = "feature"
+
+  acceptance {
+
+    criterion "full-coverage" {
+      description = "ANTLR grammar accepts 243/243 real .mos files (up from 242/243)"
+    }
+
+    criterion "both-usages" {
+      description = "Grammar handles when as both structured block name (rules) and step-text keyword (scenarios)"
+    }
+
+    criterion "cross-validation" {
+      description = "Property-based cross-validation test passes for all files including when-block files"
+    }
+  }
+  sprint = "SPR-2026-011"
+}
+

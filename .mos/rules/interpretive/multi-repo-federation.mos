@@ -1,0 +1,7 @@
+rule "multi-repo-federation" {
+  name = "Cross-Repo Federation"
+  type = "interpretive"
+  scope = "project"
+  enforcement = "info"
+}
+

@@ -1,0 +1,87 @@
+contract "BUG-2026-002" {
+  title = "Concurrent lexicon writes lose data (race condition)"
+  status = "complete"
+  created_at = 2026-03-03T09:51:19Z
+  updated_at = 2026-03-03T09:51:19Z
+  goal = "AddTerm and RemoveTerm perform non-atomic read-modify-write on the lexicon file. When multiple goroutines (or parallel CI jobs) mutate the lexicon concurrently, writes are lost or the file is corrupted mid-parse. Fix: add file-level locking (flock/lockfile) or atomic-rename writes to the lexicon mutation path."
+  kind = "bug"
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Concurrent AddTerm/RemoveTerm goroutines reproducing the race."
+    }
+
+    integration {
+      applies = false
+      rationale = "Race is reproducible at unit level."
+    }
+
+    contract {
+      applies = false
+    }
+
+    e2e {
+      applies = false
+    }
+
+    concurrency {
+      applies = true
+      rationale = "Core of the bug -- concurrent file mutations."
+    }
+
+    security {
+      applies = false
+    }
+  }
+
+  feature "Lexicon Concurrency" {
+
+    scenario "Concurrent AddTerm calls preserve all terms" {
+      status = "done"
+      given {
+        a workspace with an initialized lexicon
+        10 goroutines each adding a unique term concurrently
+      }
+      when {
+        all goroutines complete
+      }
+      then {
+        the lexicon contains all 10 terms
+        the file is valid and parseable
+      }
+    }
+
+    scenario "Concurrent AddTerm and RemoveTerm do not corrupt" {
+      status = "done"
+      given {
+        a workspace with 5 pre-existing lexicon terms
+        5 goroutines adding new terms
+        3 goroutines removing existing terms
+      }
+      when {
+        all goroutines complete
+      }
+      then {
+        the file is valid and parseable
+        no terms are lost beyond the explicitly removed ones
+      }
+    }
+
+    scenario "Atomic writes prevent partial reads" {
+      status = "done"
+      given {
+        writeArtifact uses temp file plus rename
+      }
+      when {
+        a reader opens the file during a concurrent write
+      }
+      then {
+        the reader sees either the old or new complete content
+        no partial or empty content is ever observed
+      }
+    }
+  }
+}
+

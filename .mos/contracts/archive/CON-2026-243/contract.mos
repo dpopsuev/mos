@@ -1,0 +1,26 @@
+contract "CON-2026-243" {
+  title = "Scope-violation phrase matching"
+  status = "complete"
+  created_at = 2026-03-06T13:45:08Z
+  updated_at = 2026-03-06T13:45:08Z
+  goal = "Replace bag-of-words scope-violation matching with phrase matching requiring all exclude tokens to appear in the spec title"
+  justifies = "NEED-2026-001"
+  kind = "feature"
+
+  feature "Phrase-level scope matching" {
+
+    scenario "no false positive on partial token overlap" {
+      given = "need excludes 'making governance decisions' and spec title is 'Governance Decision Audit Trail'"
+      when = "the scope-violation rule is evaluated"
+      then = "no scope-violation diagnostic is emitted"
+    }
+
+    scenario "true positive when all exclude tokens appear" {
+      given = "need excludes 'making governance decisions' and spec title is 'Making Governance Decisions Easier'"
+      when = "the scope-violation rule is evaluated"
+      then = "a scope-violation error diagnostic is emitted"
+    }
+  }
+  sprint = "SPR-2026-037"
+}
+

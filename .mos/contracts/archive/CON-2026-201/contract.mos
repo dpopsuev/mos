@@ -1,0 +1,15 @@
+contract "CON-2026-201" {
+  title = "Reorganize cmd/mos/ into sub-tool directories"
+  status = "complete"
+  created_at = 2026-03-05T12:51:25Z
+  updated_at = 2026-03-05T12:51:25Z
+  goal = "Move CLI adapters into cmd/mos/govern/, cmd/mos/insight/, cmd/mos/guard/. Each directory contains thin cobra commands that parse flags and call the corresponding moslib/ package. main.go dispatches to all three. Layer 3 CLI."
+
+  scope {
+    depends_on = ["CON-2026-197", "CON-2026-198", "CON-2026-199", "CON-2026-200"]
+  }
+  priority = "p1"
+  depends_on = "CON-2026-197, CON-2026-198, CON-2026-199, CON-2026-200"
+  sprint = "SPR-2026-018"
+}
+

@@ -1,0 +1,20 @@
+contract "CON-2026-240" {
+  title = "mos lint --agent shorthand"
+  status = "complete"
+  created_at = 2026-03-06T13:45:07Z
+  updated_at = 2026-03-06T13:45:07Z
+  goal = "Add --agent flag to mos lint that implies --summary -v --format json --severity error"
+  justifies = "NEED-2026-001"
+  kind = "feature"
+
+  feature "Agent shorthand flag" {
+
+    scenario "agent flag produces JSON summary at error severity" {
+      given = "the linter has findings at various severities"
+      when = "mos lint --agent is run"
+      then = "output is JSON summary with verbose samples filtered to error severity"
+    }
+  }
+  sprint = "SPR-2026-037"
+}
+

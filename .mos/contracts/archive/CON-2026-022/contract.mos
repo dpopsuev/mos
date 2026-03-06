@@ -1,0 +1,223 @@
+contract "CON-2026-022" {
+  title = "Contract Hierarchy & Subgraphs"
+  status = "complete"
+  goal = "Contracts support a parent field for containment hierarchy (Initiative > Epic > Story > Sub-task) and a branches field for version/branch scoping -- enabling subgraph rendering, rollup progress, scoped listing, and backport workflows, orthogonal to the existing dependency DAG."
+  depends_on = ["CON-2026-021"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Parent field parsing, hierarchy validation (no cycles, max depth), rollup progress computation, subgraph extraction, branches field parsing and filtering."
+    }
+
+    integration {
+      applies = true
+      rationale = "Create contracts with parent references, verify graph clusters, list with --parent filter, progress rollup across children. Create branch-scoped contracts, filter by --branch, verify backport tree rollup."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Full CLI round-trip: create initiative, create epics under it, create stories under epics, verify graph renders subgraphs and rollup progress. Create backport tree with per-branch children, verify rollup."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "No new concurrency surfaces beyond existing contract creation."
+    }
+
+    security {
+      applies = false
+      rationale = "No new trust boundaries."
+    }
+  }
+
+  feature "Parent Field" {
+
+    scenario "Assign parent to a contract" {
+      status = "done"
+      given {
+        an initiative contract CON-INIT exists
+      }
+      when {
+        mos contract create --parent CON-INIT EPIC-001 is executed
+      }
+      then {
+        EPIC-001 is created with parent = "CON-INIT"
+        CON-INIT lists EPIC-001 as a child
+      }
+    }
+
+    scenario "Reject circular parent references" {
+      status = "done"
+      given {
+        contract A has parent B
+      }
+      when {
+        contract B is updated with parent A
+      }
+      then {
+        the operation fails with a cycle detection error
+      }
+    }
+
+    scenario "Reparent a contract" {
+      status = "done"
+      given {
+        contract STORY-001 has parent EPIC-001
+      }
+      when {
+        mos contract update STORY-001 --parent EPIC-002 is executed
+      }
+      then {
+        STORY-001 moves from EPIC-001 to EPIC-002
+        EPIC-001 no longer lists STORY-001 as a child
+      }
+    }
+  }
+
+  feature "Subgraph Rendering" {
+
+    scenario "Graph clusters children under parent" {
+      status = "done"
+      given {
+        an initiative with two epics, each with three stories
+      }
+      when {
+        mos contract graph --format mermaid is executed
+      }
+      then {
+        the output contains subgraph blocks grouping children under their parent
+        dependency edges cross subgraph boundaries correctly
+      }
+    }
+
+    scenario "Single-node graph shows children" {
+      status = "done"
+      given {
+        an epic EPIC-001 with three story children
+      }
+      when {
+        mos contract graph EPIC-001 is executed
+      }
+      then {
+        the output shows EPIC-001 and all its children
+        parent and sibling contracts are shown as context
+      }
+    }
+  }
+
+  feature "Rollup Progress" {
+
+    scenario "Parent progress aggregates children" {
+      status = "done"
+      given {
+        an epic EPIC-001 with three stories: one complete, one active, one draft
+      }
+      when {
+        mos contract show EPIC-001 is executed
+      }
+      then {
+        the progress line shows aggregated done/total across all children
+        children with their own scenarios contribute their scenario counts
+        children without scenarios count as 0 or 1 based on their status
+      }
+    }
+  }
+
+  feature "Scoped Listing" {
+
+    scenario "List children of a parent" {
+      status = "done"
+      given {
+        contracts exist at multiple hierarchy levels
+      }
+      when {
+        mos contract list --parent EPIC-001 is executed
+      }
+      then {
+        only direct children of EPIC-001 are returned
+      }
+    }
+
+    scenario "List root contracts" {
+      status = "done"
+      given {
+        contracts exist at multiple hierarchy levels
+      }
+      when {
+        mos contract list --roots is executed
+      }
+      then {
+        only contracts with no parent are returned
+      }
+    }
+
+    scenario "Recursive listing" {
+      status = "done"
+      given {
+        an initiative with nested epics and stories
+      }
+      when {
+        mos contract list --parent CON-INIT --recursive is executed
+      }
+      then {
+        all descendants at every level are returned
+        output is indented to reflect nesting depth
+      }
+    }
+  }
+
+  feature "Branch Scoping" {
+
+    scenario "Assign branches to a contract" {
+      status = "done"
+      given {
+        a bug fix contract BUG-ROOT exists
+      }
+      when {
+        mos contract create --parent BUG-ROOT --branches "release/v1.2" BUG-BP-12 is executed
+      }
+      then {
+        BUG-BP-12 is created with branches = ["release/v1.2"]
+        mos contract show BUG-BP-12 displays the branch scope
+      }
+    }
+
+    scenario "Filter contracts by branch" {
+      status = "done"
+      given {
+        contracts exist scoped to release/v1.0, release/v1.1, and release/v1.2
+        some contracts have no branch scope
+      }
+      when {
+        mos contract list --branch "release/v1.2" is executed
+      }
+      then {
+        only contracts whose branches field contains release/v1.2 are returned
+        unscoped contracts are excluded
+      }
+    }
+
+    scenario "Backport tree with per-branch children" {
+      status = "done"
+      given {
+        a root bug fix BUG-ROOT with three children each scoped to a different release branch
+        one child is complete, one is active, one is pending
+      }
+      when {
+        mos contract show BUG-ROOT is executed
+      }
+      then {
+        rollup progress reflects the state of all branch-scoped children
+        each child's branch scope is visible in recursive listing
+      }
+    }
+  }
+}
+

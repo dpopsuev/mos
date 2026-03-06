@@ -1,0 +1,116 @@
+contract "CON-2026-128" {
+  title = "jq-style path accessors for DSL field mutations"
+  status = "complete"
+  slug = "jq-path-accessors"
+  justifies = "SPEC-2026-028"
+  sprint = "SPR-2026-005"
+  batch = "BAT-2026-006"
+  goal = "Add a jq-style path syntax to the CLI for reading and mutating nested DSL fields in a single command. Path components use dot notation for named blocks, bracket notation for indexed repeated blocks, and = for assignment. This eliminates multi-step remove-block + add workflows and temp-file apply round trips. Agents get atomic, surgical mutations with minimal context. Examples: mos set CON-001 coverage.unit.applies true, mos get SPEC-001 acceptance.C1.description, mos append CON-001 scope.depends_on CON-2026-125."
+  created_at = 2026-03-04T12:10:00Z
+  updated_at = 2026-03-04T11:25:33Z
+
+  feature "Path-based field read" {
+
+    scenario "Read a top-level field" {
+      given {
+        a contract CON-001 with title = "Hello"
+      }
+      when {
+        mos get CON-001 title is executed
+      }
+      then {
+        the output is Hello
+      }
+    }
+
+    scenario "Read a nested block field" {
+      given {
+        a contract with coverage.unit.applies = true
+      }
+      when {
+        mos get CON-001 coverage.unit.applies is executed
+      }
+      then {
+        the output is true
+      }
+    }
+
+    scenario "Read from indexed repeated block" {
+      given {
+        a contract with two features
+      }
+      when {
+        mos get CON-001 features[1].name is executed
+      }
+      then {
+        the name of the second feature is returned
+      }
+    }
+  }
+
+  feature "Path-based field write" {
+
+    scenario "Set a top-level field" {
+      given {
+        a contract CON-001
+      }
+      when {
+        mos set CON-001 status active is executed
+      }
+      then {
+        the contract status is updated to active
+      }
+    }
+
+    scenario "Set a nested block field" {
+      given {
+        a spec with a test_matrix block
+      }
+      when {
+        mos set SPEC-001 test_matrix.unit.symbol TestFoo is executed
+      }
+      then {
+        the unit layer symbol is set to TestFoo
+      }
+    }
+
+    scenario "Set creates intermediate blocks if absent" {
+      given {
+        a spec with no test_matrix block
+      }
+      when {
+        mos set SPEC-001 test_matrix.unit.symbol TestFoo is executed
+      }
+      then {
+        the test_matrix and unit blocks are created with symbol = TestFoo
+      }
+    }
+  }
+
+  feature "Path-based append for list fields" {
+
+    scenario "Append to a list field" {
+      given {
+        a scenario with labels = ["happy_path"]
+      }
+      when {
+        mos append CON-001 features[0].scenarios[0].labels adversarial is executed
+      }
+      then {
+        the labels field becomes ["happy_path", "adversarial"]
+      }
+    }
+  }
+
+  coverage {
+
+    unit {
+      applies = true
+    }
+
+    integration {
+      applies = true
+    }
+  }
+}
+

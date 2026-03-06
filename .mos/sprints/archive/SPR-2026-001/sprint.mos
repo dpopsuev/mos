@@ -1,0 +1,8 @@
+sprint "SPR-2026-001" {
+  title = "Housekeeping: fix integrity and close tooling gaps"
+  status = "complete"
+  end_date = "2026-03-10"
+  goal = "Desired state: (1) ID allocator never collides with archived IDs, (2) linter detects ID collisions, (3) all four CAD types usable from CLI, (4) contracts linkable to needs and sprints from creation, (5) query layer enables filtered list and reverse-reference lookups, (6) mos audit produces a single housekeeping report."
+  start_date = "2026-03-03"
+}
+
