@@ -1,0 +1,15 @@
+contract "CON-2026-199" {
+  title = "Move mesh formatting into moslib/mesh/"
+  status = "complete"
+  created_at = 2026-03-05T12:51:18Z
+  updated_at = 2026-03-05T12:51:18Z
+  goal = "Move renderTree, renderMermaid, resolvePackagePath, detectModPath, collectImports, collectImportedBy from cmd/mos/mesh.go into moslib/mesh/. Layer 2 Insight. CLI becomes a thin adapter."
+
+  scope {
+    depends_on = ["CON-2026-195"]
+  }
+  priority = "p2"
+  depends_on = "CON-2026-195"
+  sprint = "SPR-2026-017"
+}
+

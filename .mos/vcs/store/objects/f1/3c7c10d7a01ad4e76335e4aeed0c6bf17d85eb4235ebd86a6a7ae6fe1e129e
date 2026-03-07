@@ -1,0 +1,13 @@
+blob
+contract "CON-2026-148" {
+  title = "Add mos sprint / mos batch / mos need subcommand families for discoverability"
+  status = "complete"
+  created_at = 2026-03-04T16:04:27Z
+  updated_at = 2026-03-04T16:04:27Z
+  goal = "Agents discover CLI capabilities via --help. Today mos contract, mos rule, mos spec, mos binder have dedicated subcommand families. Sprint, batch, and need do not -- they work via mos show/set with ID-prefix inference but are invisible to --help. Register sprint, batch, and need as top-level subcommands that delegate to runGenericCommand, giving agents mos sprint --help, mos batch --help, mos need --help for operation discovery."
+  kind = "feature"
+  justifies = "NEED-2026-002"
+  sprint = "SPR-2026-013"
+  slug = "sprint-batch-need-subcommands"
+}
+

@@ -1,0 +1,19 @@
+blob
+rule "test-coverage" {
+  name = "Test Coverage Gate"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "warning"
+  vector = "functional"
+
+  harness {
+    command = "go test -cover ./..."
+    timeout = "5m"
+
+    metric "go_coverage" {
+      floor = 0
+      unit = "%"
+    }
+  }
+}
+

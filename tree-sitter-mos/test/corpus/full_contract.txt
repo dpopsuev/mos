@@ -1,0 +1,106 @@
+==================
+Full contract with all features
+==================
+
+contract "CON-2026-042" {
+  title = "Implement API deprecation notices"
+  status = "active"
+  goal = "All deprecated GA fields emit a warning."
+
+  scope {
+    rules = ["api-backward-compat"]
+    depends_on = ["CON-2026-039"]
+  }
+
+  feature "Deprecation notice headers" {
+    background {
+      given {
+        the Kubernetes API server is running
+        deprecated GA fields exist
+      }
+    }
+    scenario "Deprecated field triggers warning" {
+      sut = "pkg/endpoints/"
+      given {
+        a client sends a request using deprecated field "podCIDR"
+      }
+      when {
+        the API server processes the request
+      }
+      then {
+        the response includes a "Warning" header
+        the warning references the deprecation release
+      }
+    }
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string))))
+      (block_item
+        (nested_block
+          (block_name
+            (identifier))
+          (block
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (list
+                    (value
+                      (string))))))
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (list
+                    (value
+                      (string)))))))))
+      (block_item
+        (feature_block
+          (string)
+          (background_block
+            (given_block
+              (step_line)
+              (step_line)))
+          (scenario_block
+            (string)
+            (scenario_content
+              (field
+                (key
+                  (identifier))
+                (value
+                  (string)))
+              (given_block
+                (step_line))
+              (when_block
+                (step_line))
+              (then_block
+                (step_line)
+                (step_line)))))))))

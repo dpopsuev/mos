@@ -1,0 +1,117 @@
+blob
+contract "CON-2026-008" {
+  title = "Curia Module Tree"
+  status = "complete"
+  goal = "`curia <path>` renders an interactive module tree and import graph for any Go codebase, starting with Mos itself."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Tree node expansion/collapse logic, import graph edge filtering, model state transitions"
+    }
+
+    integration {
+      applies = true
+      rationale = "Scanner -> model -> TUI pipeline against real Go source (Mos itself)"
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API"
+    }
+
+    e2e {
+      applies = true
+      rationale = "cst-tui . against mos/ must render correctly"
+    }
+
+    performance {
+      applies = false
+      rationale = "Not in scope"
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Single-threaded TUI"
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundaries -- local file scanning only"
+    }
+  }
+
+  feature "TUI Module Explorer" {
+
+    scenario "Module tree displays packages with files and symbols" {
+      given {
+        cst-tui is launched against a Go module
+      }
+      when {
+        the module tree panel renders
+      }
+      then {
+        all packages appear as tree nodes
+        each package expands to show files and symbols
+        exported symbols are visually distinct from unexported
+      }
+    }
+
+    scenario "Tree navigation with expand and collapse" {
+      given {
+        cst-tui is running with a loaded module
+      }
+      when {
+        the user presses up/down to navigate and enter to expand/collapse
+      }
+      then {
+        the cursor moves between packages
+        enter toggles the expanded state of the selected package
+        collapsed packages hide their files and symbols
+      }
+    }
+
+    scenario "Import graph shows dependencies for selected package" {
+      given {
+        cst-tui is running and a package is selected in the tree
+      }
+      when {
+        the import graph panel renders
+      }
+      then {
+        outgoing imports are listed under "Imports"
+        incoming imports are listed under "Imported by"
+        internal and external imports are visually distinguished
+      }
+    }
+
+    scenario "Responsive layout adapts to terminal size" {
+      given {
+        cst-tui is running
+      }
+      when {
+        the terminal is resized
+      }
+      then {
+        both panels resize proportionally
+        content remains readable at reasonable terminal widths
+      }
+    }
+
+    scenario "Dog-food gate -- Mos sees itself" {
+      given {
+        cst-tui is launched against the mos/ directory
+      }
+      when {
+        the TUI renders
+      }
+      then {
+        all Mos packages appear: moslib/survey, moslib/model, moslib/linter, moslib/lsp, moslib/dsl, moslib/primitive, cmd/cst, cmd/csttui
+        the import graph shows the real dependency chain
+        navigation works across all packages
+      }
+    }
+  }
+}
+

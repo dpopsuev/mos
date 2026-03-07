@@ -1,0 +1,7 @@
+sprint "SPR-2026-042" {
+  status = "complete"
+  title = "Agent DX: Query Filtering & Preventive Lint"
+  goal = "Eliminate shell glue from governance queries and prevent re-parenting ceremony accumulation with --where filtering, rich text output, and a spec-on-originating lint rule"
+  contracts = "CON-2026-254,CON-2026-255,CON-2026-256"
+}
+

@@ -1,0 +1,71 @@
+---
+description: Mos DSL grammar reference — block nesting rules and allowed syntax
+globs: **/*.mos
+alwaysApply: false
+---
+
+# Mos DSL Grammar
+
+## Root-level block types
+
+A `.mos` file starts with a root block: `contract`, `sprint`, `rule`, `specification`, `need`, `architecture`, `config`, `lexicon`, `binder`, `batch`, `doc`, `directive`, `watch`.
+
+Inside root blocks the parser accepts: **fields** (`key = value`), **named blocks** (`name { ... }`), and **keyword blocks** (`section`, `scope`, `config`, `harness`, `feature`, `spec`, `criterion`).
+
+## Feature blocks
+
+`feature "Name" { ... }` — only three child types allowed:
+
+| Child | Purpose |
+|---|---|
+| `background { ... }` | Shared preconditions (at most one) |
+| `scenario "Name" { ... }` | Gherkin-style acceptance criterion |
+| `group "Name" { ... }` | Logical grouping of scenarios |
+
+**Nothing else is valid inside feature.** No `description = "..."`, no free-form fields. Put descriptive text in the feature's name string instead.
+
+```
+feature "Guard API: single entry point for all enforcement" {
+
+  scenario "pre-commit delegates to guard" {
+    given = "A project root"
+    when  = "guard.PreCommit(root) is called"
+    then  = "Returns unified pass/fail with diagnostics"
+  }
+}
+```
+
+## Scenario blocks
+
+`scenario "Name" { ... }` accepts:
+
+- `given = "..."` / `when = "..."` / `then = "..."` — Gherkin triple
+- `labels = [...]` — string array for tagging
+- Any `key = value` field
+
+## Spec blocks
+
+`spec "Name" { ... }` accepts `include "path"` directives and `feature` blocks.
+
+## Rule files
+
+`rule "slug" { ... }` — mechanical rules require at least one of: `feature`, `spec` with includes, or `harness` block.
+
+```
+harness {
+  command = "go build ./..."
+  timeout = "30s"
+}
+```
+
+## Lifecycle statuses by artifact type
+
+| Type | Active | Terminal (archive) |
+|---|---|---|
+| contract | `draft`, `active` | `complete`, `cancelled`, `abandoned`, `closed`, `duplicate` |
+| sprint | `planned`, `active` | `complete`, `closed`, `abandoned`, `duplicate`, `cancelled` |
+| specification | `candidate`, `draft`, `active` | `superseded`, `retired` |
+| need | `identified`, `validated`, `addressed` | `retired` |
+| batch | `planned`, `ready` | `promoted`, `cancelled` |
+
+Artifacts in terminal status belong in `archive/`, not `active/`.

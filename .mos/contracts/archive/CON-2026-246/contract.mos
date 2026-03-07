@@ -1,0 +1,38 @@
+contract "CON-2026-246" {
+  title = "VCS Benchmarks at Kubernetes and LinuxKernel scale"
+  status = "complete"
+  created_at = 2026-03-06T14:54:16Z
+  updated_at = 2026-03-06T14:54:16Z
+  goal = "Add Benchmark functions exercising core VCS operations (SnapshotWorkingTree, BuildTree+Commit, DiffTrees) at Kubernetes and LinuxKernel scale"
+  justifies = "NEED-2026-004"
+  kind = "feature"
+
+  feature "VCS benchmarks at scale" {
+
+    scenario "SnapshotWorkingTree benchmarked at Kubernetes scale" {
+      given = "a Kubernetes-scale stressgen tree (~2200 artifacts) with git backend"
+      when = "vcs.SnapshotWorkingTree is called"
+      then = "ns/op and allocs/op are reported via go bench"
+    }
+
+    scenario "BuildTree+Commit benchmarked at Kubernetes scale" {
+      given = "a Kubernetes-scale index with all artifacts staged"
+      when = "Index.BuildTree and StoreCommit are called"
+      then = "ns/op and allocs/op are reported via go bench"
+    }
+
+    scenario "DiffTrees benchmarked at Kubernetes scale" {
+      given = "two Kubernetes-scale snapshots with minor differences"
+      when = "vcs.DiffTrees is called"
+      then = "ns/op and allocs/op are reported via go bench"
+    }
+
+    scenario "All three operations benchmarked at LinuxKernel scale" {
+      given = "a LinuxKernel-scale stressgen tree (~3700 artifacts) with git backend"
+      when = "Snapshot, Commit, and Diff benchmarks run"
+      then = "ns/op and allocs/op are reported for each operation"
+    }
+  }
+  sprint = "SPR-2026-039"
+}
+

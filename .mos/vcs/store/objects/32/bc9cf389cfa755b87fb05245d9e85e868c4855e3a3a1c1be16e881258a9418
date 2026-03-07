@@ -1,0 +1,13 @@
+blob
+rule "tests-pass" {
+  name = "Tests Must Pass"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "error"
+
+  harness {
+    command = "go test ./..."
+    timeout = "5m"
+  }
+}
+

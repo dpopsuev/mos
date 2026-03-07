@@ -1,0 +1,7 @@
+sprint "SPR-2026-044" {
+  status = "complete"
+  title = "Agentic Context Steroids: architecture scanner foundation"
+  goal = "Add --depth N grouping flag and multi-language scanner support (Rust, TypeScript, composite) for non-Mos projects"
+  contracts = "CON-2026-258,CON-2026-260"
+}
+

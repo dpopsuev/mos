@@ -1,0 +1,133 @@
+blob
+contract "CON-2026-017" {
+  title = "Governance Model Benchmark"
+  status = "draft"
+  justifies = "NEED-2026-001"
+  goal = "A benchmark harness scaffolds all 8 governance models (5 pure + 3 hybrid) across the PTP 4-repo and Dunix 100-repo scenarios, lints each workspace, collects quantitative metrics into scorecards, and produces a comparison table that validates against the qualitative evaluation matrix from CON-2026-014."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Scorecard type, metric collection helpers, individual model scaffold functions."
+    }
+
+    integration {
+      applies = true
+      rationale = "Full benchmark runner: scaffold + lint + collect for each model."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Complete benchmark run across all 8 models, comparison table generated."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Sequential model execution."
+    }
+
+    security {
+      applies = false
+      rationale = "Local operations only."
+    }
+  }
+
+  feature "Governance Model Benchmark" {
+
+    scenario "All 8 models scaffold PTP scenario" {
+      given {
+        a test forge
+        all 8 GovernanceModel implementations
+      }
+      when {
+        ScaffoldPTP is called for each model
+      }
+      then {
+        each model produces a valid Workspace
+        the PTP scenario has 4 repos (or 5 for umbrella)
+        each repo has a .cst/ directory
+      }
+    }
+
+    scenario "All 8 models scaffold Dunix scenario" {
+      given {
+        a test forge
+        all 8 GovernanceModel implementations
+      }
+      when {
+        ScaffoldDunix is called for each model
+      }
+      then {
+        each model produces a valid Workspace with 100+ repos
+      }
+    }
+
+    scenario "Scorecard collected for each model" {
+      given {
+        a scaffolded and linted workspace for a model
+      }
+      when {
+        collectMetrics is called
+      }
+      then {
+        all 8 measurable dimensions have values
+        LintTimeMs is positive
+        TotalRepos matches the workspace repo count
+      }
+    }
+
+    scenario "Comparison table produced" {
+      given {
+        scorecards for all 8 models
+      }
+      when {
+        the report generator runs
+      }
+      then {
+        a markdown table is produced with 8 rows (one per model) and columns for all dimensions
+        the table is written to docs/governance-model-benchmark-results.md
+      }
+    }
+
+    scenario "Quantitative results validate qualitative rankings" {
+      given {
+        the comparison table from this contract
+        the qualitative evaluation matrix from CON-2026-014
+      }
+      when {
+        the rankings are compared
+      }
+      then {
+        Hybrid C+E is confirmed as top-ranked or discrepancies are documented
+        any model that ranked differently has a documented explanation
+      }
+    }
+
+    scenario "Scale growth measured" {
+      given {
+        PTP lint time and Dunix lint time for each model
+      }
+      when {
+        ScaleGrowthFactor is computed (Dunix / PTP)
+      }
+      then {
+        models with sub-linear growth are identified
+        models with super-linear growth are flagged
+      }
+    }
+  }
+
+  scope {
+    depends_on = ["CON-2026-014"]
+  }
+  updated_at = 2026-03-03T19:10:38Z
+  batch = "BAT-2026-003"
+  slug = "governance-benchmark"
+}
+

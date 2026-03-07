@@ -1,0 +1,12 @@
+contract "BUG-2026-004" {
+  title = "ID allocator re-uses archived contract IDs"
+  status = "complete"
+  justifies = "NEED-2026-001"
+  sprint = "SPR-2026-001"
+  created_at = 2026-03-03T15:51:49Z
+  updated_at = 2026-03-03T16:07:46Z
+  goal = "NextID in project.go only increments a sequence counter without checking whether the generated ID already exists in the archive directory. Active contracts collide with archived ones (e.g. active CON-2026-029 Dunix vs archived CON-2026-029 Lifecycle hooks). Fix NextID to scan both active and archive before allocating, and add a linter rule to detect existing collisions."
+  precondition = "NextID increments a monotonic sequence without checking archive. Active CON-2026-029/030/031/038-042 collide with archived contracts of the same IDs. The contract graph shows duplicate entries."
+  labels = ["bug", "allocator", "integrity"]
+}
+

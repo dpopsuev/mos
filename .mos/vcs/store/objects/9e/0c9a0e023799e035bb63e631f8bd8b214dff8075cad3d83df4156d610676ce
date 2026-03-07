@@ -1,0 +1,20 @@
+blob
+specification "SPEC-2026-015" {
+  title = "Cryptographic Identity and Signing"
+  status = "active"
+  enforcement = "disabled"
+  description = "SSH-based identity model for mos. Identity equals public key fingerprint, not name. An allowed_signers registry maps keys to contributors. All governance actions (rule creation, contract ratification, declaration amendments) require SSH signatures. Agents receive distinct keys with scoped authorization. The identity model is the trust foundation for federation, fork sync, and multi-user governance."
+  name = "Cryptographic Identity and Signing"
+  slug = "spec-cryptographic-identity"
+
+  feature "Identity bootstrap on init" {
+  }
+
+  feature "Signed governance actions" {
+  }
+
+  feature "Agent key scoping" {
+  }
+  justifies = "NEED-2026-001"
+}
+

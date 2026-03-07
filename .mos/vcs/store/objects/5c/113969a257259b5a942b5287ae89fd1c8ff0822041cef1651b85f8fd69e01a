@@ -1,0 +1,9 @@
+blob
+sprint "SPR-2026-009" {
+  status = "cancelled"
+  title = "Quality Vectors Foundation"
+  goal = "Implement add-criterion CLI command (BUG-2026-009). Build the structural linter with nesting-depth as the first metric and bidirectional thresholds (CON-2026-134). Define the quality rules config block DSL for declaring metrics, thresholds, and language overrides (CON-2026-142)."
+  slug = "quality-vectors-foundation"
+  contracts = ""
+}
+

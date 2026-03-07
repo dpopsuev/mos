@@ -1,0 +1,8 @@
+blob
+sprint "SPR-2026-023" {
+  status = "complete"
+  title = "Metric Extractor Registry + Maquette"
+  goal = "Implement Metric Extractor Registry and Maquette."
+  contracts = "CON-2026-210,CON-2026-211,CON-2026-212,CON-2026-213,CON-2026-214,CON-2026-215,CON-2026-216"
+}
+

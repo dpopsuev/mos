@@ -1,0 +1,10 @@
+contract "CON-2026-054" {
+  title = "Harness rule: lint-clean"
+  status = "complete"
+  created_at = 2026-03-03T17:02:15Z
+  updated_at = 2026-03-03T17:06:13Z
+  goal = "A mechanical harness rule lint-clean runs mos lint and fails if any errors exist. The harness enforces mos's own governance."
+  justifies = "NEED-2026-001"
+  sprint = "SPR-2026-002"
+}
+

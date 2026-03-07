@@ -1,0 +1,20 @@
+blob
+rule "loc-per-file" {
+  name = "Lines of Code Per File"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "warning"
+  vector = "structural"
+  glob = "**/*.go"
+
+  config {
+    metric = "loc_per_file"
+    ceiling = 500
+  }
+
+  harness {
+    command = "go build ./..."
+    timeout = "30s"
+  }
+}
+

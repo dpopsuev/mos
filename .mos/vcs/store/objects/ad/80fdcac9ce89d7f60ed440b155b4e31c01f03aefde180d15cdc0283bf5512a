@@ -1,0 +1,101 @@
+blob
+contract "BUG-2026-001" {
+  title = "Contract Show Rendering Edge Cases"
+  status = "complete"
+  goal = "Progress rendering, depends_on parsing, and current-step resolution handle all edge cases correctly: empty contracts show no progress, all-pending contracts identify the first pending step as current, and depends_on is read from both scope blocks and top-level fields."
+  depends_on = ["CON-2026-015"]
+
+  feature "Progress Rendering" {
+
+    scenario "Empty contract shows no progress line" {
+      status = "done"
+      given {
+        a contract with no features or scenarios
+      }
+      when {
+        mos contract show is executed
+      }
+      then {
+        no Progress line is rendered
+        no "Status: all complete" message appears
+      }
+    }
+
+    scenario "All-pending contract identifies first step as current" {
+      status = "done"
+      given {
+        a contract with 12 scenarios all with status = "pending"
+      }
+      when {
+        mos contract show is executed
+      }
+      then {
+        Progress shows "0/12"
+        Current shows the first scenario name
+        "Status: all complete" does NOT appear
+      }
+    }
+
+    scenario "All-done contract shows all complete" {
+      status = "done"
+      given {
+        a contract where every scenario has status = "done"
+      }
+      when {
+        mos contract show is executed
+      }
+      then {
+        Progress shows "N/N" where done equals total
+        "Status: all complete" message appears
+        no Current step is shown
+      }
+    }
+
+    scenario "Mixed progress shows correct current" {
+      status = "done"
+      given {
+        a contract with some "done" and some "pending" scenarios
+      }
+      when {
+        mos contract show is executed
+      }
+      then {
+        Progress shows "done/total"
+        Current shows the first non-done scenario
+        Prev and Next are populated relative to current
+      }
+    }
+  }
+
+  feature "depends_on Parsing Fallback" {
+
+    scenario "Top-level depends_on is read by graph" {
+      status = "done"
+      given {
+        a contract with depends_on at the artifact block level (not inside scope block)
+      }
+      when {
+        mos contract graph is executed
+      }
+      then {
+        the dependency edge appears in the graph output
+        the depended-on contract shows this contract in its "depended on by" list
+      }
+    }
+
+    scenario "scope-block depends_on takes precedence" {
+      status = "done"
+      given {
+        a contract with depends_on inside a scope block
+      }
+      when {
+        mos contract graph is executed
+      }
+      then {
+        the scope-block depends_on is used
+        behavior is identical to before the fallback was added
+      }
+    }
+  }
+}
+

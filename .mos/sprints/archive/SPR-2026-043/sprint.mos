@@ -1,0 +1,7 @@
+sprint "SPR-2026-043" {
+  status = "complete"
+  title = "Mesh project-wide mode, batch set, VCS tree-cache"
+  goal = "Deliver mesh project-wide mode, batch set operations, and VCS tree-cache for performance"
+  contracts = "BUG-2026-025,FEAT-2026-001,FEAT-2026-003"
+}
+

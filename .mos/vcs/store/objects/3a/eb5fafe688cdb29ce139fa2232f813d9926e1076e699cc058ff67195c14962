@@ -1,0 +1,10 @@
+blob
+specification "SPEC-2026-004" {
+  title = "Lifecycle Transition Gates"
+  status = "active"
+  addresses = "C3"
+  enforcement = "disabled"
+  justifies = "NEED-2026-001"
+  slug = "transition-gates"
+}
+

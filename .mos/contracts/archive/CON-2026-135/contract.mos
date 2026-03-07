@@ -1,0 +1,123 @@
+contract "CON-2026-135" {
+  title = "Local CI/CD loop: mos ci, git hooks, harness filtering"
+  status = "complete"
+  created_at = 2026-03-04T12:08:54Z
+  updated_at = 2026-03-04T12:08:54Z
+  kind = "contract"
+  goal = "Make mos act as the local CI/CD gatekeeper — a single mos ci command that runs build, vet, test, lint, audit, and harness in sequence with fail-fast. Add git pre-commit hook integration and harness rule filtering to complete the dogfooding loop."
+  justifies = "SPEC-2026-028"
+
+  feature "CI pipeline command" {
+
+    scenario "Full pipeline passes all 6 stages" {
+      status = "done"
+      given {
+        a clean codebase with 0 lint errors
+      }
+      when {
+        the agent runs mos ci
+      }
+      then {
+        build, vet, test, lint, audit, and harness all pass sequentially
+      }
+    }
+
+    scenario "Fast mode skips slow stages" {
+      status = "done"
+      given {
+        a codebase
+      }
+      when {
+        the agent runs mos ci --fast
+      }
+      then {
+        only build, vet, and lint run; test, audit, harness are skipped
+      }
+    }
+
+    scenario "Pipeline fails fast on first broken stage" {
+      status = "done"
+      given {
+        a codebase with a lint error
+      }
+      when {
+        the agent runs mos ci
+      }
+      then {
+        the pipeline stops at the lint stage and exits with code 1
+      }
+    }
+  }
+
+  feature "Git pre-commit hook" {
+
+    scenario "Hook install writes pre-commit script" {
+      status = "done"
+      given {
+        a git repository
+      }
+      when {
+        the agent runs mos hook install
+      }
+      then {
+        a pre-commit hook is written to .git/hooks/pre-commit that calls mos ci --fast
+      }
+    }
+
+    scenario "Hook uninstall removes the hook" {
+      status = "done"
+      given {
+        a pre-commit hook installed by mos
+      }
+      when {
+        the agent runs mos hook uninstall
+      }
+      then {
+        the hook file is removed
+      }
+    }
+
+    scenario "Uninstall refuses to remove foreign hooks" {
+      status = "done"
+      given {
+        a pre-commit hook not installed by mos
+      }
+      when {
+        the agent runs mos hook uninstall
+      }
+      then {
+        the command refuses with an error
+      }
+    }
+  }
+
+  feature "Harness rule filtering" {
+
+    scenario "Run a single rule by ID" {
+      status = "done"
+      given {
+        multiple harness rules defined
+      }
+      when {
+        the agent runs mos harness run --rule tests-pass
+      }
+      then {
+        only the tests-pass rule executes
+      }
+    }
+
+    scenario "Filter by enforcement level" {
+      status = "done"
+      given {
+        rules with error and warning enforcement
+      }
+      when {
+        the agent runs mos harness run --enforcement error
+      }
+      then {
+        only error-level rules execute
+      }
+    }
+  }
+}
+

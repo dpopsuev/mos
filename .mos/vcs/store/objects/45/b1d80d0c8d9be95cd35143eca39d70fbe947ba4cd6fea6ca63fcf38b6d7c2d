@@ -1,0 +1,20 @@
+blob
+specification "SPEC-2026-016" {
+  title = "Bill Lifecycle: proposal to ratification"
+  status = "active"
+  enforcement = "disabled"
+  name = "Bill Lifecycle: proposal to ratification"
+  slug = "spec-bill-lifecycle"
+  description = "Every unit of work begins as a Bill — a public proposal visible to all participants — and upon ratification becomes a binding Contract. The lifecycle mirrors a legislature: introduction, committee stage (laboratory evidence), readings and debate, ratification or abandonment. Rejected Bills remain in the record as negative space. This is Phase 3 of the Roadmap and the legislative heart of Constitution governance."
+
+  feature "Bill introduction" {
+  }
+
+  feature "Bill lifecycle stages" {
+  }
+
+  feature "Negative space preservation" {
+  }
+  justifies = "NEED-2026-001"
+}
+

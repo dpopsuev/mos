@@ -1,0 +1,42 @@
+contract "CON-2026-072" {
+  title = "Git parity: merge"
+  status = "complete"
+  created_at = 2026-03-03T18:57:44Z
+  updated_at = 2026-03-03T19:10:53Z
+  goal = "Merge governance branches with conflict resolution semantics. Field-level three-way merge for structured artifacts. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-merge"
+  depends_on = "CON-2026-070"
+
+  feature "merge" {
+
+    scenario "fast-forward merge" {
+      status = "done"
+      given {
+        main is ancestor of feature
+      }
+      when {
+        user merges feature into main
+      }
+      then {
+        main advances to feature tip without a merge commit
+      }
+    }
+
+    scenario "three-way merge with conflicts" {
+      status = "done"
+      given {
+        main and feature diverged on the same file
+      }
+      when {
+        user merges feature into main
+      }
+      then {
+        merge reports file-level conflicts
+      }
+    }
+  }
+}
+

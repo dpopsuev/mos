@@ -1,0 +1,43 @@
+contract "CON-2026-064" {
+  title = "Git parity: commit"
+  status = "complete"
+  created_at = 2026-03-03T18:57:17Z
+  updated_at = 2026-03-03T19:10:53Z
+  goal = "Snapshot current governance state as an immutable commit object via the object store. Content-addressable, with parent references forming a DAG. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-commit"
+  depends_on = "CON-2026-063"
+
+  feature "Creating governance commits" {
+
+    scenario "commit staged changes" {
+      status = "done"
+      given {
+        a governance repo with staged artifacts in the index
+      }
+      when {
+        mos vcs commit -m 'update contracts' is run
+      }
+      then {
+        a tree object is built from the index, a commit object is created with the tree hash and parent ref, and HEAD is updated
+      }
+    }
+
+    scenario "nothing to commit" {
+      status = "done"
+      given {
+        a governance repo with no staged changes
+      }
+      when {
+        mos vcs commit is run
+      }
+      then {
+        the command exits with an error indicating nothing to commit
+      }
+    }
+  }
+  sprint = "SPR-2026-006"
+}
+

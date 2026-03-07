@@ -1,0 +1,7 @@
+blob
+sprint "SPR-2026-032" {
+  title = "Quality Vectors Foundation"
+  status = "closed"
+  goal = "Implement the three quality vector verifiers (functional, structural, performance) so the harness can produce real quality measurements instead of pass/fail."
+  contracts = "CON-2026-138,CON-2026-139,CON-2026-140"
+}

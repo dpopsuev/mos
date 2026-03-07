@@ -1,0 +1,360 @@
+# Hypothetical .mos/rules/mechanical/api-backward-compat.mos
+# Kubernetes-scale rule: API backward compatibility enforcement.
+# Same semantic content as kubernetes-rule.toml and kubernetes-rule.hcl.
+# See README.md for experiment context and analysis.
+#
+# This example uses an inline feature (no spec {} wrapper) for side-by-side
+# comparison. In practice, a rule this large would use multi-file composition:
+#
+#   spec {
+#     include "features/field-stability.mos"
+#     include "features/serialization.mos"
+#     include "features/deprecation.mos"
+#   }
+#
+# Each included file contains a standalone feature block.
+
+rule "api-backward-compat" {
+  name        = "API Backward Compatibility"
+  type        = "mechanical"
+  scope       = "organization"
+  enforcement = "error"
+  applicability = "glob"
+  glob        = "staging/src/k8s.io/api/**/*.go"
+  priority    = 100
+  deprecated  = false
+  supersedes  = ["api-compat-v1", "api-compat-v2-beta"]
+  tags        = ["api", "stability", "ga-policy", "sig-api-machinery"]
+  description = """
+    All GA (generally available) API types must maintain backward compatibility.
+    No field may be removed, renamed, or have its type changed without a full
+    deprecation cycle (minimum 3 releases). New required fields are forbidden
+    on existing resources. Default values must not change semantics for existing
+    clients. Serialization round-trip must be preserved.
+
+    This rule implements KEP-1635 and the Kubernetes API deprecation policy.
+    It applies to all API groups under staging/src/k8s.io/api/ and is enforced
+    at the organization level. Exceptions require SIG API Machinery approval
+    through a formal Bill with evidence of migration path and client impact
+    analysis.
+    """
+
+  applicability_overrides {
+    include = [
+      "staging/src/k8s.io/api/core/v1/**",
+      "staging/src/k8s.io/api/apps/v1/**",
+      "staging/src/k8s.io/api/batch/v1/**",
+      "staging/src/k8s.io/api/networking/v1/**",
+      "staging/src/k8s.io/api/rbac/v1/**",
+      "staging/src/k8s.io/api/storage/v1/**",
+      "staging/src/k8s.io/api/autoscaling/v2/**",
+      "staging/src/k8s.io/api/policy/v1/**",
+      "staging/src/k8s.io/api/certificates/v1/**",
+      "staging/src/k8s.io/api/coordination/v1/**",
+      "staging/src/k8s.io/api/discovery/v1/**",
+      "staging/src/k8s.io/api/events/v1/**",
+      "staging/src/k8s.io/api/node/v1/**",
+      "staging/src/k8s.io/api/scheduling/v1/**",
+      "staging/src/k8s.io/api/admissionregistration/v1/**",
+    ]
+    exclude = [
+      "staging/src/k8s.io/api/*/v1alpha1/**",
+      "staging/src/k8s.io/api/*/v1beta1/**",
+      "staging/src/k8s.io/api/*/v2beta1/**",
+      "staging/src/k8s.io/api/*/v2beta2/**",
+      "**/zz_generated.*",
+      "**/doc.go",
+      "**/*_test.go",
+    ]
+  }
+
+  harness {
+    command           = "go run ./cmd/api-compat-check --baseline=release-1.31 --current=HEAD"
+    success_exit_code = 0
+    timeout           = "5m"
+    retry             = 0
+    parallel          = false
+    environment       = { KUBERNETES_API_COMPAT_STRICT = "true", GOFLAGS = "-count=1" }
+
+    thresholds {
+      max_field_additions_per_release  = 50
+      max_type_changes_with_conversion = 10
+      required_deprecation_releases    = 3
+      required_migration_window_days   = 365
+    }
+  }
+
+  identity {
+    created_by         = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    created_at         = 2024-06-15T00:00:00Z
+    creation_signature = "-----BEGIN SSH SIGNATURE-----\nU1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAg...\n-----END SSH SIGNATURE-----"
+    version            = 6
+    last_amended_by    = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    last_amended_at    = 2026-02-01T00:00:00Z
+  }
+
+  governance {
+    owning_sig                   = "sig-api-machinery"
+    approvers = [
+      "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG...",
+      "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIL...",
+      "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIM...",
+    ]
+    exception_process            = "bill"
+    exception_requires_approvers = 2
+    review_cadence               = "quarterly"
+    next_review                  = 2026-06-01T00:00:00Z
+
+    exception {
+      granted_to  = "CON-2025-142"
+      scope       = "staging/src/k8s.io/api/flowcontrol/v1"
+      reason      = "One-time field rename during beta-to-GA transition with automatic conversion webhook"
+      expires     = 2026-03-01T00:00:00Z
+      approved_by = [
+        "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG...",
+        "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIL...",
+      ]
+    }
+
+    exception {
+      granted_to  = "CON-2025-198"
+      scope       = "staging/src/k8s.io/api/resource/v1"
+      reason      = "Dynamic Resource Allocation API restructuring (KEP-4381) -- approved structural change with 2-release migration window"
+      expires     = 2026-06-01T00:00:00Z
+      approved_by = [
+        "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIM...",
+        "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIN...",
+      ]
+    }
+  }
+
+  dependencies {
+    requires_rules = ["api-review-required", "openapi-schema-valid", "protobuf-tag-stable"]
+    conflicts_with = []
+    suggested_with = ["api-deprecation-notice", "client-go-compat"]
+  }
+
+  feature "API Backward Compatibility" {
+    GA API types must maintain backward compatibility across releases.
+    No breaking changes without a full deprecation cycle.
+
+    background {
+      given {
+        the Kubernetes source tree at HEAD
+        the baseline release is "1.31"
+        the API compatibility checker is configured with strict mode
+      }
+    }
+
+    group "No field removal from GA types" {
+      scenario "Stable field exists in both versions" {
+        sut  = "staging/src/k8s.io/api/core/v1/types.go"
+        test = "test/integration/api/field_compat_test.go"
+        case = "TestFieldCompat/Stable field exists in both versions"
+        given {
+          a GA API type "PodSpec" in "core/v1"
+          the field "containers" exists in the baseline
+        }
+        when {
+          I compare the field list between baseline and HEAD
+        }
+        then {
+          the field "containers" exists in HEAD
+          its type has not changed
+        }
+      }
+
+      scenario "Field removed from GA type" {
+        given {
+          a GA API type with a field present in the baseline
+        }
+        when {
+          that field is absent in HEAD
+        }
+        then {
+          the compatibility check fails
+          the violation message includes "field removed from GA type"
+          the violation references the deprecation policy
+        }
+      }
+
+      scenario "Field renamed without alias" {
+        given {
+          a GA API type with a field "podCIDR" in the baseline
+        }
+        when {
+          the field is renamed to "podCIDRs" in HEAD without a JSON alias
+        }
+        then {
+          the compatibility check fails
+          the violation message includes "field renamed without backward-compatible alias"
+        }
+      }
+    }
+
+    group "No type changes on existing fields" {
+      scenario "Field type narrowed" {
+        given {
+          a GA API type with a field of type "string" in the baseline
+        }
+        when {
+          the field type changes to "enum" in HEAD
+        }
+        then {
+          the compatibility check fails
+          the violation message includes "field type changed"
+        }
+      }
+
+      scenario "Field type widened with conversion" {
+        given {
+          a GA API type with a field of type "int32" in the baseline
+          a conversion function exists from int32 to int64
+        }
+        when {
+          the field type changes to "int64" in HEAD
+        }
+        then {
+          the compatibility check passes
+          a warning is emitted for manual review
+        }
+      }
+    }
+
+    group "No new required fields on existing resources" {
+      scenario "Optional field added" {
+        given {
+          a GA API type "Deployment" in "apps/v1"
+        }
+        when {
+          a new field "revisionHistoryPolicy" is added with omitempty
+        }
+        then {
+          the compatibility check passes
+        }
+      }
+
+      scenario "Required field added" {
+        given {
+          a GA API type "Deployment" in "apps/v1"
+        }
+        when {
+          a new field "requiredLabel" is added without omitempty
+          no default value is specified
+        }
+        then {
+          the compatibility check fails
+          the violation message includes "new required field on existing GA type"
+        }
+      }
+    }
+
+    group "Serialization round-trip preservation" {
+      scenario "JSON round-trip intact" {
+        given {
+          a GA API type with a known fixture in the baseline
+        }
+        when {
+          the fixture is serialized to JSON and deserialized back
+        }
+        then {
+          the output matches the input byte-for-byte
+        }
+      }
+
+      scenario "Protobuf round-trip intact" {
+        given {
+          a GA API type with a known fixture in the baseline
+        }
+        when {
+          the fixture is serialized to protobuf and deserialized back
+        }
+        then {
+          all fields are preserved
+          no unknown fields are introduced
+        }
+      }
+    }
+
+    group "Default value stability" {
+      scenario "Default value unchanged" {
+        given {
+          a GA API type with field "restartPolicy" defaulting to "Always"
+        }
+        when {
+          I read the default in HEAD
+        }
+        then {
+          it is still "Always"
+        }
+      }
+
+      scenario "Default value changed" {
+        given {
+          a GA API type with a field that has a default value in the baseline
+        }
+        when {
+          the default value differs in HEAD
+        }
+        then {
+          the compatibility check fails
+          the violation message includes "default value changed for GA field"
+        }
+      }
+    }
+
+    group "Deprecation cycle enforcement" {
+      scenario "Deprecated field within window" {
+        given {
+          a GA field deprecated in release "1.30"
+          the deprecation policy requires 3 releases
+        }
+        when {
+          the current release is "1.32"
+        }
+        then {
+          the field must still be present
+          a deprecation warning is acceptable
+        }
+      }
+
+      scenario "Deprecated field removed after window" {
+        given {
+          a GA field deprecated in release "1.28"
+          the deprecation policy requires 3 releases
+        }
+        when {
+          the current release is "1.32"
+        }
+        then {
+          the field may be removed
+          the removal is recorded in the changelog
+        }
+      }
+    }
+
+    group "Rate limiting structural changes" {
+      scenario "Field additions within threshold" {
+        given {
+          30 new fields added across all GA types in this release
+          the threshold is 50 fields per release
+        }
+        then {
+          the compatibility check passes
+        }
+      }
+
+      scenario "Field additions exceed threshold" {
+        given {
+          65 new fields added across all GA types in this release
+          the threshold is 50 fields per release
+        }
+        then {
+          the compatibility check fails
+          the violation message includes "field addition rate exceeds threshold"
+          the message suggests splitting changes across releases
+        }
+      }
+    }
+  }
+}

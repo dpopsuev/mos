@@ -1,0 +1,24 @@
+declaration {
+  name = "kubernetes"
+  created = 2024-01-15T00:00:00Z
+  authors = [
+    "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG...",
+    "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIL...",
+  ]
+  description = """
+    Kubernetes is an open-source container orchestration platform.
+    This Constitution instance governs API stability, deprecation
+    policy, and contribution standards.
+    """
+
+  identity {
+    created_by = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    created_at = 2024-01-15T00:00:00Z
+    creation_signature = """
+-----BEGIN SSH SIGNATURE-----
+U1NIU0lH...
+-----END SSH SIGNATURE-----"""
+    version = 1
+  }
+}
+

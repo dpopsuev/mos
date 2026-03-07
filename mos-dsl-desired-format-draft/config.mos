@@ -1,0 +1,254 @@
+# .mos/config.mos
+# Project-level Constitution configuration.
+# Unnamed artifact -- exactly one per repository.
+#
+# Upstream federation is recursive, not tier-locked.
+#
+# A mos with NO `upstream` block is a domain root -- the ultimate
+# authority. Every other mos declares one or more `upstream` blocks
+# pointing at parent moss. Depth is emergent from the chain; there
+# is no hardcoded number of tiers.
+#
+# The `scope` field on `upstream` and `governance` blocks is a user-defined
+# label (free string), NOT a structural tier. It exists for human readability
+# and linter diagnostics only. The real hierarchy is the upstream DAG.
+#
+# Rules cascade downward: a downstream repo inherits all upstream rules and
+# can add its own, but must not contradict ancestors. `extends` references a
+# specific ancestor rule to specialize it.
+#
+# ──────────────────────────────────────────────────────────────────────────
+# Concrete example: Red Hat organizational hierarchy (7 tiers)
+#
+#   Depth 0  CEO/President          ← domain root (no upstream)
+#     └─ 1   CTO                    ← upstream → CEO
+#          └─ 2  VP Engineering     ← upstream → CTO
+#               └─ 3  Telco Division Director  ← upstream → VP
+#                    └─ 4  Telco QE Director   ← upstream → Division
+#                         └─ 5  QE Manager (group collective) ← upstream → Director
+#                              └─ 6  Quality Engineer (cabinet - individual) ← upstream → Manager
+#
+# Each node is a separate repository. The depth is not special -- adding
+# depth 7, 8, ... is just another `upstream` block. The grammar never
+# cares how deep you are.
+# ──────────────────────────────────────────────────────────────────────────
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 0 — CEO/President. Domain root. No upstream. Source of all authority.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+    format  = "dsl-v3"
+  }
+
+  backend {
+    type = "git"
+    refs_prefix = "refs/mos/"
+  }
+
+  governance {
+    model = "bdfl"
+    scope = "executive"
+    jurisdiction = "company-wide"
+    ratification_authority = ["ceo"]
+    default_enforcement = "error"
+  }
+}
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 1 — CTO. Points at CEO.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "ceo" {
+    url   = "https://github.com/redhat/corporate-mos"
+    ref   = "main"
+    scope = "executive"
+  }
+
+  governance {
+    model = "bdfl"
+    scope = "c-suite"
+    jurisdiction = "technology"
+    ratification_authority = ["cto"]
+  }
+}
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 2 — VP Engineering. Points at CTO.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "cto" {
+    url   = "https://github.com/redhat/cto-mos"
+    ref   = "main"
+    scope = "c-suite"
+  }
+
+  governance {
+    model = "committee"
+    scope = "vp"
+    jurisdiction = "engineering"
+    ratification_authority = ["vp-engineering"]
+  }
+}
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 3 — Telco Division Director. Points at VP.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "vp-eng" {
+    url   = "https://github.com/redhat/engineering-mos"
+    ref   = "main"
+    scope = "vp"
+  }
+
+  governance {
+    model = "committee"
+    scope = "division"
+    jurisdiction = "telecommunications"
+    ratification_authority = ["telco-division-director"]
+  }
+}
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 4 — Telco QE Director. Points at Division.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "telco-division" {
+    url   = "https://github.com/redhat/telco-mos"
+    ref   = "main"
+    scope = "division"
+  }
+
+  governance {
+    model = "committee"
+    scope = "department"
+    jurisdiction = "telco-quality-engineering"
+    ratification_authority = ["telco-qe-director"]
+  }
+}
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 5 — QE Manager. Group Collective. Points at QE Director.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "telco-qe" {
+    url   = "https://github.com/redhat/telco-qe-mos"
+    ref   = "main"
+    scope = "department"
+  }
+
+  governance {
+    model = "consensus"
+    scope = "collective"
+    jurisdiction = "qe-platform-team"
+    ratification_authority = ["qe-manager"]
+  }
+}
+
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+# Depth 6 — Quality Engineer. Cabinet (Individual). Points at Manager.
+# The leaf node. Governance scope "cabinet" = individual contributor.
+# ┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "qe-team" {
+    url   = "https://github.com/redhat/qe-platform-mos"
+    ref   = "main"
+    scope = "collective"
+  }
+
+  governance {
+    model = "bdfl"
+    scope = "cabinet"
+    jurisdiction = "individual"
+    ratification_authority = ["dpopsuev"]
+  }
+}
+
+# ──────────────────────────────────────────────────────────────────────────
+# Multiple upstreams -- cross-org federation.
+# A repo can inherit from more than one upstream (DAG, not just tree).
+# ──────────────────────────────────────────────────────────────────────────
+
+config {
+  mos {
+    version = 1
+  }
+
+  backend {
+    type = "git"
+  }
+
+  upstream "org-a" {
+    url   = "https://github.com/org-a/mos"
+    ref   = "main"
+    scope = "partner-org"
+  }
+
+  upstream "org-b" {
+    url   = "https://github.com/org-b/mos"
+    ref   = "main"
+    scope = "partner-org"
+  }
+
+  governance {
+    model = "consensus"
+    scope = "joint-venture"
+    jurisdiction = "cross-org-project"
+  }
+}

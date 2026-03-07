@@ -1,0 +1,168 @@
+blob
+contract "CON-2026-019" {
+  title = "Consilium IDE Prototype"
+  status = "draft"
+  justifies = "NEED-2026-001"
+  goal = "A working terminal IDE prototype split into Consilium (TUI client) and Curia (headless server/daemon) that combines code editing, code observability, circuit-driven agent execution (Origami), circuit visualization (Sumi), and BYOB model integration (Ollama). Consilium is the thin Bubbletea TUI that renders and captures input; Curia is the persistent daemon that manages sessions, buffers, agents, and circuit execution. Dog-food gate: edit Mos's own source code through a full Consilium-to-Curia session."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Editor buffer operations, panel layout logic, Component registration, circuit YAML loading."
+    }
+
+    integration {
+      applies = true
+      rationale = "moslib/survey integration, Origami Component wiring, ProviderRouter to Ollama, Kami EventBridge connection."
+    }
+
+    contract {
+      applies = true
+      rationale = "Origami Component interface compliance, ProviderRouter dispatch contract, MCP tool schemas."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Dog-food gate: open file, edit, run harness circuit, visualize, chat -- full session."
+    }
+
+    concurrency {
+      applies = true
+      rationale = "MuxDispatcher multi-agent coordination, Papercup worker goroutines, EventBridge SSE streaming."
+    }
+
+    security {
+      applies = true
+      rationale = "Ollama API key handling, cloud provider credential management, agent-initiated file edit trust boundary."
+    }
+  }
+
+  feature "Consilium IDE PoC" {
+
+    scenario "Editor opens and edits a file" {
+      given {
+        a Go source file exists at "moslib/model/module.go"
+      }
+      when {
+        the user runs "consilium moslib/model/module.go"
+      }
+      then {
+        the file is displayed with syntax highlighting
+        the user can insert, delete, and select text
+        the user can save the file
+        undo/redo works
+      }
+    }
+
+    scenario "Code observability panels work" {
+      given {
+        Consilium is open with a Go project
+      }
+      when {
+        the user toggles the module tree panel
+      }
+      then {
+        packages, files, and symbols are displayed in a navigable tree
+        selecting a symbol in the tree navigates the editor to that location
+        the import graph panel shows dependencies for the selected package
+      }
+    }
+
+    scenario "IDE circuit executes via Origami" {
+      given {
+        Consilium has a registered Component with IDE-domain transformers
+        ProviderRouter is wired to Ollama or a cloud provider
+      }
+      when {
+        the user triggers the "run harness" circuit on the current project
+      }
+      then {
+        the circuit executes: harness discovery, command execution, result extraction
+        results are displayed in the Consilium UI
+        the circuit execution is visible in the Sumi viewer
+      }
+    }
+
+    scenario "Agent chat works with BYOB providers" {
+      given {
+        Ollama is running locally with a model loaded
+        ProviderRouter is configured with Ollama as a provider
+      }
+      when {
+        the user opens the agent chat pane and sends a message
+      }
+      then {
+        the message is dispatched via MuxDispatcher to Ollama
+        the response is displayed in the chat pane
+        the chat has access to the current file context
+      }
+    }
+
+    scenario "Headless daemon persists sessions" {
+      given {
+        Curia server is running via "consilium serve"
+        a client is attached and an agent circuit is executing
+      }
+      when {
+        the client disconnects (crash or intentional detach)
+      }
+      then {
+        the server continues running
+        the agent circuit continues executing
+        a new client can attach via "consilium attach" and resume the session
+        buffer state, circuit progress, and agent conversation are preserved
+      }
+    }
+
+    scenario "Multi-client collaboration" {
+      given {
+        Curia server is running with a project open
+        two clients are attached to the same server
+      }
+      when {
+        Client A edits file X and Client B edits file Y
+      }
+      then {
+        both clients see each other's cursor positions
+        file X is locked from Client B's edits (locked zone)
+        both clients see the same circuit execution state
+        agent activity is visible to both clients simultaneously
+      }
+    }
+
+    scenario "Remote execution mode" {
+      given {
+        Curia server is running on a remote host with Ollama and project files
+      }
+      when {
+        a client attaches via "consilium attach remote-host:port"
+      }
+      then {
+        the client renders the remote project's files
+        agent circuits execute on the remote server using its Ollama instance
+        edits are applied to remote files
+        the client TUI is a thin renderer with no local file access needed
+      }
+    }
+
+    scenario "Dog-food gate passes" {
+      given {
+        Mos repository is open in Consilium
+      }
+      when {
+        the user edits a file, views the module tree, runs a harness circuit, and chats with an agent
+      }
+      then {
+        all four operations work in a single Consilium session
+        no crashes or data loss
+        the harness circuit results are visible in the Sumi viewer
+        disconnecting and reconnecting preserves the full session state
+      }
+    }
+  }
+  updated_at = 2026-03-03T19:10:39Z
+  batch = "BAT-2026-003"
+  slug = "consilium-ide-proto"
+}
+

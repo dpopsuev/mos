@@ -1,0 +1,16 @@
+blob
+contract "CON-2026-116" {
+  title = "List output includes artifact names"
+  status = "complete"
+  created_at = 2026-03-03T21:33:27Z
+  updated_at = 2026-03-04T09:25:51Z
+  slug = "list-shows-names"
+  description = "The list subcommand on all artifact types must show the artifact name alongside the ID and status. Currently new specs list with blank names, requiring individual show calls to identify them. For agents, this forces N extra round-trips to understand what exists. The list is the orientation command — it must be self-sufficient."
+  name = "List output includes artifact names"
+
+  feature "Names in list output" {
+  }
+  batch = ""
+  sprint = "SPR-2026-013"
+}
+

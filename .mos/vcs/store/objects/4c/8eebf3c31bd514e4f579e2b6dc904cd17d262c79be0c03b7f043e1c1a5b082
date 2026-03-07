@@ -1,0 +1,42 @@
+blob
+contract "CON-2026-231" {
+  title = "Guard Facade: unified enforcement API"
+  status = "complete"
+  created_at = 2026-03-04T00:00:00Z
+  updated_at = 2026-03-04T00:00:00Z
+  goal = "Complete moslib/guard as the unified facade for all enforcement operations (lint, harness, VCS pre-commit, CI gates, audit), replacing the current scattered implementations across vcscmd, ci, and direct linter/harness calls"
+  justifies = "SPEC-2026-001"
+  kind = "refactor"
+
+  scope {
+    depends_on = ["CON-2026-089"]
+  }
+
+  section "current-state" {
+    description = "moslib/guard is a 40-line stub. Guard logic is scattered: pre-commit hooks live in cmd/mos/vcscmd, CI gates in cmd/mos/ci, lint invocations in multiple CLI commands. ARCH-desired places linter, harness, vcs, ci, audit under Guard."
+  }
+
+  feature "Guard API: single entry point for all enforcement operations" {
+
+    scenario "G1" {
+      given = "A project root"
+      when = "guard.PreCommit(root) is called"
+      then = "Runs lint + harness checks and returns a unified pass/fail result with diagnostics"
+    }
+
+    scenario "G2" {
+      given = "A project root and CI stage configuration"
+      when = "guard.CIGate(root, stage) is called"
+      then = "Runs the appropriate subset of checks for that CI stage"
+    }
+
+    scenario "G3" {
+      given = "guard.PreCommit is available"
+      when = "cmd/mos/vcscmd pre-commit hook is invoked"
+      then = "It delegates to guard.PreCommit instead of directly calling linter and harness"
+    }
+  }
+  sprint = "SPR-2026-035"
+  slug = "guard-facade"
+}
+

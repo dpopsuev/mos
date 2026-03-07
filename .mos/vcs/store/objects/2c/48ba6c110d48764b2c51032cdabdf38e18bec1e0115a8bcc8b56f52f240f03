@@ -1,0 +1,7 @@
+blob
+sprint "SPR-2026-035" {
+  title = "Architecture Convergence: Guard + Golden Rule + Interfaces"
+  status = "closed"
+  goal = "Close the remaining ARCH-desired gaps: complete the Guard facade, enforce the Golden Rule (artifact as sole .mos/ gateway), and define explicit Interface A/B boundaries."
+  contracts = "CON-2026-231,CON-2026-232,CON-2026-233"
+}

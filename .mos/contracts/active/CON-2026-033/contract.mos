@@ -1,0 +1,228 @@
+contract "CON-2026-033" {
+  title = "Metrics & Bottleneck Detection"
+  status = "deferred"
+  created_at = 2026-03-03T14:47:37Z
+  updated_at = 2026-03-03T19:10:45Z
+  goal = "MetricsSink collecting per-tick measurements, threshold-based bottleneck flags, Enceladus Index, and report generation."
+  labels = ["dogfood", "simulation", "dunix"]
+  parent = "CON-2026-029"
+
+  feature "MetricsSink collection" {
+
+    scenario "Performance metrics recorded per tick" {
+      status = "pending"
+      given {
+        a running simulation with MetricsSink attached
+      }
+      when {
+        a RunLinter activity completes at tick 500
+      }
+      then {
+        lint_time_ms is recorded for tick 500
+        parse_time_ms is recorded
+        the metric is tagged with site and repo
+      }
+    }
+
+    scenario "Governance health metrics" {
+      status = "pending"
+      given {
+        a repo with 3 orphan needs and 2 uncovered criteria
+      }
+      when {
+        governance health is sampled at tick 1000
+      }
+      then {
+        orphan_count = 3
+        uncovered_criteria = 2
+        scope_violations and dangling_crosssite_links are recorded
+      }
+    }
+
+    scenario "Scale metrics grow over time" {
+      status = "pending"
+      given {
+        a simulation starting with 4 repos and 15 engineers
+      }
+      when {
+        the simulation reaches Era III (tick 7300+)
+      }
+      then {
+        total_artifacts > 100
+        repo_count > 10
+        site_count >= 4
+      }
+    }
+  }
+
+  feature "Bottleneck detection" {
+
+    scenario "Threshold crossing raises a flag" {
+      status = "pending"
+      given {
+        a bottleneck threshold: lint_time_ms > 5000
+      }
+      when {
+        lint_time_ms reaches 6200 at tick 14600 on Ganymede
+      }
+      then {
+        a BottleneckFlag is emitted with tick=14600, site=Ganymede, metric=lint_time_ms, value=6200
+      }
+    }
+
+    scenario "Governance bottleneck: orphan rate" {
+      status = "pending"
+      given {
+        a threshold: orphan_rate > 0.15
+      }
+      when {
+        orphan_count / total_needs exceeds 0.15 at tick 8000
+      }
+      then {
+        a BottleneckFlag is emitted for governance health
+      }
+    }
+
+    scenario "Chain depth bottleneck" {
+      status = "pending"
+      given {
+        a threshold: max_chain_depth > 10
+      }
+      when {
+        a traceability chain spans 12 artifacts across 3 sites
+      }
+      then {
+        a BottleneckFlag is emitted with the chain details
+      }
+    }
+  }
+
+  feature "Enceladus Index" {
+
+    scenario "Enceladus Index computed correctly" {
+      status = "pending"
+      given {
+        10 linter warnings flagged in the last 1000 ticks
+        3 of those warnings were ignored (no action taken)
+        1 incident occurred that matched an ignored warning
+      }
+      when {
+        the Enceladus Index is calculated
+      }
+      then {
+        enceladus_index = ignored_warnings / incidents = 3.0
+        a high index (> 2.0) is flagged as a governance risk
+      }
+    }
+  }
+
+  feature "Report generation" {
+
+    scenario "Per-era summary" {
+      status = "pending"
+      given {
+        a completed 5-era simulation
+      }
+      when {
+        the report is generated
+      }
+      then {
+        5 era summaries are produced
+        each summary includes: site count, repo count, artifact count, bottleneck count
+      }
+    }
+
+    scenario "Bottleneck report lists all flags" {
+      status = "pending"
+      given {
+        a simulation that produced 15 bottleneck flags
+      }
+      when {
+        the bottleneck report is generated
+      }
+      then {
+        all 15 flags are listed with tick, site, repo, era, metric, value
+        flags are sorted by tick
+      }
+    }
+
+    scenario "Governance model scorecard" {
+      status = "pending"
+      given {
+        a simulation with 8 governance models across 14 sites
+      }
+      when {
+        the scorecard is generated
+      }
+      then {
+        each site gets a score including: avg chain depth, time-to-addressed, orphan rate, sync latency
+        governance models are ranked by overall health
+        military models are scored separately with compartment overhead metrics
+      }
+    }
+  }
+
+  feature "Compartmentalization metrics" {
+
+    scenario "Opaque reference count tracked" {
+      status = "pending"
+      given {
+        a simulation with civilian and military sites
+      }
+      when {
+        the linter encounters cross-references to compartmented artifacts
+      }
+      then {
+        opaque_reference_count is recorded per tick
+        the count grows as military repos accumulate artifacts
+      }
+    }
+
+    scenario "Clearance denial rate tracked" {
+      status = "pending"
+      given {
+        civilian operators attempt to access compartmented artifacts
+      }
+      when {
+        metrics are sampled
+      }
+      then {
+        clearance_denial_rate (denials / total access attempts) is recorded
+        a high denial rate flags potential misconfiguration
+      }
+    }
+
+    scenario "Declassification count tracked" {
+      status = "pending"
+      given {
+        the USSN declassifies ussn-conscience at tick 23725
+      }
+      when {
+        the declassification event is processed
+      }
+      then {
+        declassification_count increments
+        previously opaque references become normal references
+        the Enceladus Index is recomputed with the newly visible data
+      }
+    }
+
+    scenario "Graph integrity score after Quiet War" {
+      status = "pending"
+      given {
+        40% of SRJSN cross-reference links are corrupted at tick 31025
+      }
+      when {
+        graph integrity is measured
+      }
+      then {
+        graph_integrity_score drops from 1.0 to approximately 0.6
+        sealed governance chain recovery restores it over subsequent ticks
+        recovery time (ticks to reach 0.95 integrity) is recorded
+      }
+    }
+  }
+  batch = "BAT-2026-002"
+  slug = "metrics-bottleneck"
+}
+

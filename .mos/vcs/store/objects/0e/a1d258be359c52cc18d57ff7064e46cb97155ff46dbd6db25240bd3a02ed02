@@ -1,0 +1,30 @@
+blob
+contract "CON-2026-162" {
+  title = "Add unit tests for CLI subpackage handlers"
+  status = "complete"
+  created_at = 2026-03-04T18:44:12Z
+  updated_at = 2026-03-04T18:44:12Z
+  goal = "Add at least 3 handler-level unit tests per CLI subpackage (contract, rule, config, vcscmd, ci, generic, spec, binder, lexicon). Tests invoke the Cobra command with args and verify behavior via temp directories — not process exec. Minimum 27 new tests total."
+  kind = "feature"
+
+  acceptance {
+
+    criterion "min-tests-per-pkg" {
+      description = "At least 3 handler-level unit tests per CLI subpackage (contract, rule, config, vcscmd, ci, generic, spec, binder, lexicon)"
+    }
+
+    criterion "no-process-exec" {
+      description = "Tests invoke Cobra commands programmatically via cmd.Execute(), not via os/exec"
+    }
+
+    criterion "temp-dir-isolation" {
+      description = "Each test uses t.TempDir() for filesystem isolation"
+    }
+
+    criterion "min-total" {
+      description = "Minimum 27 new handler tests total across all subpackages"
+    }
+  }
+  sprint = "SPR-2026-011"
+}
+

@@ -1,0 +1,171 @@
+contract "CON-2026-126" {
+  title = "Test matrix lifecycle: ROGYB scoping, coverage matrix on specs, scenario labels"
+  status = "complete"
+  slug = "test-matrix-lifecycle"
+  justifies = "SPEC-2026-028"
+  sprint = "SPR-2026-005"
+  goal = "ROGYB is a process methodology scoped to active contracts only. The enduring proof lives on specifications as a test matrix (unit, integration, e2e, concurrency, security) with symbol bindings per layer. Scenarios gain a labels array field for classification (happy_path, sad_path, adversarial, edge_case, regression). Contract completion gates deposit the matrix and labeled scenarios into the justified specification. The harness runner supports label-based filtering."
+  created_at = 2026-03-04T10:30:00Z
+  updated_at = 2026-03-04T10:54:22Z
+
+  feature "ROGYB scoped to active contracts" {
+
+    scenario "ROGYB policy warns only active contracts" {
+      given {
+        the rogyb-harness-required rule with when artifact_kind = contract
+      }
+      when {
+        an archived contract without a coverage block is linted
+      }
+      then {
+        no policy-match warning is emitted
+      }
+    }
+
+    scenario "Active contract without coverage block triggers warning" {
+      given {
+        the rogyb-harness-required rule
+      }
+      when {
+        an active contract without a coverage block is linted
+      }
+      then {
+        a policy-match warning is emitted
+      }
+    }
+  }
+
+  feature "Test matrix on specifications" {
+
+    scenario "Spec declares coverage per layer with symbol bindings" {
+      given {
+        a specification with enforcement = warn
+      }
+      when {
+        the spec has a test_matrix block with unit and integration symbols
+      }
+      then {
+        spec-traceability reports no warnings
+      }
+    }
+
+    scenario "Missing test matrix triggers spec-traceability warning" {
+      given {
+        a specification with enforcement = warn and no test_matrix block
+      }
+      when {
+        the linter runs
+      }
+      then {
+        a spec-traceability warning is emitted for missing coverage layers
+      }
+    }
+
+    scenario "N/A layer with reason is accepted" {
+      given {
+        a spec with test_matrix where e2e has applies = false and a reason
+      }
+      when {
+        the linter runs
+      }
+      then {
+        no warning for e2e layer
+      }
+    }
+  }
+
+  feature "Scenario labels as array field" {
+
+    scenario "Single label on scenario" {
+      given {
+        a contract with a feature containing a scenario with labels = ["happy_path"]
+      }
+      when {
+        the parser reads the scenario
+      }
+      then {
+        the scenario Labels field contains happy_path
+      }
+    }
+
+    scenario "Multiple labels on scenario" {
+      given {
+        a scenario with labels = ["regression", "adversarial"]
+      }
+      when {
+        the parser reads the scenario
+      }
+      then {
+        the scenario Labels field contains both values
+      }
+    }
+
+    scenario "Harness filters by label" {
+      given {
+        a contract with scenarios labeled happy_path, sad_path, and adversarial
+      }
+      when {
+        mos harness run --label adversarial is executed
+      }
+      then {
+        only scenarios with adversarial in their labels array are run
+      }
+    }
+
+    scenario "Policy requires happy_path label per feature" {
+      given {
+        a linter policy requiring at least one happy_path per feature
+      }
+      when {
+        a feature has scenarios but none labeled happy_path
+      }
+      then {
+        a warning is emitted
+      }
+    }
+  }
+
+  feature "Completion gate deposits into specification" {
+
+    scenario "Contract completion checks spec has test matrix" {
+      given {
+        a complete contract that justifies SPEC-X
+      }
+      when {
+        the contract transitions active to complete
+      }
+      then {
+        the gate checks SPEC-X has a test_matrix block with symbols for applicable layers
+      }
+    }
+
+    scenario "Spec without matrix blocks contract completion" {
+      given {
+        a contract justifying SPEC-X where SPEC-X has no test_matrix
+      }
+      when {
+        the contract transitions active to complete
+      }
+      then {
+        the transition is blocked explaining which matrix layers are missing
+      }
+    }
+  }
+
+  coverage {
+
+    unit {
+      applies = true
+    }
+
+    integration {
+      applies = true
+    }
+  }
+  batch = "BAT-2026-006"
+
+  scope {
+    depends_on = ["CON-2026-125"]
+  }
+}
+

@@ -1,0 +1,129 @@
+blob
+contract "CON-2026-029" {
+  title = "Lifecycle hooks: declarative aggregate-state triggers on artifact types"
+  status = "complete"
+  created_at = 2026-03-03T12:00:00Z
+  updated_at = 2026-03-03T12:00:00Z
+  goal = "Add a hooks block to the lifecycle definition of any artifact_type. Hooks are declarative rules: on_all(field, value) -> set(target_field, target_value). The framework evaluates hooks after any field mutation on child elements (e.g. scenarios inside a contract). The built-in contract type ships with a sane default hook: when all scenario statuses reach verified, set contract status to complete. When >= 1 scenario status reaches implemented, set contract status to active. Hooks are generic primitives on artifact_type, not hardcoded to contracts. Worst case: schema change, not code change."
+  kind = "feature"
+  depends_on = ["CON-2026-025", "CON-2026-028"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Hook parsing from lifecycle block, aggregate evaluation, field mutation."
+    }
+
+    integration {
+      applies = true
+      rationale = "Scenario status change triggers hook, contract status auto-transitions."
+    }
+
+    contract {
+      applies = false
+    }
+
+    e2e {
+      applies = false
+    }
+
+    concurrency {
+      applies = false
+    }
+
+    security {
+      applies = false
+    }
+  }
+
+  feature "Declarative Lifecycle Hooks" {
+
+    scenario "Parse hooks block from artifact_type lifecycle" {
+      status = "done"
+      given {
+        an artifact_type with lifecycle containing a hooks block
+        the hooks block defines on_all with field, value, set_field, set_value
+      }
+      when {
+        the registry is loaded
+      }
+      then {
+        the LifecycleDef contains parsed HookDefs
+        each HookDef has trigger type, watched field, threshold value, target field, and target value
+      }
+    }
+
+    scenario "on_any hook fires when at least one child matches" {
+      status = "done"
+      given {
+        a hook defined as on_any(status, implemented) -> set(status, active)
+        an artifact with 3 child scenarios all pending
+      }
+      when {
+        one scenario status is set to implemented
+      }
+      then {
+        the hook fires and sets the parent artifact status to active
+      }
+    }
+
+    scenario "on_all hook fires when every child matches" {
+      status = "done"
+      given {
+        a hook defined as on_all(status, verified) -> set(status, complete)
+        an artifact with 3 child scenarios
+      }
+      when {
+        all 3 scenario statuses reach verified
+      }
+      then {
+        the hook fires and sets the parent artifact status to complete
+      }
+    }
+
+    scenario "Hook does not fire when threshold not met" {
+      status = "done"
+      given {
+        a hook defined as on_all(status, verified) -> set(status, complete)
+        an artifact with 3 child scenarios and 2 are verified
+      }
+      when {
+        the hooks are evaluated
+      }
+      then {
+        the hook does not fire
+        the parent status remains unchanged
+      }
+    }
+
+    scenario "Hooks are idempotent" {
+      status = "done"
+      given {
+        a hook that has already fired and set status to complete
+      }
+      when {
+        the hooks are evaluated again without changes
+      }
+      then {
+        no redundant write occurs
+        the status remains complete
+      }
+    }
+
+    scenario "Default contract type ships with sane hook defaults" {
+      status = "done"
+      given {
+        a fresh mos init workspace
+      }
+      when {
+        the built-in contract artifact_type is inspected
+      }
+      then {
+        it has on_any(status, implemented) -> set(status, active)
+        it has on_all(status, verified) -> set(status, complete)
+      }
+    }
+  }
+}
+

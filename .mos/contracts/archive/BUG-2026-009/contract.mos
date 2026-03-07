@@ -1,0 +1,30 @@
+contract "BUG-2026-009" {
+  title = "Missing CLI command: add-criterion for acceptance blocks"
+  status = "complete"
+  created_at = 2026-03-04T14:36:17Z
+  updated_at = 2026-03-04T14:36:17Z
+  goal = "Needs (and potentially specs) have acceptance { criterion ... } blocks but no CLI command to add criteria. The add-section, add-feature, add-scenario, add-coverage verbs exist for other nested structures, but add-criterion is absent. Users must fall back to file editing or apply to add acceptance criteria."
+  kind = "bug"
+  slug = "missing-add-criterion-cli"
+  sprint = "SPR-2026-012"
+
+  acceptance {
+
+    criterion "contract-add-criterion" {
+      description = "mos contract add-criterion <ID> --name <slug> --description <text> adds a criterion to the acceptance block"
+    }
+
+    criterion "creates-acceptance-block" {
+      description = "If no acceptance block exists, one is created automatically"
+    }
+
+    criterion "all-artifact-kinds" {
+      description = "Works on contracts, needs, specs, and all generic artifact types with acceptance blocks"
+    }
+
+    criterion "build-clean" {
+      description = "go build ./... and go test ./... pass with zero errors"
+    }
+  }
+}
+

@@ -1,0 +1,74 @@
+blob
+contract "CON-2026-236" {
+  title = "Fast Governance Mode: Audit Without Harness Execution"
+  status = "complete"
+  slug = "fast-governance-mode"
+  justifies = "NEED-2026-005"
+  depends_on = "CON-2026-141"
+  kind = "feature"
+  goal = "Provide a --no-harness flag on mos audit that skips external command execution (go test, benchmarks, etc.) and returns only governance-layer results: lint counts, integrity index from cached snapshots, sprint status, orphan contracts, architecture violations, and drift. This enables a sub-second feedback loop for AI agents that need governance state without waiting for test execution. The full harness remains the default for CI and human use."
+
+  feature "Skip harness execution" {
+
+    scenario "audit with --no-harness returns governance data only" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a project with harness rules that take 30 seconds to execute
+      }
+      when {
+        mos audit --no-harness is run
+      }
+      then {
+        the audit completes in under 2 seconds returning lint sprint and architecture data
+      }
+    }
+
+    scenario "integrity index uses last cached snapshot when harness is skipped" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        3 snapshots exist in .mos/snapshots/ from previous runs
+      }
+      when {
+        mos audit --no-harness is run
+      }
+      then {
+        the report shows the integrity score from the most recent snapshot instead of recomputing
+      }
+    }
+
+    scenario "no-harness with no cached snapshots reports index as unavailable" {
+      labels = ["edge_case"]
+      actor = "agent"
+      given {
+        no snapshots exist in .mos/snapshots/
+      }
+      when {
+        mos audit --no-harness is run
+      }
+      then {
+        the integrity index section shows N/A with a note to run a full audit first
+      }
+    }
+  }
+
+  feature "Governance-only JSON output" {
+
+    scenario "JSON output includes all governance fields" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        an agent needs structured governance state for decision-making
+      }
+      when {
+        mos audit --no-harness --format json is run
+      }
+      then {
+        the JSON includes lint_errors lint_warnings sprint_status orphan_contracts arch_violations drift_violations and cached integrity_score
+      }
+    }
+  }
+  batch = "BAT-2026-007"
+  sprint = "SPR-2026-036"
+}

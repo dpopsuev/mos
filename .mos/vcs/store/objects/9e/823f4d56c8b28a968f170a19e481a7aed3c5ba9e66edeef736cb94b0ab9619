@@ -1,0 +1,176 @@
+blob
+contract "CON-2026-045" {
+  title = "Site Topology & Locales"
+  status = "deferred"
+  created_at = 2026-03-03T14:47:31Z
+  updated_at = 2026-03-03T19:10:45Z
+  goal = "Define the 10 simulation sites (Terra through Triton) with latency matrix, and 7 locale keyword registries (TerranEnglish through Tritonic)."
+  labels = ["dogfood", "simulation", "dunix"]
+  parent = "CON-2026-029"
+
+  feature "Site topology" {
+
+    scenario "14 sites with latency matrix" {
+      status = "pending"
+      given {
+        the full Dunix site registry is initialized (10 civilian + 4 military)
+      }
+      when {
+        all sites are queried
+      }
+      then {
+        14 sites exist: Terra, Luna, Mars, Ceres, Ganymede, Europa, Titan, Enceladus, Miranda, Triton, Olympus, Vesta, Tiangong-Ares, Zvezdny
+        each pair has a defined one-way latency in ticks
+        Luna has the shortest latency to Terra (1 tick)
+        Triton has the longest latency to Terra (280 ticks)
+        military sites share latency with their co-located civilian sites
+      }
+    }
+
+    scenario "Site has forge, teams, and locale" {
+      status = "pending"
+      given {
+        site Terra is initialized
+      }
+      when {
+        Terra is inspected
+      }
+      then {
+        it has a forge (bare git repos)
+        it has a team list (initially 3 teams)
+        it has locale TerranEnglish
+      }
+    }
+
+    scenario "Sites can be added at specific ticks" {
+      status = "pending"
+      given {
+        a simulation with only Terra at tick 0
+      }
+      when {
+        the NewSiteJoins milestone fires at tick 365 for Mars
+      }
+      then {
+        Mars site is created with its forge and teams
+        the latency matrix is extended to include Mars
+      }
+    }
+
+    scenario "Luna is relay-only (no repos)" {
+      status = "pending"
+      given {
+        the Luna site is initialized
+      }
+      when {
+        Luna's repos are queried
+      }
+      then {
+        repo count is 0
+        Luna has role = "arbiter"
+        Luna runs linter but never commits code
+      }
+    }
+  }
+
+  feature "Locale keyword registries" {
+
+    scenario "7 locales with distinct keyword mappings" {
+      status = "pending"
+      given {
+        all 7 locales are registered
+      }
+      when {
+        each locale is queried for its governance keywords
+      }
+      then {
+        TerranEnglish maps contract, rule, specification, need, architecture, docs
+        MartianEnglish maps mandate, capability, specification, need, structure, docs
+        BeltCreole maps mandate, edict, spec, signal, blueprint, log
+        Jovian maps charter, signal, specification, need, architecture, record
+        Titanese maps covenant, intuition, thesis, need, form, reflection
+        Compact maps pact, rule, spec, need, plan, note
+        Tritonic maps protocol, axiom, thesis, signal, schema, entry
+      }
+    }
+
+    scenario "Locale creation at milestone tick" {
+      status = "pending"
+      given {
+        a simulation with TerranEnglish only
+      }
+      when {
+        the LocaleCreation milestone fires at tick 1825 for MartianEnglish
+      }
+      then {
+        MartianEnglish is registered in the locale registry
+        Mars site's locale is set to MartianEnglish
+        artifacts created on Mars after tick 1825 use MartianEnglish keywords
+      }
+    }
+
+    scenario "Cross-locale artifact resolution" {
+      status = "pending"
+      given {
+        a need created on Mars using MartianEnglish keyword "mandate"
+      }
+      when {
+        Terra references this artifact using TerranEnglish
+      }
+      then {
+        the federation resolver maps "mandate" to "contract" for display
+        the canonical ID (mars:NEED-001) is locale-independent
+      }
+    }
+  }
+
+  feature "Military sites" {
+
+    scenario "Military site joins as opaque node" {
+      status = "pending"
+      given {
+        the USSN MilitaryAdoption milestone fires at tick 1095
+      }
+      when {
+        USSN-Terra (Olympus) site is created
+      }
+      then {
+        Olympus has compartmented repos (ussn-kernel, ussn-fleetcom)
+        Olympus appears in the federation graph as an opaque node
+        civilian sites can see the node exists but not its artifact content
+      }
+    }
+
+    scenario "Military site with chain-of-command governance" {
+      status = "pending"
+      given {
+        the SRJSN MilitaryAdoption milestone fires at tick 2555
+      }
+      when {
+        Tiangong-Ares site is created at Mars L1
+      }
+      then {
+        Tiangong-Ares uses chain-of-command governance
+        ratification is by commanding officer seal only
+        the site latency matches Mars (14 ticks to Terra)
+      }
+    }
+
+    scenario "Military site destroyed by war" {
+      status = "pending"
+      given {
+        USSN Phobos station hosts 3 compartmented repos
+      }
+      when {
+        the War event fires at tick 15330
+      }
+      then {
+        Phobos site is destroyed
+        3 repos are permanently lost
+        the governance graph retains opaque placeholder nodes for the lost repos
+      }
+    }
+  }
+  batch = "BAT-2026-002"
+  slug = "site-topology"
+}
+

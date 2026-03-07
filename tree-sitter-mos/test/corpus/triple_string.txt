@@ -1,0 +1,33 @@
+==================
+Triple-quoted string
+==================
+
+specification "SPEC-1" {
+  section "overview" {
+    text = """
+Multi-line content
+with several lines
+and preserved formatting."""
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (nested_block
+          (block_name
+            (identifier))
+          (string)
+          (block
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (triple_string))))))))))

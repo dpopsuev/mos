@@ -1,0 +1,18 @@
+specification "SPEC-2026-022" {
+  title = "Manifesto Dogfood: first milestone"
+  status = "active"
+  enforcement = "disabled"
+  name = "Manifesto Dogfood: first milestone"
+  slug = "spec-manifesto-dogfood"
+  description = "The first milestone from the Manifesto: rewrite the Golden Contract (MANIFESTO.md) through Constitution. If .mos cannot express the very document that defines it — a founding Declaration with vision, philosophy, governance, and strategic direction — then it cannot express anything. The manifesto sections become .mos artifacts: the Declaration captures the founding intent, sections 1-4 become docs or needs, sections 5-9 become specs and rules, the roadmap becomes sprints and batches. When these markdown files are replaced by .mos artifacts, the embryo has drawn its first breath. Manifesto Section 11."
+
+  feature "Manifesto section mapping" {
+  }
+
+  feature "Markdown retirement" {
+  }
+  satisfies = "NEED-2026-002"
+  state = "desired"
+  group = "dogfood"
+}
+

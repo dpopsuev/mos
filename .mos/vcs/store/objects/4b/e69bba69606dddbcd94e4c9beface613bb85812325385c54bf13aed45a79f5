@@ -1,0 +1,11 @@
+blob
+contract "CON-2026-124" {
+  title = "Title-only create with auto-ID as primary workflow"
+  status = "complete"
+  created_at = 2026-03-04T09:10:16Z
+  updated_at = 2026-03-04T11:16:04Z
+  goal = "Make auto-ID the primary create path. The user provides only --title (and optionally --project), and mos generates the canonical ID. The usage string and help should reflect this as the default. Additionally, a --kind flag (e.g. --kind bug) should map to the corresponding project prefix, so users do not need to memorize project names."
+  batch = "BAT-2026-006"
+  slug = "title-only-auto-id"
+}
+

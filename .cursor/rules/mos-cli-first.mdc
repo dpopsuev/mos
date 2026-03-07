@@ -1,0 +1,215 @@
+---
+description: Always use the mos CLI for governance artifact operations — never edit .mos files directly
+alwaysApply: true
+---
+
+# Mos CLI-First Rule
+
+All `.mos/` artifact operations MUST go through the `mos` CLI. Never edit `.mos` files via StrReplace, Write, sed, or any direct file manipulation.
+
+## 5-Blade Architecture
+
+Mos is decomposed into five subsystem binaries, each also accessible as `mos <subsystem>`:
+
+| Blade | Binary | `mos` subcommand | Scope |
+|---|---|---|---|
+| **gov** | `mgov` | `mos gov` | Authoring & lifecycle — artifact CRUD, field manipulation, formatting, project setup |
+| **vcs** | `mvcs` | `mos vcs` | Versioning & transport — Git-masquerading VCS for `refs/mos/*` |
+| **gate** | `mgate` | `mos gate` | Verification & enforcement — quality gates, linting, CI pipeline |
+| **trace** | `mtrace` | `mos trace` | Traceability across the full SE stack — needs, specs, architecture, implementation |
+| **store** | `mstore` | `mos store` | Plumbing — low-level object store internals |
+
+`mos` itself is a pure router. No commands live directly on it (except `lsp` and `completion`).
+
+## Commands Reference
+
+### gov (mgov) — Governance Authoring
+
+| Operation | Command |
+|---|---|
+| Create artifact | `mgov <kind> create --title "..." [--kind bug] [--goal "..."] [--sprint ID] [--justifies ID]` |
+| Read field | `mgov get <ID> <dot.path>` |
+| Write field | `mgov set <ID> <dot.path> <value>` |
+| Append to list | `mgov append <ID> <dot.path> <value>` |
+| Show full artifact | `mgov show <ID>` |
+| Update status | `mgov <kind> status <ID> <new-status>` |
+| Delete artifact | `mgov <kind> delete <ID>` |
+| Add section | `mgov <kind> add-section <ID> --name "..." --text "..."` |
+| Add criterion | `mgov <kind> add-criterion <ID> --id C1 --description "..." --verified-by harness` |
+| Add feature | `mgov <kind> add-feature <ID> --name "..."` |
+| Add scenario | `mgov <kind> add-scenario <ID> --feature "..." --name "..."` |
+| Remove block | `mgov <kind> remove-block <ID> --block "..."` |
+| List artifacts | `mgov <kind> list` |
+| Add spec include | `mgov <kind> add-spec <ID> <package-path> [...]` |
+| Sprint: add contracts | `mgov sprint add-contract <sprint-id> <contract-id> [...]` |
+| Sprint: remove contracts | `mgov sprint remove-contract <sprint-id> <contract-id> [...]` |
+| Query (rich + filters) | `mgov query --kind <k> [--where field=value] [--verbose] [--format json]` |
+| Format files | `mgov fmt [path]` |
+| Project status | `mgov status` |
+
+Where `<kind>` is one of: `contract`, `need`, `sprint`, `batch`, `spec`, `rule`, `binder`, `lexicon`, `doc`, `architecture`.
+
+### vcs (mvcs) — Version Control
+
+| Operation | Command |
+|---|---|
+| Commit | `mvcs commit -m "..."` |
+| Log (oneline) | `mvcs log --oneline -n 5` |
+| Log (JSON) | `mvcs log --format json -n 3` |
+| Log (with stat) | `mvcs log --stat -n 1` |
+| Push | `mvcs push` |
+| Pull | `mvcs pull` |
+| Status | `mvcs status` |
+| Branch | `mvcs branch <name>` |
+
+### gate (mgate) — Quality Gates
+
+| Operation | Command |
+|---|---|
+| Lint | `mgate lint` |
+| Lint (agent mode) | `mgate lint --agent` |
+| Lint (summary) | `mgate lint --severity error --summary -v` |
+| Validate (parse-only) | `mgate validate` |
+| Audit | `mgate audit [--trend] [--velocity]` |
+| Harness | `mgate harness run [--rule <id>]` |
+| Doctor | `mgate doctor` |
+| CI pipeline | `mgate ci [--fast] [--fix]` |
+| Hook install | `mgate hook install` |
+
+### trace (mtrace) — Traceability
+
+| Operation | Command |
+|---|---|
+| Context mesh | `mtrace mesh <path> [--format text\|json\|mermaid]` |
+| Architecture sync | `mtrace architecture sync [--path .] [--scanner auto] [--markdown] [--grouped]` |
+| Survey | `mtrace survey <path>` |
+| Clone artifacts | `mtrace clone --from <path> --kinds <k1,k2> [--state S] [--group G]` |
+| Generate specs | `mgov spec generate [--state current\|desired] [--exclude dir1,dir2]` |
+
+### store (mstore) — Plumbing
+
+| Operation | Command |
+|---|---|
+| Store status | `mstore status` |
+| Verify integrity | `mstore verify` |
+| Audit log | `mstore log [--tail N]` |
+
+## Specification Grouping & Candidate Status
+
+Specifications support a `group` field (free-text, derived from top-level source directory) and a `candidate` lifecycle status:
+
+- **`candidate`**: Generated/proposed spec, not yet reviewed. Comes before `draft` in the lifecycle.
+- **`draft`**: Accepted for refinement.
+- **`group`**: Subsystem tag (e.g. `builtin`, `compat`, `moslib`) for filtering and organizing large spec sets.
+
+Use `mgov query --kind specification --where group=builtin` to filter by group. Use `mgov set <ID> status draft` to promote a candidate to draft.
+
+## Context Mesh
+
+Use `mtrace mesh <path>` to understand the governance context of any code package. It resolves a filesystem path or package name to linked specs, contracts, needs, sprints, and architectural import edges.
+
+- **text** (default): tree view grouped by kind
+- **json**: full graph with nodes and edges for programmatic consumption
+- **mermaid**: subgraph diagram for visual review
+
+Use this command **before** making changes to understand what governance artifacts are relevant to the code you're about to touch.
+
+## Schema Evolution
+
+The mos CLI is under active development. Commands, flags, and subcommands change frequently. Before assuming a flag doesn't exist or a command works a certain way, run `<binary> <command> --help` to check the current interface. Do this especially:
+
+- At the start of a session
+- Before creating or updating artifacts
+- When a command fails unexpectedly (the flag may have been renamed or moved)
+
+Do not rely on memorized flag lists from previous sessions.
+
+## Escape Hatch
+
+If the CLI cannot perform a required operation (missing subcommand, unsupported field, bulk edit beyond what `mgov set`/`mgov update` supports), then:
+
+1. State clearly: "The mos CLI does not support [operation]. Editing the file directly as a workaround."
+2. File a bug or feature request via: `mgov contract create --kind bug --title "CLI: missing support for [operation]"` (or `--kind feat`).
+3. Only then fall back to direct file edit.
+4. Run `mgov fmt` on the touched file afterward.
+
+## Package Layout
+
+### Layer 0 (Foundation) — no internal deps
+`moslib/dsl`, `moslib/schema`, `moslib/store`, `moslib/model`, `moslib/names`
+
+### Layer 1 (Govern Core) — depends on Layer 0 only
+`moslib/artifact`, `moslib/registry`
+
+### Layer 2 (Domain) — depends on Layer 0 + Layer 1
+`moslib/linter`, `moslib/harness`, `moslib/vcs`, `moslib/guard`, `moslib/arch`, `moslib/mesh`, `moslib/clone`, `moslib/survey`, `moslib/topology`
+
+### Layer 3 (CLI) — thin adapters
+| Subsystem | CLI packages |
+|---|---|
+| gov | `cmd/mos/govern`, `cmd/mos/contract`, `cmd/mos/rule`, `cmd/mos/spec`, `cmd/mos/binder`, `cmd/mos/lexicon`, `cmd/mos/config`, `cmd/mos/generic` |
+| vcs | `cmd/mos/vcscmd` |
+| gate | `cmd/mos/gatecmd`, `cmd/mos/ci` |
+| trace | `cmd/mos/tracecmd` |
+| store | `cmd/mos/storecmd` |
+
+### Wiring
+`cmd/internal/wire` — shared dependency injection callbacks.
+`cmd/internal/subsystem` — builder functions returning `*cobra.Command` for each subsystem.
+
+**Golden Rule**: `artifact/` is the ONLY package that touches `.mos/` files. Everything else goes through its API.
+
+**Cross-tool restriction**: No Layer 2 package imports another Layer 2 package from a different sub-tool.
+
+## Examples
+
+```bash
+# Create a bug
+mgov contract create --kind bug --title "Linter false positives" --goal "..."
+
+# Set a slug
+mgov set CON-2026-018 slug macro-ide-arch
+
+# Update status to complete
+mgov contract status CON-2026-171 complete
+
+# Add a section to a need
+mgov need add-section NEED-2026-001 --name "Principle" --text "..."
+
+# Sprint contract management
+mgov sprint add-contract SPR-2026-015 CON-2026-187 CON-2026-188
+mgov sprint remove-contract SPR-2026-015 CON-2026-189
+
+# Query with filters
+mgov query --kind contract --where status=active --verbose
+mgov query --kind contract --where status=draft --format json
+
+# Context mesh: understand governance context of a package
+mtrace mesh moslib/governance
+mtrace mesh cmd/mos --format json
+mtrace mesh ./moslib/linter --format mermaid
+
+# Generate specs from architecture
+mgov spec generate --state current
+mgov spec generate --state current --exclude t,Documentation
+
+# Clone specs from another project
+mtrace clone --from ~/Workspace/git --kinds specification --group builtin
+
+# Promote a candidate spec to draft
+mgov set SPEC-2026-033 status draft
+
+# VCS operations
+mvcs commit -m "feat: add query filtering"
+mvcs log --oneline -n 5
+mvcs push
+
+# Architecture
+mtrace architecture sync
+mtrace architecture sync --grouped --scanner go
+
+# Quality gates
+mgate lint --severity error --summary -v
+mgate ci --fast
+mgate doctor
+```

@@ -1,0 +1,18 @@
+blob
+contract "CON-2026-145" {
+  title = "Declare link field metadata in config.mos artifact_type blocks for core types"
+  status = "complete"
+  created_at = 2026-03-04T16:00:16Z
+  updated_at = 2026-03-04T16:00:16Z
+  goal = "DefaultRegistry() seeds link field metadata (justifies, implements, documents, sprint, batch, parent, depends_on) for core types, but config.mos artifact_type blocks do not declare link=true or ref_kind on their field definitions. This means the linter's CustomArtifactSchema never sees link metadata for core types and falls back to a hardcoded list. Add link and ref_kind declarations to the default artifact_type field blocks in defaultArtifactTypeBlocks() so that the linter can derive link fields from config.mos without fallback. Depends on CON-2026-144 for full effect."
+  kind = "feature"
+
+  scope {
+    depends_on = ["CON-2026-144"]
+  }
+  depends_on = "CON-2026-144"
+  justifies = "NEED-2026-002"
+  sprint = "SPR-2026-014"
+  slug = "link-field-metadata"
+}
+

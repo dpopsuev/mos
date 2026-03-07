@@ -1,0 +1,19 @@
+{
+  "name": "tree-sitter-mos",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for the Mos DSL",
+  "main": "bindings/node",
+  "tree-sitter": [
+    {
+      "scope": "source.mos",
+      "file-types": [
+        "mos"
+      ],
+      "highlights": "queries/highlights.scm"
+    }
+  ],
+  "dependencies": {
+    "tree-sitter": "^0.25.0",
+    "tree-sitter-cli": "^0.26.6"
+  }
+}

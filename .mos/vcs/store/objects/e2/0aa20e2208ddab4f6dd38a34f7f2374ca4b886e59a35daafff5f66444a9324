@@ -1,0 +1,91 @@
+blob
+contract "CON-2026-235" {
+  title = "Incremental Diff-Aware Linting"
+  status = "complete"
+  slug = "diff-aware-lint"
+  justifies = "NEED-2026-005"
+  depends_on = "CON-2026-234"
+  kind = "feature"
+  goal = "Enable the linter to operate on a subset of changed files rather than the full artifact tree. An AI agent edits one file at a time; re-linting the entire project after each edit is wasteful and produces noise from pre-existing issues. The --changed flag uses VCS diff to scope the lint pass. A --files flag accepts an explicit file list for non-VCS contexts."
+
+  feature "VCS-aware changed file detection" {
+
+    scenario "lint only files modified since last commit" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a git repository with 3 modified .mos files and 50 unchanged ones
+      }
+      when {
+        mos lint --changed is run
+      }
+      then {
+        only the 3 modified files are linted and diagnostics reference only those files
+      }
+    }
+
+    scenario "changed flag with no VCS falls back to full lint" {
+      labels = ["edge_case"]
+      actor = "agent"
+      given {
+        a project directory that is not a git repository
+      }
+      when {
+        mos lint --changed is run
+      }
+      then {
+        the full lint pass runs and a warning is emitted that VCS detection was unavailable
+      }
+    }
+  }
+
+  feature "Explicit file list" {
+
+    scenario "lint a specific list of files" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        an agent has edited .mos/contracts/active/CON-2026-100/contract.mos
+      }
+      when {
+        mos lint --files .mos/contracts/active/CON-2026-100/contract.mos is run
+      }
+      then {
+        only that single file is linted
+      }
+    }
+
+    scenario "cross-reference validation still runs for scoped files" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a contract references a sprint that does not exist
+      }
+      when {
+        mos lint --files targeting that contract is run
+      }
+      then {
+        the cross-reference error is reported because ref validation loads the target lazily
+      }
+    }
+  }
+
+  feature "Baseline suppression" {
+
+    scenario "new-only mode suppresses pre-existing diagnostics" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a project with 20 pre-existing info-level diagnostics and 1 new error introduced by the agent
+      }
+      when {
+        mos lint --changed --new-only is run
+      }
+      then {
+        only the 1 new diagnostic is reported
+      }
+    }
+  }
+  batch = "BAT-2026-007"
+  sprint = "SPR-2026-036"
+}

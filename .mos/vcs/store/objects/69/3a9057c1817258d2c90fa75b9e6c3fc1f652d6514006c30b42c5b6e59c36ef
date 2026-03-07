@@ -1,0 +1,48 @@
+blob
+rule "rogyb-harness-required" {
+  name = "ROGYB Harness Required"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "warning"
+
+  harness {
+    command = "go test ./..."
+    timeout = "5m"
+  }
+
+  section "red" {
+    text = """
+Write a failing test that captures the exact behavior you want. The test must fail for the right reason — it proves the feature is absent or the bug is present. No code changes yet."""
+  }
+
+  section "orange" {
+    text = """
+Instrument the code path with logging, tracing, or metrics before making the fix. Orange is failure observability — add sensors so you can see exactly where and why the test fails. The fix has not landed yet; you are making the failure visible."""
+  }
+
+  section "green" {
+    text = """
+Write the minimum code to make the failing test pass. No more, no less. The test goes green; the feature works or the bug is fixed. Correctness is proven by the harness."""
+  }
+
+  section "yellow" {
+    text = """
+Instrument the success path with logging, tracing, or metrics after the fix. Yellow is success observability — add sensors that confirm the fix is working in production, not just in the test. If Orange asked 'can I see the failure?', Yellow asks 'can I see the fix holding?'"""
+  }
+
+  section "blue" {
+    text = """
+Refactor for quality. Clean up duplication, improve naming, simplify structure. No behavior changes — the tests must still pass. Blue is also where you tune Orange and Yellow output — keep the sensors that earn their keep and remove or downgrade the rest. Logs are important, but too many are dangerous: excessive logging can cause inode starvation, disk pressure, or leak sensitive data into long-lived stores. Blue is the craft step: the code works (green), is observable (orange+yellow), and now it is clean and lean."""
+  }
+
+  when {
+    artifact_kind = "contract"
+    status = "draft"
+  }
+
+  when {
+    artifact_kind = "contract"
+    status = "active"
+  }
+}
+

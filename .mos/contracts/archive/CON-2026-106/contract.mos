@@ -1,0 +1,19 @@
+contract "CON-2026-106" {
+  title = "CON-2026-106"
+  status = "abandoned"
+  created_at = 2026-03-03T21:18:23Z
+  updated_at = 2026-03-03T21:28:42Z
+  name = "Constitution Helper Agent"
+  slug = "constitution-helper-agent"
+  description = "The Gate milestone. An agent that ingests an existing .cursor/ directory (or kombucha.mdc seed) and bootstraps a valid .mos/ from it. The agent must: analyze existing FSC artifacts (rules, contracts, skills, glossary, docs, notes, security cases), classify each by type and resolution level, ask clarifying questions where ambiguous, map them to constitutional concepts (standing law, Bills/Contracts, vocabulary, resolution layers, governance model), and generate a valid .mos/ that is lintable and enforceable. Test cases: kombucha.mdc seed and asterisk/.cursor/ (~200 files). Manifesto Section 11, Roadmap Phase 5."
+
+  feature "Cursor directory ingestion" {
+  }
+
+  feature "Valid .mos/ generation" {
+  }
+
+  feature "Asterisk stress test" {
+  }
+}
+

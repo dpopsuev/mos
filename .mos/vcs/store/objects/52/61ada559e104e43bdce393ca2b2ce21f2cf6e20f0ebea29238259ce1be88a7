@@ -1,0 +1,7 @@
+blob
+layers {
+  layer "project" {
+    level = 1
+  }
+}
+

@@ -1,0 +1,11 @@
+blob
+contract "CON-2026-058" {
+  title = "Code normalization: mechanical refactoring pass"
+  status = "complete"
+  created_at = 2026-03-03T17:19:08Z
+  updated_at = 2026-03-03T19:10:45Z
+  goal = "Apply deterministic, behavior-preserving transformations across the codebase: replace if-chains with switch statements, extract magic literals into named constants, and adopt generic utility libraries (e.g. slices, maps) for hand-rolled loops."
+  justifies = "NEED-2026-001"
+  slug = "code-normalization"
+}
+

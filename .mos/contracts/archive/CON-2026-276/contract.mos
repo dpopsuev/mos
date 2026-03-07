@@ -1,0 +1,10 @@
+contract "CON-2026-276" {
+  title = "Decompose moslib/governance God package into focused sub-packages"
+  status = "closed"
+  created_at = 2026-03-07T12:42:29Z
+  updated_at = 2026-03-07T12:42:29Z
+  goal = "moslib/governance has 16 in-edges and 6 out-edges, same smell as pre-CON-2026-257 moslib/vcs. Split into governance/query, governance/lifecycle, governance/render or similar DAG"
+  kind = "feat"
+  priority = "high"
+}
+

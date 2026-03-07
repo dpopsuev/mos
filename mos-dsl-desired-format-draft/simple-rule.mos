@@ -1,0 +1,77 @@
+rule "no-binary-commits" {
+  name = "No Binary Commits"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "error"
+  applicability = "glob"
+  glob = "**/*"
+  priority = 10
+  tags = ["hygiene", "repo-health"]
+  description = "Prevents committing binary files that bloat repository history."
+
+  harness {
+    command = "mos check-binaries --staged"
+    success_exit_code = 0
+    timeout = "30s"
+  }
+
+  identity {
+    created_by = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    created_at = 2026-01-10T00:00:00Z
+    creation_signature = """
+-----BEGIN SSH SIGNATURE-----
+U1NIU0lH...
+-----END SSH SIGNATURE-----"""
+    version = 1
+  }
+
+  feature "Binary file detection" {
+
+    scenario "Binary file in staging area" {
+      sut = "internal/git/staging.go"
+      test = "internal/git/staging_test.go"
+      case = "TestBinaryDetection/Binary file in staging area"
+      given {
+        a commit is staged
+        the commit contains a file matching "*.exe"
+      }
+      when {
+        the pre-commit hook runs
+      }
+      then {
+        the commit is rejected
+        the error message includes "binary file detected"
+        the error message lists the offending file paths
+      }
+    }
+
+    scenario "Non-binary file passes" {
+      given {
+        a commit is staged
+        the commit contains only ".go" and ".md" files
+      }
+      when {
+        the pre-commit hook runs
+      }
+      then {
+        the commit is accepted
+      }
+    }
+
+    scenario "Allowlisted binary passes" {
+      given {
+        a commit is staged
+        the commit contains "testdata/fixture.bin"
+        the file matches the binary allowlist
+      }
+      when {
+        the pre-commit hook runs
+      }
+      then {
+        the commit is accepted
+        an info diagnostic notes the allowlisted binary
+      }
+    }
+  }
+}
+

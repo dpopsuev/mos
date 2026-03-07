@@ -1,0 +1,13 @@
+rule "go-build-pass" {
+  name = "Go Build Must Pass"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "error"
+  vector = "functional"
+
+  harness {
+    command = "go build ./..."
+    timeout = "2m"
+  }
+}
+

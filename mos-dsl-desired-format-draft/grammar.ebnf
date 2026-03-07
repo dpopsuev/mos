@@ -1,0 +1,200 @@
+(* Constitution DSL Grammar v3 -- EBNF *)
+(* A .mos file contains exactly one artifact. *)
+(* *)
+(* The grammar separates two protocol layers: *)
+(* - Machine protocol (fixed): Go types, token constants, parser paths. *)
+(* - Human protocol (vocabulary-driven): keyword strings developers write. *)
+(* *)
+(* All keywords listed below are English defaults. A vocabulary's *)
+(* "keywords" block can override them for any human language. *)
+(* *)
+(* ~16 default keywords: rule, contract, config, declaration, vocabulary, *)
+(* layers, layer, spec, include, feature, background, scenario, group, *)
+(* given, when, then *)
+
+File = { Comment | Newline } Artifact { Comment | Newline } ;
+
+(* -- Top-level artifact types (open set) -- *)
+(* Any identifier can be an artifact type. The parser uses a heuristic: *)
+(* Ident String "{" -> named artifact, Ident "{" -> unnamed artifact. *)
+(* Standard types: rule, contract, config, declaration, vocabulary, layers *)
+
+Artifact = Identifier [ String ] Block ;
+
+(* -- Block structure -- *)
+
+Block     = "{" { BlockItem } "}" ;
+BlockItem = Field | FeatureBlock | SpecBlock | NestedBlock | Comment | Newline ;
+
+(* Named nested blocks: Ident String Block (e.g. layer "project" { ... }) *)
+(* Unnamed nested blocks: Ident Block (e.g. identity { ... }) *)
+(* *)
+(* Nesting is recursive and unrestricted. In particular, a contract may   *)
+(* contain nested contracts (contract-of-contracts). Dependency ordering  *)
+(* between sibling blocks is declared via `depends_on` fields, not by     *)
+(* parse order. Topologies:                                               *)
+(*   - Linear:     A -> B -> C          (sequential phases)               *)
+(*   - Non-linear: A,B independent; C depends on both (diamond join)      *)
+(*   - Mixed:      arbitrary DAG within the parent scope                  *)
+NestedBlock = Identifier [ String ] Block ;
+
+(* -- Spec block (optional grouping for composition and includes) -- *)
+(* spec {} is NOT a lexer mode switch (unlike v1). It is a pure grouping   *)
+(* construct parsed in normal mode. It scopes include directives and       *)
+(* groups feature blocks for multi-file composition. For single inline     *)
+(* features, spec {} is optional -- feature can appear directly as a       *)
+(* BlockItem.                                                              *)
+
+SpecBlock    = "spec" "{" { IncludeDir | FeatureBlock | Comment | Newline } "}" ;
+IncludeDir   = "include" String ;
+
+(* -- Fields -- *)
+
+Field = Identifier "=" Value ;
+
+Value = String
+      | Integer
+      | Float
+      | Boolean
+      | DateTime
+      | List
+      | InlineTable
+      ;
+
+List        = "[" [ Value { "," Value } [ "," ] ] "]" ;
+InlineTable = "{" [ Field { "," Field } [ "," ] ] "}" ;
+
+(* -- Feature block (unified Gherkin, fully brace-delimited) -- *)
+(* All keywords are lowercase. No colons. Steps are free-text lines     *)
+(* inside given/when/then blocks. Multiple lines = implicit AND.        *)
+(* No "And" or "But" keywords -- each line in a step block is a step.   *)
+
+FeatureBlock    = "feature" String "{"
+                    { DescriptionLine }
+                    [ BackgroundBlock ]
+                    { GroupBlock | ScenarioBlock }
+                  "}" ;
+
+BackgroundBlock = "background" "{" GivenBlock "}" ;
+
+GroupBlock      = "group" String "{" { ScenarioBlock } "}" ;
+
+(* Scenario fields are an open set: any Identifier = Value pair is accepted. *)
+(* The linter validates which fields are allowed based on the vocabulary. *)
+ScenarioBlock   = "scenario" String "{"
+                    { Field }
+                    [ GivenBlock ]
+                    [ WhenBlock ]
+                    [ ThenBlock ]
+                  "}" ;
+
+(* Standard scenario fields (all optional, parsed as regular fields):       *)
+(*   sut  = String   -- System Under Test: source file/package the scenario *)
+(*                       validates.                                         *)
+(*   test = String   -- Test file: where the mechanical proof lives.        *)
+(*   case = String   -- Test case: grep-able identifier linking the         *)
+(*                       scenario to a specific test case within the test   *)
+(*                       file. For Go subtests: "TestParent/Subtest name".  *)
+(*                       When omitted, the scenario title is the grep       *)
+(*                       target (works when t.Run uses the scenario title). *)
+(* The traceability chain: scenario title (what) -> sut (where in code) ->  *)
+(* test (where proved) -> case (which proof). The linter can mechanically   *)
+(* verify: does the case string appear in the test file?                    *)
+
+GivenBlock      = "given" "{" { StepLine } "}" ;
+WhenBlock       = "when"  "{" { StepLine } "}" ;
+ThenBlock       = "then"  "{" { StepLine } "}" ;
+
+StepLine        = (* any non-empty line not starting with "}" *) ;
+
+(* -- Issue tracker adapter blocks -- *)
+(* A contract is the repository-native representation of an issue tracker   *)
+(* ticket. External trackers (Jira, GitHub, Linear, etc.) are mirrors       *)
+(* synced via adapter tooling. Tracker blocks use the generic named-block   *)
+(* syntax; no grammar extension is required.                                *)
+(*                                                                          *)
+(*   tracker "github" { repo = "org/repo", issue = 42, ... }               *)
+(*   tracker "jira"   { project = "PROJ", key = "PROJ-123", ... }          *)
+(*                                                                          *)
+(* Multiple tracker blocks per contract are allowed (multi-system sync).    *)
+(* The adapter name (block title) is a free identifier, not grammar-fixed.  *)
+(* Fields inside are adapter-specific; the grammar imposes no constraints.  *)
+(*                                                                          *)
+(* Hierarchy mapping:                                                       *)
+(*   umbrella contract -> Epic / Initiative                                 *)
+(*   nested contract   -> Story / Task / Subtask                            *)
+(*   depends_on        -> "blocks" / "is-blocked-by" ticket links           *)
+(*   status            -> ticket workflow state (adapter maps values)        *)
+(*   feature/scenario  -> acceptance criteria                               *)
+
+(* -- Upstream federation (recursive, not tier-locked) -- *)
+(*                                                                          *)
+(* A mos with NO `upstream` block is the domain root -- the        *)
+(* ultimate authority. Every other mos declares one or more         *)
+(* `upstream` named blocks pointing at parent moss.                *)
+(*                                                                          *)
+(* Depth is emergent from the chain; there is no hardcoded number of tiers. *)
+(* The `scope` label on upstream/governance is a free string for human       *)
+(* readability and linter diagnostics -- NOT a structural tier.             *)
+(*                                                                          *)
+(*   upstream "parent-name" {                                               *)
+(*     url   = "https://github.com/org/mos"                       *)
+(*     ref   = "main"                                                       *)
+(*     scope = "organization"     -- user-defined label, any string         *)
+(*   }                                                                      *)
+(*                                                                          *)
+(* Example chain (depth is arbitrary):                                      *)
+(*   root (no upstream)                                                     *)
+(*     └─ org (upstream -> root)                                            *)
+(*          └─ division (upstream -> org)                                    *)
+(*               └─ team (upstream -> division)                              *)
+(*                    └─ sub-team (upstream -> team)                         *)
+(*                                                                          *)
+(* Rules cascade downward: downstream inherits all ancestor rules and can   *)
+(* add its own, but must not contradict. `extends = "R-XXX"` specializes    *)
+(* a specific ancestor rule.                                                *)
+(*                                                                          *)
+(* Multiple upstreams are allowed (DAG, not just tree) for cross-org        *)
+(* federation. `mos init --upstream <url>` bootstraps a new repo from a     *)
+(* reference mos, inheriting its rules, vocabulary, and layers.    *)
+
+(* -- Vocabulary keyword localization -- *)
+(* The vocabulary artifact can contain a "keywords" block that maps *)
+(* machine-protocol keywords (English) to human-protocol keywords. *)
+(* The vocabulary file itself is always parsed with English defaults *)
+(* (bootstrap contract -- avoids circular dependency). *)
+
+VocabularyKeywords = "keywords" "{" { Field } "}" ;
+
+(* Example: *)
+(*   vocabulary { *)
+(*     keywords { *)
+(*       feature  = "característica" *)
+(*       scenario = "escenario" *)
+(*       given    = "dado" *)
+(*       rule     = "regla" *)
+(*     } *)
+(*   } *)
+
+(* -- Lexical rules -- *)
+
+String    = '"' { Char } '"'
+          | '"""' { Char | Newline } '"""' ;
+
+Integer   = [ "-" ] Digit { Digit } ;
+Float     = [ "-" ] Digit { Digit } "." Digit { Digit } ;
+Boolean   = "true" | "false" ;
+
+DateTime  = Date "T" Time Timezone ;
+Date      = Year "-" Month "-" Day ;
+Time      = Hour ":" Minute ":" Second ;
+Timezone  = "Z" | ( "+" | "-" ) Hour ":" Minute ;
+
+Identifier = Letter { Letter | Digit | "_" | "-" } ;
+Comment    = "#" RestOfLine ;
+Newline    = "\n" ;
+RestOfLine = { Char } Newline ;
+
+Letter = "a".."z" | "A".."Z" | (* any Unicode letter *) ;
+Digit  = "0".."9" ;
+Char   = (* any Unicode character except control characters *) ;

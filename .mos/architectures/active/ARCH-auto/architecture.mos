@@ -1,0 +1,1473 @@
+architecture "mos" {
+  resolution = "package"
+  title = "mos"
+  status = "active"
+
+  component "cmd/internal/subsystem" {
+    package = "github.com/dpopsuev/mos/cmd/internal/subsystem"
+    symbols = "GateCmd, GovCmd, StoreCmd, TraceCmd, VCSCmd"
+  }
+
+  component "cmd/internal/wire" {
+    package = "github.com/dpopsuev/mos/cmd/internal/wire"
+    symbols = "Init"
+  }
+
+  component "cmd/mgate" {
+    package = "github.com/dpopsuev/mos/cmd/mgate"
+  }
+
+  component "cmd/mgov" {
+    package = "github.com/dpopsuev/mos/cmd/mgov"
+  }
+
+  component "cmd/mos" {
+    package = "github.com/dpopsuev/mos/cmd/mos"
+  }
+
+  component "cmd/mos/binder" {
+    package = "github.com/dpopsuev/mos/cmd/mos/binder"
+    symbols = "Cmd"
+  }
+
+  component "cmd/mos/ci" {
+    package = "github.com/dpopsuev/mos/cmd/mos/ci"
+    symbols = "AutoStatusCmd, Cmd"
+  }
+
+  component "cmd/mos/cliutil" {
+    package = "github.com/dpopsuev/mos/cmd/mos/cliutil"
+    symbols = "IsAgentMode, AgentEnvelope, CaptureStdout, EmitAgentEnvelope, ErrNonZeroExit, ErrInternalLint, CoreKindDirs, ApplyOverflowFields, ParseKVArgs, ExtractPositional"
+  }
+
+  component "cmd/mos/config" {
+    package = "github.com/dpopsuev/mos/cmd/mos/config"
+    symbols = "Cmd"
+  }
+
+  component "cmd/mos/contract" {
+    package = "github.com/dpopsuev/mos/cmd/mos/contract"
+    symbols = "Cmd, ChainCmd, InferArtifactKind, RunApply, RunEdit"
+  }
+
+  component "cmd/mos/factory" {
+    package = "github.com/dpopsuev/mos/cmd/mos/factory"
+    symbols = "BlockOps, AllBlocks, KindConfig, Register, ApplyCmd, EditCmd, AddSectionCmd, AddFeatureCmd, AddScenarioCmd, AddCriterionCmd, RemoveBlockCmd, AddCoverageCmd, AddBillCmd, AddSpecCmd, AddBlameCmd, SetHarnessCmd, RemoveScenarioCmd, SetSectionCmd, SetFieldCmd"
+  }
+
+  component "cmd/mos/gatecmd" {
+    package = "github.com/dpopsuev/mos/cmd/mos/gatecmd"
+    symbols = "AuditCmd, LintCmd, HarnessCmd, HarnessRunCmd, DoctorCmd, MaquetteCmd, ValidateCmd"
+  }
+
+  component "cmd/mos/generic" {
+    package = "github.com/dpopsuev/mos/cmd/mos/generic"
+    symbols = "NewCmd, AddSectionCmd, AddFeatureCmd, AddScenarioCmd, AddCriterionCmd, RemoveBlockCmd, AddCoverageCmd, AddBillCmd, AddSpecCmd, ApplyCmd, EditCmd"
+  }
+
+  component "cmd/mos/govern" {
+    package = "github.com/dpopsuev/mos/cmd/mos/govern"
+    symbols = "ArchiveCmd, StatusCmd, MigrateCmd, InitProjectCmd, FmtCmd, ReclassifyCmd, QueryCmd, UpdateCmd, ShowCmd, GetCmd, SetCmd, AppendCmd, VerbCreateCmd, WhyCmd"
+  }
+
+  component "cmd/mos/lexicon" {
+    package = "github.com/dpopsuev/mos/cmd/mos/lexicon"
+    symbols = "Cmd"
+  }
+
+  component "cmd/mos/rule" {
+    package = "github.com/dpopsuev/mos/cmd/mos/rule"
+    symbols = "Cmd"
+  }
+
+  component "cmd/mos/spec" {
+    package = "github.com/dpopsuev/mos/cmd/mos/spec"
+    symbols = "Cmd, SpecSyncCmd"
+  }
+
+  component "cmd/mos/storecmd" {
+    package = "github.com/dpopsuev/mos/cmd/mos/storecmd"
+    symbols = "StoreCmd"
+  }
+
+  component "cmd/mos/tracecmd" {
+    package = "github.com/dpopsuev/mos/cmd/mos/tracecmd"
+    symbols = "ArchSyncCmd, MeshCmd, CloneCmd, SpecGenCmd, SurveyCmd"
+  }
+
+  component "cmd/mos/vcscmd" {
+    package = "github.com/dpopsuev/mos/cmd/mos/vcscmd"
+    symbols = "Cmd, RunPreCommitGates, HookCmd"
+  }
+
+  component "cmd/mstore" {
+    package = "github.com/dpopsuev/mos/cmd/mstore"
+  }
+
+  component "cmd/mtrace" {
+    package = "github.com/dpopsuev/mos/cmd/mtrace"
+  }
+
+  component "cmd/mvcs" {
+    package = "github.com/dpopsuev/mos/cmd/mvcs"
+  }
+
+  component "moslib/arch" {
+    package = "github.com/dpopsuev/mos/moslib/arch"
+    symbols = "ArchService, ArchEdge, ArchForbidden, ArchModel, ParseArchModel, RenderMermaid, ComponentGroup, SyncOptions, ProjectToArchModel, RenderArchMos, RenderArchMarkdown, CheckForbiddenEdges, ReadConfigFn, LoadComponentGroups, ReadFileFunc, ComputeChurn, LayerDef, SubToolDef, ExceptionDef, DesiredArch, DriftViolation, ParseDesiredArch, DetectDrift, ReadArchitectureFn, LoadDesiredArch, SpecGenOpts, SpecGenResult, GenericCreateFn, FindGenericArtifactPathFn, GenerateSpecs, ResolveInitialStatus, DeriveGroup, ShouldExclude, ReadSpecIncludesFn, FindExistingSpecIncludes, AddSpecInclude, AddSpecSection, BuildSurveySummary"
+  }
+
+  component "moslib/artifact" {
+    package = "github.com/dpopsuev/mos/moslib/artifact"
+    symbols = "Criterion, ParseAcceptanceCriteria, CriterionCoverage, FormatCriteria, ArchService, ArchEdge, ArchForbidden, ArchModel, ComponentGroup, SyncOptions, ParseArchModel, RenderMermaid, RenderArchMos, RenderArchMarkdown, ProjectToArchModel, CheckForbiddenEdges, LoadComponentGroups, ComputeChurn, Artifact, RegisterArtifact, InitDynamicRegistry, ApplyArtifact, EditArtifact, BinderOpts, BinderInfo, CreateBinder, ListBinders, ShowBinder, BinderBind, BinderUnbind, BinderTrace, MosDir, ConfigFile, ActiveDir, ArchiveDir, StatusDraft, StatusActive, StatusComplete, StatusAbandoned, FieldTitle, FieldStatus, FieldGoal, FieldKind, FieldLabels, BlockScope, BlockCoverage, BlockTestMatrix, BlockPersonas, FormatText, FormatJSON, KindContract, KindSpecification, KindRule, KindBinder, KindLexicon, KindSprint, KindBatch, KindNeed, KindArchitecture, DirContracts, DirSpecifications, DirRules, DirBinders, DirSprints, DirBatches, DirNeeds, DirArchitectures, DirPerm, FilePerm, ContextResult, ContextRule, ContractContext, FormatContext, ValidStatuses, ContractOpts, CreateContract, UpdateContractStatus, ContractUpdateOpts, UpdateContract, DeleteContract, ShowContract, ShowContractVerbose, Summary, ContractSummary, ContractProgress, ShowContractShort, ContractGraph, LinkContract, UnlinkContract, FindDependents, FindChildren, TopologicalSort, DetectCycles, ContractGraphNode, ContractGraphSorted, RenameContract, FindContractPath, ContractInfo, ListOpts, ListContracts, ValidateDependencies, ValidateParent, GenericAddSection, GenericAddFeature, GenericAddScenario, GenericAddCriterion, GenericRemoveBlock, GenericSetHarness, GenericAddCoverage, GenericAddBill, GenericAddSpec, GenericRemoveScenario, BlameEntry, GenericAddBlame, GenericRemoveBlame, ParseBlameEntries, GenericInfo, FindGenericArtifactPath, FindGenericPath, GenericCreateWithTemplate, GenericCreate, GenericList, GenericShow, GenericDelete, GenericUpdateStatus, GenericUpdate, EvaluateHooks, GetContractStatus, InitOpts, Init, GovernReader, GovernEnforcer, NewReader, NewEnforcer, LedgerEntry, AppendLedger, ReadLedger, FormatHistory, LedgerPathForContract, AppendContractLedger, LexiconTerm, ListTerms, AddTerm, RemoveTerm, MigrationDiff, FieldDefault, ComputeMigration, ApplyMigration, FormatMigrationPlan, PathGet, PathSet, PathAppend, GetArtifactField, SetArtifactField, AppendArtifactField, Predicate, HarnessDef, Policy, LoadPolicies, MatchesArtifact, MatchingPolicies, AddRuleWhen, ProjectDef, LoadProjects, FindDefaultProject, FindProjectByPrefix, NextID, NextIDForType, AddProject, QueryOpts, QueryResult, QueryArtifacts, RichQueryResults, FieldStr, GroupResults, FormatQueryResults, ReadMosFile, ReadMosDirEntries, ReadConfig, ReadLexiconFile, ReadLayers, ReadTemplate, ReadRuleInventory, ReadContractInventory, ReadArtifactInventory, ReadArchitecture, ReadSpecificationIncludes, ReadDSLFile, ReadConfigBlock, ReclassifyResult, Reclassify, HookDef, TransitionGate, LifecycleDef, ArtifactTypeDef, Registry, FieldOpts, CoreKinds, DefaultRegistry, LoadRegistry, AddArtifactType, RemoveArtifactType, RemoveProject, AddFieldToType, SetTypeLifecycle, SetTypeDirectory, SetFieldEnum, Relocation, RelocateMisplacedArtifacts, RuleOpts, CreateRule, RuleInfo, ListRules, ShowRule, RuleUpdateOpts, UpdateRule, DeleteRule, UpdateRuleFields, SetRuleHarness, RemoveRuleBlock, AddRuleSection, ScenarioInfo, ValidateScenarioTransition, ListScenarios, SetScenarioStatus, SetAllScenariosStatus, SealInfo, ResolveOperator, SealContract, UnsealContract, CheckSeal, CheckSealForMutation, ResolveAuthority, Services, DefaultServices, Svc, SpecOpts, SpecInfo, SpecUpdateOpts, ValidEnforcements, CreateSpec, ListSpecs, ShowSpec, UpdateSpec, FindSpecPath, SprintAddContracts, SprintRemoveContracts, SprintCloseResult, SprintClose, SprintCloseDryRun, SprintProposal, PlanSprint, Store, FSStore, DefaultStore, LoadTemplate, MergeTemplate, ValidateArtifactFunc, LintDiagnostic, LintFunc, LexiconLoaderFunc, ScanProjectFunc, ValidateContract, ValidateRule, LintAll, LoadLexicon, ScanProject, VerifyResult, VerifyContract, TriggerResult, EvaluateWatchTriggers"
+  }
+
+  component "moslib/artifact/chain" {
+    package = "github.com/dpopsuev/mos/moslib/artifact/chain"
+    symbols = "BlameRef, ChainLink, ChainResult, NegativeSpaceEntry, NegativeChainResult, WalkChain, WalkNegativeChain, FormatChain, FormatNegativeChain"
+  }
+
+  component "moslib/clone" {
+    package = "github.com/dpopsuev/mos/moslib/clone"
+    symbols = "Opts, Result, GenericCreateFn, FindPathFn, FieldStrFn, Run, ExtractFields, CopySpecBlocks, RemapReferences"
+  }
+
+  component "moslib/dsl" {
+    package = "github.com/dpopsuev/mos/moslib/dsl"
+    symbols = "File, Node, Comment, ArtifactBlock, Field, Block, Value, StringVal, IntegerVal, FloatVal, BoolVal, DateTimeVal, ListVal, InlineTableVal, SpecBlock, IncludeDirective, FeatureBlock, ScenarioContainer, Group, Scenario, Background, StepBlock, StringValue, ParseError, FindBlock, FieldString, FieldInt, FieldFloat, FieldStringSlice, FieldBool, HasField, ToMap, SetField, RemoveBlock, RemoveNamedBlock, WalkBlocks, AppendToBlock, WithArtifact, ReadArtifact, FindField, Format, KeywordMap, DefaultKeywords, AddKeywords, ExtractKeywords, Lexer, NewLexer, Parse, LoadKeywords, ParseFiles, TokenType, TokenEOF, TokenIdent, TokenString, TokenInteger, TokenFloat, TokenBool, TokenDateTime, TokenLBrace, TokenRBrace, TokenLBracket, TokenRBracket, TokenEquals, TokenComma, TokenComment, TokenNewline, TokenFeature, TokenBackground, TokenScenario, TokenGiven, TokenWhen, TokenThen, TokenGroup, TokenSpec, TokenInclude, TokenStepText, Token"
+  }
+
+  component "moslib/dsl/antlrgen" {
+    package = "github.com/dpopsuev/mos/moslib/dsl/antlrgen"
+    symbols = "MosDSLLexer, MosDSLLexerLexerStaticData, MosDSLLexerInit, NewMosDSLLexer, MosDSLLexerGIVEN_OPEN, MosDSLLexerWHEN_OPEN, MosDSLLexerTHEN_OPEN, MosDSLLexerFEATURE, MosDSLLexerBACKGROUND, MosDSLLexerSCENARIO, MosDSLLexerGIVEN, MosDSLLexerWHEN, MosDSLLexerTHEN, MosDSLLexerGROUP, MosDSLLexerSPEC, MosDSLLexerINCLUDE, MosDSLLexerTRUE, MosDSLLexerFALSE, MosDSLLexerLBRACE, MosDSLLexerRBRACE, MosDSLLexerLBRACKET, MosDSLLexerRBRACKET, MosDSLLexerEQUALS, MosDSLLexerCOMMA, MosDSLLexerTRIPLE_STRING, MosDSLLexerSTRING, MosDSLLexerDATETIME, MosDSLLexerFLOAT, MosDSLLexerINT, MosDSLLexerIDENT, MosDSLLexerCOMMENT, MosDSLLexerWS, MosDSLLexerNL, MosDSLLexerSTEP_RBRACE, MosDSLLexerSTEP_TEXT, MosDSLLexerSTEP_NL, MosDSLLexerStepText, MosDSLParser, MosDSLParserParserStaticData, MosDSLParserInit, NewMosDSLParser, MosDSLParserEOF, MosDSLParserGIVEN_OPEN, MosDSLParserWHEN_OPEN, MosDSLParserTHEN_OPEN, MosDSLParserFEATURE, MosDSLParserBACKGROUND, MosDSLParserSCENARIO, MosDSLParserGIVEN, MosDSLParserWHEN, MosDSLParserTHEN, MosDSLParserGROUP, MosDSLParserSPEC, MosDSLParserINCLUDE, MosDSLParserTRUE, MosDSLParserFALSE, MosDSLParserLBRACE, MosDSLParserRBRACE, MosDSLParserLBRACKET, MosDSLParserRBRACKET, MosDSLParserEQUALS, MosDSLParserCOMMA, MosDSLParserTRIPLE_STRING, MosDSLParserSTRING, MosDSLParserDATETIME, MosDSLParserFLOAT, MosDSLParserINT, MosDSLParserIDENT, MosDSLParserCOMMENT, MosDSLParserWS, MosDSLParserNL, MosDSLParserSTEP_RBRACE, MosDSLParserSTEP_TEXT, MosDSLParserSTEP_NL, MosDSLParserRULE_file, MosDSLParserRULE_artifact, MosDSLParserRULE_artifactType, MosDSLParserRULE_block, MosDSLParserRULE_blockItem, MosDSLParserRULE_field, MosDSLParserRULE_key, MosDSLParserRULE_value, MosDSLParserRULE_boolean, MosDSLParserRULE_list, MosDSLParserRULE_inlineTable, MosDSLParserRULE_nestedBlock, MosDSLParserRULE_blockName, MosDSLParserRULE_specBlock, MosDSLParserRULE_includeDir, MosDSLParserRULE_featureBlock, MosDSLParserRULE_backgroundBlock, MosDSLParserRULE_groupBlock, MosDSLParserRULE_scenarioBlock, MosDSLParserRULE_scenarioContent, MosDSLParserRULE_givenBlock, MosDSLParserRULE_whenBlock, MosDSLParserRULE_thenBlock, MosDSLParserRULE_stepLine, IFileContext, FileContext, NewEmptyFileContext, InitEmptyFileContext, NewFileContext, IArtifactContext, ArtifactContext, NewEmptyArtifactContext, InitEmptyArtifactContext, NewArtifactContext, IArtifactTypeContext, ArtifactTypeContext, NewEmptyArtifactTypeContext, InitEmptyArtifactTypeContext, NewArtifactTypeContext, IBlockContext, BlockContext, NewEmptyBlockContext, InitEmptyBlockContext, NewBlockContext, IBlockItemContext, BlockItemContext, NewEmptyBlockItemContext, InitEmptyBlockItemContext, NewBlockItemContext, IFieldContext, FieldContext, NewEmptyFieldContext, InitEmptyFieldContext, NewFieldContext, IKeyContext, KeyContext, NewEmptyKeyContext, InitEmptyKeyContext, NewKeyContext, IValueContext, ValueContext, NewEmptyValueContext, InitEmptyValueContext, NewValueContext, IBooleanContext, BooleanContext, NewEmptyBooleanContext, InitEmptyBooleanContext, NewBooleanContext, IListContext, ListContext, NewEmptyListContext, InitEmptyListContext, NewListContext, IInlineTableContext, InlineTableContext, NewEmptyInlineTableContext, InitEmptyInlineTableContext, NewInlineTableContext, INestedBlockContext, NestedBlockContext, NewEmptyNestedBlockContext, InitEmptyNestedBlockContext, NewNestedBlockContext, IBlockNameContext, BlockNameContext, NewEmptyBlockNameContext, InitEmptyBlockNameContext, NewBlockNameContext, ISpecBlockContext, SpecBlockContext, NewEmptySpecBlockContext, InitEmptySpecBlockContext, NewSpecBlockContext, IIncludeDirContext, IncludeDirContext, NewEmptyIncludeDirContext, InitEmptyIncludeDirContext, NewIncludeDirContext, IFeatureBlockContext, FeatureBlockContext, NewEmptyFeatureBlockContext, InitEmptyFeatureBlockContext, NewFeatureBlockContext, IBackgroundBlockContext, BackgroundBlockContext, NewEmptyBackgroundBlockContext, InitEmptyBackgroundBlockContext, NewBackgroundBlockContext, IGroupBlockContext, GroupBlockContext, NewEmptyGroupBlockContext, InitEmptyGroupBlockContext, NewGroupBlockContext, IScenarioBlockContext, ScenarioBlockContext, NewEmptyScenarioBlockContext, InitEmptyScenarioBlockContext, NewScenarioBlockContext, IScenarioContentContext, ScenarioContentContext, NewEmptyScenarioContentContext, InitEmptyScenarioContentContext, NewScenarioContentContext, IGivenBlockContext, GivenBlockContext, NewEmptyGivenBlockContext, InitEmptyGivenBlockContext, NewGivenBlockContext, IWhenBlockContext, WhenBlockContext, NewEmptyWhenBlockContext, InitEmptyWhenBlockContext, NewWhenBlockContext, IThenBlockContext, ThenBlockContext, NewEmptyThenBlockContext, InitEmptyThenBlockContext, NewThenBlockContext, IStepLineContext, StepLineContext, NewEmptyStepLineContext, InitEmptyStepLineContext, NewStepLineContext, BaseMosDSLParserListener, MosDSLParserListener"
+  }
+
+  component "moslib/governance" {
+    package = "github.com/dpopsuev/mos/moslib/governance"
+    symbols = "Init, InitDynamicRegistry"
+  }
+
+  component "moslib/governance/audit" {
+    package = "github.com/dpopsuev/mos/moslib/governance/audit"
+    symbols = "Report, SprintSummary, AuditOpts, RunAudit, FormatReport"
+  }
+
+  component "moslib/governance/chain" {
+    package = "github.com/dpopsuev/mos/moslib/governance/chain"
+    symbols = "ChainLink, ChainResult, NegativeChainResult, NegativeSpaceEntry, WalkChain, WalkNegativeChain, FormatChain, FormatNegativeChain"
+  }
+
+  component "moslib/guard" {
+    package = "github.com/dpopsuev/mos/moslib/guard"
+    symbols = "LintChecker, HarnessChecker, LintResultFromDiags, CheckResult, PreCommitChecker, GateResult, PreCommit, CIGate, RunPreCommitGates"
+  }
+
+  component "moslib/harness" {
+    package = "github.com/dpopsuev/mos/moslib/harness"
+    symbols = "Baseline, RegressionResult, StoreBaseline, LoadBaseline, CompareBaseline, HarnessSpec, FilterByVector, Filter, FilterByTrigger, Evidence, Extractor, RegisterExtractor, LookupExtractor, ListExtractors, IntegrityIndex, ComputeIntegrityIndex, ComputeIntegrityIndexFromVectors, FormatIntegrityText, MetricThreshold, MetricResult, ExtractMetrics, QualityConfig, LanguageOverride, DiscoverQualityConfigs, FormatText, FormatJSON, Discover, Run, LintResult, LintFunc, LightweightScan, ScenarioMatch, MatchScenarios, ScenarioCoverage, StateSnapshot, StoreSnapshot, LoadSnapshots, LoadSnapshotsInRange, SnapshotFromIndex, ParseSnapshotTimestamp, StoreCommitSnapshot, LoadCommitSnapshot, LoadCommitSnapshots, LoadAllSnapshots, TrajectoryStatus, StatusConverging, StatusStalled, StatusOscillating, StatusRegressing, StatusInsufficient, AxisTrajectory, TrajectoryReport, AnalyzeTrajectory, DetectStall, DetectOscillation, FormatTrajectoryText, TrendPoint, VelocityReport, ComputeTrend, ComputeVelocity, FormatTrendText, FormatVelocityText, VectorFunctional, VectorStructural, VectorPerformance, AllVectors, VectorDetail, VectorResult, EvaluateVectors, FormatVectorsText, VectorsMosDir"
+  }
+
+  component "moslib/linter" {
+    package = "github.com/dpopsuev/mos/moslib/linter"
+    symbols = "DetectChangedFiles, LoadArtifactSchemas, CustomArtifactSchema, ProjectContext, MergedLexicon, LayerDef, LoadContext, Diagnostic, Severity, SeverityError, SeverityWarning, SeverityInfo, Linter, FilterNewOnly, ExtractArtifactID, ValidateRuleFile, ValidateContractFile, ValidateGenericFile, NestingViolation, AnalyzeNestingDepth, LengthViolation, AnalyzeFunctionLength, RunStructuralChecks, ParamViolation, AnalyzeParamsPerFunction, FanOutViolation, AnalyzeFanOut, LOCViolation, AnalyzeLOCPerFile, SymbolResolution, ResolveSymbol, ReadGoModulePath"
+  }
+
+  component "moslib/lsp" {
+    package = "github.com/dpopsuev/mos/moslib/lsp"
+    symbols = "CompletionItem, CompletionKindField, CompletionKindKeyword, CompletionKindBlock, ArtifactKind, ArtifactUnknown, ArtifactConfig, ArtifactDeclaration, ArtifactRule, ArtifactContract, DetectArtifactKind, Complete, Location, Range, Position, Definition, DocumentStore, NewDocumentStore, URIToPath, PathToURI, HoverResult, Hover, Server, NewServer, RequestMessage, ResponseMessage, ResponseError, NotificationMessage, Transport, NewTransport"
+  }
+
+  component "moslib/mesh" {
+    package = "github.com/dpopsuev/mos/moslib/mesh"
+    symbols = "StatusChange, InferStatusChanges, ApplyStatusChanges, Node, Edge, Graph, RenderTree, RenderMermaid, MermaidID, MermaidEsc, FindNode, NodeLabel, CollectImports, CollectImportedBy, ResolvePackagePath, DetectModPath, Resolve, ResolveAll, RenderTreeAll, CommitTrace, TraceCommitContracts, MapContractsToSpecs, SpecUpdate, InferSpecIncludes"
+  }
+
+  component "moslib/mesh/export" {
+    package = "github.com/dpopsuev/mos/moslib/mesh/export"
+    symbols = "ExportArchitecture, GraphDelta, NodeDiff, DiffGraphs, ExportUnifiedGraph, Reader, ExportGovernance, ExportMesh, ExportSurvey, ExportProjectToGraph"
+  }
+
+  component "moslib/model" {
+    package = "github.com/dpopsuev/mos/moslib/model"
+    symbols = "Language, LangUnknown, LangGo, LangRust, LangPython, LangTypeScript, LangC, LangCpp, Project, NewProject, Namespace, NewNamespace, File, NewFile, Symbol, SymbolKind, SymbolFile, SymbolModule, SymbolNamespace, SymbolPackage, SymbolClass, SymbolMethod, SymbolProperty, SymbolField, SymbolConstructor, SymbolEnum, SymbolInterface, SymbolFunction, SymbolVariable, SymbolConstant, SymbolString, SymbolNumber, SymbolBoolean, SymbolArray, SymbolObject, SymbolKey, SymbolNull, SymbolEnumMember, SymbolStruct, SymbolEvent, SymbolOperator, SymbolTypeParameter, DependencyGraph, NewDependencyGraph, DependencyEdge"
+  }
+
+  component "moslib/names" {
+    package = "github.com/dpopsuev/mos/moslib/names"
+    symbols = "MosDir, ConfigFile, ActiveDir, ArchiveDir, StatusDraft, StatusActive, StatusComplete, StatusAbandoned, FieldTitle, FieldStatus, FieldGoal, FieldKind, FieldLabels, BlockScope, BlockCoverage, BlockTestMatrix, BlockPersonas, FormatText, FormatJSON, KindContract, KindSpecification, KindRule, KindBinder, KindLexicon, KindSprint, KindBatch, KindNeed, KindArchitecture, DirContracts, DirSpecifications, DirRules, DirBinders, DirSprints, DirBatches, DirNeeds, DirArchitectures, DirPerm, FilePerm"
+  }
+
+  component "moslib/primitive" {
+    package = "github.com/dpopsuev/mos/moslib/primitive"
+    symbols = "Artifact, Spec, Identity, Signer, NewArtifact, Store, FSStore, NewFSStore"
+  }
+
+  component "moslib/registry" {
+    package = "github.com/dpopsuev/mos/moslib/registry"
+    symbols = "ProjectDef, LoadProjects, FindDefaultProject, FindProjectByPrefix, NextID, NextIDForType, AddProject, TransitionDef, HookDef, TransitionGate, LifecycleDef, ArtifactTypeDef, Registry, DefaultRegistry, LoadRegistry, CoreKinds, AddArtifactType, RemoveArtifactType, RemoveProject, FieldOpts, AddFieldToType, SetTypeLifecycle, SetTypeDirectory, SetFieldEnum"
+  }
+
+  component "moslib/schema" {
+    package = "github.com/dpopsuev/mos/moslib/schema"
+    symbols = "TransitionDef, FieldSchema, ExpectsDownstream, ArtifactSchema, DefaultCoreSchemas"
+  }
+
+  component "moslib/store" {
+    package = "github.com/dpopsuev/mos/moslib/store"
+    symbols = "AuditEntry, AuditLogger, NewAuditLogger, ReadAuditLog, Store, DefaultStore, FSStore, ObjectStore, IntegrityError, DefaultObjectStore, ReadFile, ReadDir, Stat, MkdirAll, RemoveAll, Rename, WriteFile"
+  }
+
+  component "moslib/survey" {
+    package = "github.com/dpopsuev/mos/moslib/survey"
+    symbols = "AutoScanner, DetectLanguage, DefaultLSPServer, CompositeScanner, CtagsScanner, GoScanner, LSPScanner, PackagesScanner, RustScanner, Scanner, TypeScriptScanner"
+  }
+
+  component "moslib/topology" {
+    package = "github.com/dpopsuev/mos/moslib/topology"
+    symbols = "Checkpoint, Rollback, DeltaReport, PreFlightDelta, FormatDelta, Promote, Demote, SplitPlan, Split, Merge, Union, Secede"
+  }
+
+  component "moslib/vcs" {
+    package = "github.com/dpopsuev/mos/moslib/vcs"
+    symbols = "FSStore, NewFSStore, GitStore, NewGitStore, NewGitStoreFromRepo, Migrate, Hash, ZeroHash, NewHash, ParseHash, ObjectType, ObjectBlob, ObjectTree, ObjectCommit, TreeEntry, CommitData, Ref, ObjectStore, ErrFSStoreNoRemote, ModeRegular, ModeDir, HeadsPrefix, TagsPrefix, SymHeadFile, DefaultBranch, InitHead, WriteSymbolicHead, WriteDetachedHead, ReadSymbolicHead, ResolveHead, CurrentBranch, VCSConfig, Repository, BackendFS, BackendGit, InitRepo, OpenRepo, WriteVCSConfig"
+  }
+
+  component "moslib/vcs/history" {
+    package = "github.com/dpopsuev/mos/moslib/vcs/history"
+    symbols = "BlameLine, Blame, CreateBranch, ListBranches, DeleteBranch, CheckoutResult, Checkout, CheckoutNewBranch, GrepOpts, GrepMatch, Grep, LogEntry, Log, CommitStat, HashObject, CatFile, LsTree, LsTreeEntry, RevParse, CreateTag, ListTags, DeleteTag"
+  }
+
+  component "moslib/vcs/merge" {
+    package = "github.com/dpopsuev/mos/moslib/vcs/merge"
+    symbols = "MergeConflict, MergeResult, Merge, MergeHash, FindMergeBase, RebaseResult, Rebase"
+  }
+
+  component "moslib/vcs/staging" {
+    package = "github.com/dpopsuev/mos/moslib/vcs/staging"
+    symbols = "CleanOpts, Clean, Commit, Add, DiffKind, DiffAdded, DiffModified, DiffDeleted, DiffEntry, DiffTrees, FlattenTree, IndexToMap, IndexEntry, Index, LoadIndex, ResetIndexToCommit, SnapshotWorkingTree, ShouldSkipFile, StashEntry, Stash, StashPop, StashApply, StashList, StashDrop"
+  }
+
+  component "moslib/vcs/transport" {
+    package = "github.com/dpopsuev/mos/moslib/vcs/transport"
+    symbols = "CloneResult, Clone, Fetch, Pull, PushOpts, Push, MosRemoteConfig, AddRemote, RemoveRemote, ListRemotes"
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/binder" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/binder"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/ci" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/ci"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/config" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/config"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/contract" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/contract"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/gatecmd" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/gatecmd"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/generic" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/generic"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/govern" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/govern"
+    protocol = "import"
+    weight = 14
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/lexicon" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/lexicon"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/rule" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/rule"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/spec" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/spec"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/storecmd" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/storecmd"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/tracecmd" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/tracecmd"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/internal/subsystem -> cmd/mos/vcscmd" {
+    from = "cmd/internal/subsystem"
+    to = "cmd/mos/vcscmd"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/internal/subsystem -> moslib/registry" {
+    from = "cmd/internal/subsystem"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/internal/wire -> moslib/artifact" {
+    from = "cmd/internal/wire"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 13
+  }
+
+  edge "cmd/internal/wire -> moslib/linter" {
+    from = "cmd/internal/wire"
+    to = "moslib/linter"
+    protocol = "import"
+    weight = 17
+  }
+
+  edge "cmd/internal/wire -> moslib/model" {
+    from = "cmd/internal/wire"
+    to = "moslib/model"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/wire -> moslib/registry" {
+    from = "cmd/internal/wire"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "cmd/internal/wire -> moslib/schema" {
+    from = "cmd/internal/wire"
+    to = "moslib/schema"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/internal/wire -> moslib/survey" {
+    from = "cmd/internal/wire"
+    to = "moslib/survey"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mgate -> cmd/internal/subsystem" {
+    from = "cmd/mgate"
+    to = "cmd/internal/subsystem"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mgate -> cmd/internal/wire" {
+    from = "cmd/mgate"
+    to = "cmd/internal/wire"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mgate -> cmd/mos/cliutil" {
+    from = "cmd/mgate"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mgov -> cmd/internal/subsystem" {
+    from = "cmd/mgov"
+    to = "cmd/internal/subsystem"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mgov -> cmd/internal/wire" {
+    from = "cmd/mgov"
+    to = "cmd/internal/wire"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mgov -> cmd/mos/cliutil" {
+    from = "cmd/mgov"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos -> cmd/internal/subsystem" {
+    from = "cmd/mos"
+    to = "cmd/internal/subsystem"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos -> cmd/internal/wire" {
+    from = "cmd/mos"
+    to = "cmd/internal/wire"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mos -> cmd/mos/cliutil" {
+    from = "cmd/mos"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos -> moslib/lsp" {
+    from = "cmd/mos"
+    to = "moslib/lsp"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/binder -> cmd/mos/factory" {
+    from = "cmd/mos/binder"
+    to = "cmd/mos/factory"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "cmd/mos/binder -> moslib/artifact" {
+    from = "cmd/mos/binder"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 12
+  }
+
+  edge "cmd/mos/binder -> moslib/names" {
+    from = "cmd/mos/binder"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/binder -> moslib/registry" {
+    from = "cmd/mos/binder"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/ci -> moslib/artifact" {
+    from = "cmd/mos/ci"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/ci -> moslib/dsl" {
+    from = "cmd/mos/ci"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/ci -> moslib/governance/audit" {
+    from = "cmd/mos/ci"
+    to = "moslib/governance/audit"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/ci -> moslib/guard" {
+    from = "cmd/mos/ci"
+    to = "moslib/guard"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "cmd/mos/ci -> moslib/mesh" {
+    from = "cmd/mos/ci"
+    to = "moslib/mesh"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "cmd/mos/ci -> moslib/names" {
+    from = "cmd/mos/ci"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/cliutil -> moslib/artifact" {
+    from = "cmd/mos/cliutil"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/cliutil -> moslib/names" {
+    from = "cmd/mos/cliutil"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 6
+  }
+
+  edge "cmd/mos/cliutil -> moslib/registry" {
+    from = "cmd/mos/cliutil"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/config -> moslib/registry" {
+    from = "cmd/mos/config"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 15
+  }
+
+  edge "cmd/mos/contract -> cmd/mos/cliutil" {
+    from = "cmd/mos/contract"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mos/contract -> cmd/mos/factory" {
+    from = "cmd/mos/contract"
+    to = "cmd/mos/factory"
+    protocol = "import"
+    weight = 19
+  }
+
+  edge "cmd/mos/contract -> moslib/artifact" {
+    from = "cmd/mos/contract"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 55
+  }
+
+  edge "cmd/mos/contract -> moslib/governance/chain" {
+    from = "cmd/mos/contract"
+    to = "moslib/governance/chain"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/contract -> moslib/names" {
+    from = "cmd/mos/contract"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "cmd/mos/contract -> moslib/registry" {
+    from = "cmd/mos/contract"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 6
+  }
+
+  edge "cmd/mos/factory -> cmd/mos/cliutil" {
+    from = "cmd/mos/factory"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mos/factory -> moslib/artifact" {
+    from = "cmd/mos/factory"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 23
+  }
+
+  edge "cmd/mos/factory -> moslib/names" {
+    from = "cmd/mos/factory"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "cmd/mos/factory -> moslib/registry" {
+    from = "cmd/mos/factory"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 6
+  }
+
+  edge "cmd/mos/gatecmd -> cmd/mos/cliutil" {
+    from = "cmd/mos/gatecmd"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/gatecmd -> moslib/artifact" {
+    from = "cmd/mos/gatecmd"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/gatecmd -> moslib/dsl" {
+    from = "cmd/mos/gatecmd"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "cmd/mos/gatecmd -> moslib/governance/audit" {
+    from = "cmd/mos/gatecmd"
+    to = "moslib/governance/audit"
+    protocol = "import"
+    weight = 13
+  }
+
+  edge "cmd/mos/gatecmd -> moslib/harness" {
+    from = "cmd/mos/gatecmd"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 25
+  }
+
+  edge "cmd/mos/gatecmd -> moslib/linter" {
+    from = "cmd/mos/gatecmd"
+    to = "moslib/linter"
+    protocol = "import"
+    weight = 16
+  }
+
+  edge "cmd/mos/gatecmd -> moslib/names" {
+    from = "cmd/mos/gatecmd"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/generic -> cmd/mos/factory" {
+    from = "cmd/mos/generic"
+    to = "cmd/mos/factory"
+    protocol = "import"
+    weight = 16
+  }
+
+  edge "cmd/mos/generic -> moslib/artifact" {
+    from = "cmd/mos/generic"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 16
+  }
+
+  edge "cmd/mos/generic -> moslib/dsl" {
+    from = "cmd/mos/generic"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "cmd/mos/generic -> moslib/names" {
+    from = "cmd/mos/generic"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/generic -> moslib/registry" {
+    from = "cmd/mos/generic"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/govern -> cmd/mos/cliutil" {
+    from = "cmd/mos/govern"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/govern -> moslib/artifact" {
+    from = "cmd/mos/govern"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 73
+  }
+
+  edge "cmd/mos/govern -> moslib/artifact/chain" {
+    from = "cmd/mos/govern"
+    to = "moslib/artifact/chain"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/govern -> moslib/dsl" {
+    from = "cmd/mos/govern"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 6
+  }
+
+  edge "cmd/mos/govern -> moslib/governance/audit" {
+    from = "cmd/mos/govern"
+    to = "moslib/governance/audit"
+    protocol = "import"
+    weight = 11
+  }
+
+  edge "cmd/mos/govern -> moslib/harness" {
+    from = "cmd/mos/govern"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mos/govern -> moslib/names" {
+    from = "cmd/mos/govern"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "cmd/mos/govern -> moslib/registry" {
+    from = "cmd/mos/govern"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "cmd/mos/lexicon -> cmd/mos/factory" {
+    from = "cmd/mos/lexicon"
+    to = "cmd/mos/factory"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/lexicon -> moslib/artifact" {
+    from = "cmd/mos/lexicon"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/lexicon -> moslib/names" {
+    from = "cmd/mos/lexicon"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "cmd/mos/rule -> cmd/mos/factory" {
+    from = "cmd/mos/rule"
+    to = "cmd/mos/factory"
+    protocol = "import"
+    weight = 11
+  }
+
+  edge "cmd/mos/rule -> moslib/artifact" {
+    from = "cmd/mos/rule"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 24
+  }
+
+  edge "cmd/mos/rule -> moslib/names" {
+    from = "cmd/mos/rule"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/rule -> moslib/registry" {
+    from = "cmd/mos/rule"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "cmd/mos/spec -> cmd/mos/cliutil" {
+    from = "cmd/mos/spec"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/spec -> cmd/mos/factory" {
+    from = "cmd/mos/spec"
+    to = "cmd/mos/factory"
+    protocol = "import"
+    weight = 15
+  }
+
+  edge "cmd/mos/spec -> moslib/artifact" {
+    from = "cmd/mos/spec"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 17
+  }
+
+  edge "cmd/mos/spec -> moslib/mesh" {
+    from = "cmd/mos/spec"
+    to = "moslib/mesh"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/spec -> moslib/names" {
+    from = "cmd/mos/spec"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/spec -> moslib/registry" {
+    from = "cmd/mos/spec"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mos/storecmd -> moslib/store" {
+    from = "cmd/mos/storecmd"
+    to = "moslib/store"
+    protocol = "import"
+    weight = 9
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/arch" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/arch"
+    protocol = "import"
+    weight = 18
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/artifact" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 11
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/clone" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/clone"
+    protocol = "import"
+    weight = 9
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/mesh" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/mesh"
+    protocol = "import"
+    weight = 6
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/model" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/model"
+    protocol = "import"
+    weight = 14
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/names" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/tracecmd -> moslib/survey" {
+    from = "cmd/mos/tracecmd"
+    to = "moslib/survey"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/guard" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/guard"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/harness" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/names" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/vcs" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/vcs"
+    protocol = "import"
+    weight = 34
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/vcs/history" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/vcs/history"
+    protocol = "import"
+    weight = 36
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/vcs/merge" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/vcs/merge"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/vcs/staging" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/vcs/staging"
+    protocol = "import"
+    weight = 26
+  }
+
+  edge "cmd/mos/vcscmd -> moslib/vcs/transport" {
+    from = "cmd/mos/vcscmd"
+    to = "moslib/vcs/transport"
+    protocol = "import"
+    weight = 14
+  }
+
+  edge "cmd/mstore -> cmd/internal/subsystem" {
+    from = "cmd/mstore"
+    to = "cmd/internal/subsystem"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mstore -> cmd/internal/wire" {
+    from = "cmd/mstore"
+    to = "cmd/internal/wire"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mstore -> cmd/mos/cliutil" {
+    from = "cmd/mstore"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mtrace -> cmd/internal/subsystem" {
+    from = "cmd/mtrace"
+    to = "cmd/internal/subsystem"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mtrace -> cmd/internal/wire" {
+    from = "cmd/mtrace"
+    to = "cmd/internal/wire"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mtrace -> cmd/mos/cliutil" {
+    from = "cmd/mtrace"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "cmd/mvcs -> cmd/internal/subsystem" {
+    from = "cmd/mvcs"
+    to = "cmd/internal/subsystem"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mvcs -> cmd/internal/wire" {
+    from = "cmd/mvcs"
+    to = "cmd/internal/wire"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "cmd/mvcs -> cmd/mos/cliutil" {
+    from = "cmd/mvcs"
+    to = "cmd/mos/cliutil"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "moslib/arch -> moslib/dsl" {
+    from = "moslib/arch"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 21
+  }
+
+  edge "moslib/arch -> moslib/model" {
+    from = "moslib/arch"
+    to = "moslib/model"
+    protocol = "import"
+    weight = 13
+  }
+
+  edge "moslib/arch -> moslib/registry" {
+    from = "moslib/arch"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "moslib/artifact -> moslib/arch" {
+    from = "moslib/artifact"
+    to = "moslib/arch"
+    protocol = "import"
+    weight = 17
+  }
+
+  edge "moslib/artifact -> moslib/dsl" {
+    from = "moslib/artifact"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 57
+  }
+
+  edge "moslib/artifact -> moslib/harness" {
+    from = "moslib/artifact"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "moslib/artifact -> moslib/model" {
+    from = "moslib/artifact"
+    to = "moslib/model"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "moslib/artifact -> moslib/names" {
+    from = "moslib/artifact"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 38
+  }
+
+  edge "moslib/artifact -> moslib/registry" {
+    from = "moslib/artifact"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 50
+  }
+
+  edge "moslib/artifact -> moslib/schema" {
+    from = "moslib/artifact"
+    to = "moslib/schema"
+    protocol = "import"
+    weight = 15
+  }
+
+  edge "moslib/artifact -> moslib/store" {
+    from = "moslib/artifact"
+    to = "moslib/store"
+    protocol = "import"
+    weight = 9
+  }
+
+  edge "moslib/artifact/chain -> moslib/artifact" {
+    from = "moslib/artifact/chain"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 13
+  }
+
+  edge "moslib/artifact/chain -> moslib/dsl" {
+    from = "moslib/artifact/chain"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 6
+  }
+
+  edge "moslib/clone -> moslib/dsl" {
+    from = "moslib/clone"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 16
+  }
+
+  edge "moslib/clone -> moslib/names" {
+    from = "moslib/clone"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "moslib/clone -> moslib/registry" {
+    from = "moslib/clone"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "moslib/governance -> moslib/artifact" {
+    from = "moslib/governance"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "moslib/governance/audit -> moslib/arch" {
+    from = "moslib/governance/audit"
+    to = "moslib/arch"
+    protocol = "import"
+    weight = 11
+  }
+
+  edge "moslib/governance/audit -> moslib/artifact" {
+    from = "moslib/governance/audit"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 24
+  }
+
+  edge "moslib/governance/audit -> moslib/dsl" {
+    from = "moslib/governance/audit"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "moslib/governance/audit -> moslib/harness" {
+    from = "moslib/governance/audit"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 10
+  }
+
+  edge "moslib/governance/audit -> moslib/names" {
+    from = "moslib/governance/audit"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 10
+  }
+
+  edge "moslib/governance/audit -> moslib/registry" {
+    from = "moslib/governance/audit"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "moslib/governance/chain -> moslib/artifact/chain" {
+    from = "moslib/governance/chain"
+    to = "moslib/artifact/chain"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "moslib/guard -> moslib/harness" {
+    from = "moslib/guard"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 17
+  }
+
+  edge "moslib/guard -> moslib/linter" {
+    from = "moslib/guard"
+    to = "moslib/linter"
+    protocol = "import"
+    weight = 9
+  }
+
+  edge "moslib/guard -> moslib/names" {
+    from = "moslib/guard"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "moslib/harness -> moslib/dsl" {
+    from = "moslib/harness"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 17
+  }
+
+  edge "moslib/harness -> moslib/names" {
+    from = "moslib/harness"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 1
+  }
+
+  edge "moslib/linter -> moslib/artifact" {
+    from = "moslib/linter"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "moslib/linter -> moslib/dsl" {
+    from = "moslib/linter"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 41
+  }
+
+  edge "moslib/linter -> moslib/harness" {
+    from = "moslib/linter"
+    to = "moslib/harness"
+    protocol = "import"
+    weight = 18
+  }
+
+  edge "moslib/linter -> moslib/names" {
+    from = "moslib/linter"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "moslib/linter -> moslib/schema" {
+    from = "moslib/linter"
+    to = "moslib/schema"
+    protocol = "import"
+    weight = 19
+  }
+
+  edge "moslib/linter -> moslib/vcs" {
+    from = "moslib/linter"
+    to = "moslib/vcs"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "moslib/linter -> moslib/vcs/staging" {
+    from = "moslib/linter"
+    to = "moslib/vcs/staging"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "moslib/lsp -> moslib/linter" {
+    from = "moslib/lsp"
+    to = "moslib/linter"
+    protocol = "import"
+    weight = 14
+  }
+
+  edge "moslib/lsp -> moslib/names" {
+    from = "moslib/lsp"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "moslib/mesh -> moslib/artifact" {
+    from = "moslib/mesh"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 9
+  }
+
+  edge "moslib/mesh -> moslib/dsl" {
+    from = "moslib/mesh"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 7
+  }
+
+  edge "moslib/mesh -> moslib/names" {
+    from = "moslib/mesh"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "moslib/mesh -> moslib/registry" {
+    from = "moslib/mesh"
+    to = "moslib/registry"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "moslib/mesh/export -> moslib/arch" {
+    from = "moslib/mesh/export"
+    to = "moslib/arch"
+    protocol = "import"
+    weight = 10
+  }
+
+  edge "moslib/mesh/export -> moslib/artifact" {
+    from = "moslib/mesh/export"
+    to = "moslib/artifact"
+    protocol = "import"
+    weight = 10
+  }
+
+  edge "moslib/mesh/export -> moslib/dsl" {
+    from = "moslib/mesh/export"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 9
+  }
+
+  edge "moslib/mesh/export -> moslib/mesh" {
+    from = "moslib/mesh/export"
+    to = "moslib/mesh"
+    protocol = "import"
+    weight = 14
+  }
+
+  edge "moslib/mesh/export -> moslib/model" {
+    from = "moslib/mesh/export"
+    to = "moslib/model"
+    protocol = "import"
+    weight = 13
+  }
+
+  edge "moslib/mesh/export -> moslib/survey" {
+    from = "moslib/mesh/export"
+    to = "moslib/survey"
+    protocol = "import"
+    weight = 2
+  }
+
+  edge "moslib/registry -> moslib/dsl" {
+    from = "moslib/registry"
+    to = "moslib/dsl"
+    protocol = "import"
+    weight = 29
+  }
+
+  edge "moslib/registry -> moslib/names" {
+    from = "moslib/registry"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 8
+  }
+
+  edge "moslib/registry -> moslib/schema" {
+    from = "moslib/registry"
+    to = "moslib/schema"
+    protocol = "import"
+    weight = 24
+  }
+
+  edge "moslib/survey -> moslib/model" {
+    from = "moslib/survey"
+    to = "moslib/model"
+    protocol = "import"
+    weight = 45
+  }
+
+  edge "moslib/topology -> moslib/names" {
+    from = "moslib/topology"
+    to = "moslib/names"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "moslib/vcs/history -> moslib/vcs" {
+    from = "moslib/vcs/history"
+    to = "moslib/vcs"
+    protocol = "import"
+    weight = 41
+  }
+
+  edge "moslib/vcs/history -> moslib/vcs/staging" {
+    from = "moslib/vcs/history"
+    to = "moslib/vcs/staging"
+    protocol = "import"
+    weight = 5
+  }
+
+  edge "moslib/vcs/merge -> moslib/vcs" {
+    from = "moslib/vcs/merge"
+    to = "moslib/vcs"
+    protocol = "import"
+    weight = 24
+  }
+
+  edge "moslib/vcs/merge -> moslib/vcs/history" {
+    from = "moslib/vcs/merge"
+    to = "moslib/vcs/history"
+    protocol = "import"
+    weight = 3
+  }
+
+  edge "moslib/vcs/merge -> moslib/vcs/staging" {
+    from = "moslib/vcs/merge"
+    to = "moslib/vcs/staging"
+    protocol = "import"
+    weight = 15
+  }
+
+  edge "moslib/vcs/staging -> moslib/vcs" {
+    from = "moslib/vcs/staging"
+    to = "moslib/vcs"
+    protocol = "import"
+    weight = 30
+  }
+
+  edge "moslib/vcs/transport -> moslib/vcs" {
+    from = "moslib/vcs/transport"
+    to = "moslib/vcs"
+    protocol = "import"
+    weight = 16
+  }
+
+  edge "moslib/vcs/transport -> moslib/vcs/merge" {
+    from = "moslib/vcs/transport"
+    to = "moslib/vcs/merge"
+    protocol = "import"
+    weight = 4
+  }
+
+  edge "moslib/vcs/transport -> moslib/vcs/staging" {
+    from = "moslib/vcs/transport"
+    to = "moslib/vcs/staging"
+    protocol = "import"
+    weight = 1
+  }
+
+}

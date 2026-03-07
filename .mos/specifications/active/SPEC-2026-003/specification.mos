@@ -1,0 +1,16 @@
+specification "SPEC-2026-003" {
+  title = "Machine-Verifiable Traceability Graph"
+  status = "active"
+  addresses = "C2"
+  enforcement = "warn"
+  satisfies = "NEED-2026-003"
+  slug = "traceability-graph"
+
+  spec {
+    include "moslib/governance/chain"
+    include "moslib/governance"
+  }
+  state = "current"
+  group = "governance"
+}
+

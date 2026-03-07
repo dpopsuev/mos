@@ -1,0 +1,10 @@
+contract "BUG-2026-022" {
+  title = "CLI: contract add-section missing"
+  status = "complete"
+  created_at = 2026-03-05T13:15:39Z
+  updated_at = 2026-03-05T13:15:39Z
+  goal = "mos contract add-section is not wired — the add-section subcommand exists on spec/rule/binder but not contract. Should be available on all artifact kinds that support sections."
+  kind = "bug"
+  sprint = "SPR-2026-020"
+}
+

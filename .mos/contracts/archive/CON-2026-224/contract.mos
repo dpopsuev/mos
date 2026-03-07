@@ -1,0 +1,10 @@
+contract "CON-2026-224" {
+  title = "mos sprint plan: auto-suggest next sprint from backlog"
+  status = "complete"
+  created_at = 2026-03-05T21:05:23Z
+  updated_at = 2026-03-05T21:05:23Z
+  goal = "Add mos sprint plan command that scans unassigned draft contracts, ranks by dependency order and priority, and proposes a sprint. User confirms or edits, one command creates the sprint with all assignments. Replaces manual backlog triage and contract-to-sprint assignment."
+  kind = "feature"
+  slug = "sprint-plan"
+}
+

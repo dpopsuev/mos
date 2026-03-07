@@ -1,0 +1,20 @@
+layers {
+
+  layer "project" {
+    level = 1
+    description = "Project-local rules. Apply only within this repository."
+  }
+
+  layer "organization" {
+    level = 2
+    inherits_from = "project"
+    description = "Organization-wide rules. Override project rules on conflict."
+  }
+
+  layer "ecosystem" {
+    level = 3
+    inherits_from = "organization"
+    description = "Ecosystem-wide rules. Highest precedence."
+  }
+}
+

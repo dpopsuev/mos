@@ -1,0 +1,12 @@
+blob
+contract "BUG-2026-019" {
+  title = "Sprint 012 contracts retain double-quoted sprint field values"
+  status = "complete"
+  created_at = 2026-03-05T08:16:27Z
+  updated_at = 2026-03-05T08:16:27Z
+  goal = "CON-2026-171 through CON-2026-174 contain sprint = '\"SPR-2026-012\"' (escaped double-quotes wrapping the value) instead of sprint = 'SPR-2026-012'. This causes lifecycle-chain lookup failures."
+  kind = "bug"
+  slug = "double-quoted-sprint-values"
+  sprint = "SPR-2026-020"
+}
+

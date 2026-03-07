@@ -1,0 +1,227 @@
+specification "SPEC-2026-027" {
+  title = "Contract System: closing the Plan mode gaps"
+  status = "active"
+  enforcement = "warn"
+  satisfies = "NEED-2026-002"
+
+  feature "Durable storage" {
+
+    scenario "Contracts survive session crashes" {
+      given {
+        An agent is mid-execution on a contract
+      }
+      when {
+        The IDE process crashes or network drops
+      }
+      then {
+        The contract, its progress, and its artifacts remain on disk in .mos/ and can be resumed by any agent
+      }
+    }
+
+    scenario "Contracts are git-diffable files" {
+      given {
+        A contract is created or updated
+      }
+      when {
+        The operator runs git diff
+      }
+      then {
+        All changes are visible as plain-text diffs in .mos/ files, not opaque binary state
+      }
+    }
+  }
+
+  feature "Shareability" {
+
+    scenario "Contracts travel with the repo" {
+      given {
+        A project with .mos/ contracts is cloned
+      }
+      when {
+        Another operator or agent opens the project
+      }
+      then {
+        All contracts, specs, rules, batches, and sprints are immediately available without IDE-specific setup
+      }
+    }
+
+    scenario "Cross-agent handoff" {
+      given {
+        Agent A completes steps 1-3 of a contract
+      }
+      when {
+        Agent B is assigned the same contract
+      }
+      then {
+        Agent B can read the contract state, see completed features, and continue from step 4 without prior session context
+      }
+    }
+  }
+
+  feature "Template factory" {
+
+    scenario "Contracts created from templates" {
+      given {
+        A project defines contract templates in .mos/
+      }
+      when {
+        An operator runs mos contract create --from-template bug-fix
+      }
+      then {
+        A new contract is scaffolded with pre-filled features, acceptance criteria, and harness references from the template
+      }
+    }
+  }
+
+  feature "IDE independence" {
+
+    scenario "CLI-first operation" {
+      given {
+        An operator has only a terminal
+      }
+      when {
+        They run mos contract list, mos contract show, mos contract update
+      }
+      then {
+        Full contract lifecycle is available without any IDE, GUI, or network dependency
+      }
+    }
+
+    scenario "Survives network loss" {
+      given {
+        An agent is executing a contract offline
+      }
+      when {
+        Network connectivity drops
+      }
+      then {
+        All contract operations continue locally; no remote dependency is required for core governance
+      }
+    }
+  }
+
+  feature "Multi-agent parallelism" {
+
+    scenario "Parallel contract execution" {
+      given {
+        A sprint has 6 independent contracts
+      }
+      when {
+        An orchestrator agent assigns contracts to 3 worker agents
+      }
+      then {
+        Each agent reads its contract, executes independently, and updates status without conflicting with others
+      }
+    }
+
+    scenario "Listener agent churns contracts" {
+      given {
+        An operator is describing work in natural language to a listener agent
+      }
+      when {
+        The listener identifies discrete units of work
+      }
+      then {
+        It creates new contracts via mos contract create, assigns them to batches, and worker agents can pick them up immediately
+      }
+    }
+  }
+
+  feature "Structured verification" {
+
+    scenario "Harness proves completion" {
+      given {
+        A contract has a harness block with a test command
+      }
+      when {
+        An agent marks the contract as complete
+      }
+      then {
+        The harness is executed and the contract only transitions to done if the harness passes
+      }
+    }
+
+    scenario "Gherkin acceptance criteria are machine-readable" {
+      given {
+        A contract has features with Given/When/Then scenarios
+      }
+      when {
+        A linter or agent reads the contract
+      }
+      then {
+        Acceptance criteria are parseable structured data, not freeform prose buried in a conversation
+      }
+    }
+  }
+
+  feature "Dependency graph" {
+
+    scenario "Contracts express blocking relationships" {
+      given {
+        CON-A has depends_on = CON-B
+      }
+      when {
+        An orchestrator plans execution order
+      }
+      then {
+        CON-B is scheduled before CON-A, and parallel-safe contracts without dependencies can run concurrently
+      }
+    }
+  }
+
+  feature "Audit trail and observability" {
+
+    scenario "All mutations are traceable" {
+      given {
+        A contract is updated via mos contract update
+      }
+      when {
+        The operator runs git log on the contract file
+      }
+      then {
+        Every change has a commit with author, timestamp, and rationale — unlike Plan mode where edits are invisible
+      }
+    }
+
+    scenario "Project-wide status at a glance" {
+      given {
+        A project has 20 contracts across 3 sprints
+      }
+      when {
+        An operator runs mos status
+      }
+      then {
+        They see a summary of active sprint, in-flight contracts, blockers, and health — context that Plan mode cannot aggregate
+      }
+    }
+  }
+
+  feature "Context window independence" {
+
+    scenario "Contracts do not compete with code for context" {
+      given {
+        An agent is implementing a complex function
+      }
+      when {
+        It needs to check its acceptance criteria
+      }
+      then {
+        It reads a single contract file on demand rather than carrying the entire plan in its context window, freeing tokens for code
+      }
+    }
+  }
+
+  section "Plan mode gap analysis" {
+    text = """
+Cursor Plan mode is a conversational planning tool — effective for interactive design but structurally unable to outlive a session. Contracts close 17 identified gaps: (1) no shareability, (2) no durable storage, (3) no templates, (4) IDE-bound / session-fragile, (5) single-agent single-thread, (6) no structured resumption, (7) no dependency graph, (8) no verification or acceptance criteria, (9) no audit trail, (10) context window pressure, (11) no observability, (12) no scope governance, (13) no delegation semantics, (14) no rollback, (15) no cross-session learning, (16) no priority or triage, (17) no IDE portability. The mos contract system addresses every gap by making work units durable files, machine-readable, verifiable, and independent of any single process or IDE."""
+  }
+  slug = "contract-system-plan-mode-gaps"
+
+  spec {
+    include "moslib/governance"
+    include "cmd/mos"
+  }
+  state = "current"
+  group = "governance"
+}
+

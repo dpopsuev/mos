@@ -1,0 +1,10 @@
+blob
+specification "SPEC-2026-005" {
+  title = "Cross-Repo Federation"
+  status = "active"
+  addresses = "C4"
+  enforcement = "disabled"
+  justifies = "NEED-2026-001"
+  slug = "cross-repo-federation"
+}
+

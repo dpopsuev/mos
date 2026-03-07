@@ -1,0 +1,8 @@
+sprint "SPR-2026-015" {
+  status = "complete"
+  title = "Context Mesh: Agent Pre-Flight"
+  goal = "Deliver mos mesh <path> — a single CLI command that gives an AI agent the full governance spine of any code file before it starts working. Populate spec-to-code bindings, define the MeshGraph type, build the reverse resolver, and wire the CLI."
+  slug = "context-mesh-agent-preflight"
+  contracts = "CON-2026-179,CON-2026-180,CON-2026-184,CON-2026-185,BUG-2026-018,CON-2026-187,CON-2026-188"
+}
+

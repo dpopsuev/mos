@@ -1,0 +1,12 @@
+blob
+contract "BUG-2026-021" {
+  title = "NEED-2026-001 criterion C5 unaddressed"
+  status = "complete"
+  created_at = 2026-03-05T08:16:31Z
+  updated_at = 2026-03-05T08:16:31Z
+  goal = "Criterion C5 in NEED-2026-001 has no specification or contract addressing it, triggering a criterion-coverage lint error."
+  kind = "bug"
+  slug = "unaddressed-criterion-c5"
+  sprint = "SPR-2026-021"
+}
+

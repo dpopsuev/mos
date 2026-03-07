@@ -1,0 +1,19 @@
+contract "CON-2026-102" {
+  title = "CON-2026-102"
+  status = "abandoned"
+  created_at = 2026-03-03T21:07:46Z
+  updated_at = 2026-03-03T21:27:34Z
+  name = "Contract-Scoped Rules: temporary amendments"
+  slug = "contract-scoped-rules"
+  description = "Temporary rule amendments scoped to a single Contract lifetime. Override or extend standing law for the duration of work — expire automatically on contract completion or abandonment. Contract rules let teams adopt stricter or relaxed policies for a specific scope without polluting the project-wide rule set. This is the constitutional equivalent of wartime powers or emergency legislation."
+
+  feature "Attach temporary rule to contract" {
+  }
+
+  feature "Automatic expiry on completion" {
+  }
+
+  feature "Rule resolution with contract amendments" {
+  }
+}
+

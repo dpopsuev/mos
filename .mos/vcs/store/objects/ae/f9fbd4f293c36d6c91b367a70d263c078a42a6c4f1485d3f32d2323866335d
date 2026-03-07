@@ -1,0 +1,14 @@
+blob
+contract "CON-2026-080" {
+  title = "Git parity: clean"
+  status = "draft"
+  created_at = 2026-03-03T18:58:06Z
+  updated_at = 2026-03-03T19:11:01Z
+  goal = "Remove untracked artifacts from the governance working tree. Dry-run support, force and directory flags. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-clean"
+  depends_on = "CON-2026-061"
+}
+

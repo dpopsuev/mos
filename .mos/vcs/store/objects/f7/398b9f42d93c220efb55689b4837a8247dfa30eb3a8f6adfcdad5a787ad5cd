@@ -1,0 +1,31 @@
+blob
+contract "CON-2026-086" {
+  title = "Git parity: rev-parse"
+  status = "complete"
+  created_at = 2026-03-03T18:58:25Z
+  updated_at = 2026-03-03T19:11:23Z
+  goal = "Resolve symbolic refs (HEAD, branch names, tags) to content addresses. Store-dependent plumbing primitive. Reimplemented, no shelling out to git."
+  precondition = "SPEC-2026-001"
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-rev-parse"
+  depends_on = "CON-2026-136"
+
+  feature "rev-parse" {
+
+    scenario "resolve HEAD branch and tag" {
+      status = "done"
+      given {
+        a repo with a commit, branch, and tag
+      }
+      when {
+        user runs rev-parse with HEAD, branch name, and tag name
+      }
+      then {
+        all resolve to the correct commit hash
+      }
+    }
+  }
+}
+

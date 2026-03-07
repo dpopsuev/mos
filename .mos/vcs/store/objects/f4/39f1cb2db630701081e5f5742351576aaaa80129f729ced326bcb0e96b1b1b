@@ -1,0 +1,13 @@
+blob
+contract "CON-2026-143" {
+  title = "Finish registry-only engine: shrink reserved lexicon to ~24 primitives"
+  status = "complete"
+  created_at = 2026-03-04T15:08:41Z
+  updated_at = 2026-03-04T15:08:41Z
+  goal = "Re-audit found ~253 governance-relevant string literals across engine, linter, and CLI — CON-2026-129 centralized constants into names.go but did not make the Registry authoritative. Five actions: (1) Expand DefaultRegistry() from 1 kind to all 9 built-in kinds with full field/lifecycle schemas. (2) Delete kind/field/block constants from names.go for anything now in Registry — keep only ~12 true primitives plus ~12 DSL grammar words. (3) Replace all raw string lookups in binder.go, specification.go, crossref.go, init.go, generic.go, contract.go with reg.Types[kind] pattern. (4) Move inferArtifactKind in CLI to use reg.PrefixKind instead of hardcoded map. (5) Delete crossref.go hardcoded kind-specific validation — iterate Registry fields instead. Target: ~24 true primitives on par with Go's 25 keywords."
+  kind = "feature"
+  justifies = "NEED-2026-002"
+  depends_on = "CON-2026-129"
+  sprint = "SPR-2026-008"
+}
+

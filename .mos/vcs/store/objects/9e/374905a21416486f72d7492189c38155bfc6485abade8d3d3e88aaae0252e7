@@ -1,0 +1,9 @@
+blob
+sprint "SPR-2026-011" {
+  title = "Structural Cleanup + Code Quality"
+  status = "complete"
+  goal = "Address remaining structural debt from post-SPR-2026-010 audit. Split contract.go god file, extract governance/chain and governance/audit as subpackages, complete Cobra migration, break CLI cross-coupling, enforce error wrapping, replace magic strings with registry constants, continue astutil migration to hit LOC/Parse targets, resolve ANTLR when-ambiguity, delete dead code, add CLI handler tests, and fix criterion serialization bug."
+  slug = "structural-cleanup"
+  contracts = "BUG-2026-014,CON-2026-165,CON-2026-149,CON-2026-170,CON-2026-163,CON-2026-161,CON-2026-164,CON-2026-168,CON-2026-169,CON-2026-167,CON-2026-162"
+}
+

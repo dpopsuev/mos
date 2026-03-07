@@ -1,0 +1,45 @@
+==================
+Background block
+==================
+
+contract "X" {
+  feature "Test" {
+  background {
+    given {
+      the system is initialized
+      test data exists
+    }
+  }
+  scenario "First" {
+    given {
+      user is logged in
+    }
+    then {
+      dashboard is visible
+    }
+  }
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (feature_block
+          (string)
+          (background_block
+            (given_block
+              (step_line)
+              (step_line)))
+          (scenario_block
+            (string)
+            (scenario_content
+              (given_block
+                (step_line))
+              (then_block
+                (step_line)))))))))

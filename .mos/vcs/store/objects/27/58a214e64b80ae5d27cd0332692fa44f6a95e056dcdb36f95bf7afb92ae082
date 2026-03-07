@@ -1,0 +1,129 @@
+blob
+contract "CON-2026-007" {
+  title = "Stdlib Modernization"
+  status = "complete"
+  goal = "Reduce bespoke code surface by adopting stdlib modern packages, a BDD testing framework, and extracting internal duplicated patterns -- fewer custom helpers, more idiomatic Go, dogfooded BDD harness."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "All replaced patterns must produce identical results. Gomega assertions must pass on existing test data."
+    }
+
+    integration {
+      applies = true
+      rationale = "Stressgen -> parse -> lint pipeline must remain green after stdlib and assertion changes."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API changes"
+    }
+
+    e2e {
+      applies = false
+      rationale = "No user-facing command changes"
+    }
+
+    performance {
+      applies = true
+      rationale = "slices.Sorted(maps.Keys(...)) must not regress stressgen benchmarks. Re-run Dunix time budgets."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "No shared-state changes"
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundaries affected"
+    }
+  }
+
+  feature "Dependency Modernization and BDD Harness" {
+
+    scenario "stdlib maps/slices/cmp adopted" {
+      given {
+        the codebase on Go 1.25.7
+      }
+      when {
+        all hand-rolled collect-sort-iterate patterns are replaced
+      }
+      then {
+        no import of "sort" remains in survey/go_scanner.go
+        containsNewline function is deleted from dsl/format.go
+        all tests pass with identical behavior
+      }
+    }
+
+    scenario "Gomega matchers work with stdlib testing" {
+      given {
+        testkit/network/ tests use raw t.Errorf assertions
+      }
+      when {
+        assertions are converted to Gomega via NewWithT(t)
+      }
+      then {
+        all existing tests pass
+        assertion failures produce clearer diff output
+        no structural changes to test functions
+      }
+    }
+
+    scenario "Ginkgo suite for new integration tests" {
+      given {
+        a new linter or stressgen integration test
+      }
+      when {
+        it is written as a Ginkgo Describe/Context/It suite
+      }
+      then {
+        the suite runs via both "go test" and "ginkgo run"
+        the BDD structure mirrors the mos DSL structure
+        JUnit XML output is available via ginkgo --junit-report
+      }
+    }
+
+    scenario "Existing tests migrate to Ginkgo incrementally" {
+      given {
+        testkit/network/ converted to Ginkgo as proof of migration
+      }
+      when {
+        the full test suite runs
+      }
+      then {
+        Ginkgo and stdlib testing coexist without conflict
+        test count is preserved or increased
+      }
+    }
+
+    scenario "dsl.StringValue helper eliminates ad-hoc extraction" {
+      given {
+        multiple call sites extracting string from dsl.Value
+      }
+      when {
+        dsl.StringValue is introduced
+      }
+      then {
+        all ad-hoc fieldStr helpers are removed
+        callers use the canonical dsl.StringValue
+      }
+    }
+
+    scenario "Performance not regressed" {
+      given {
+        Dunix Terran and Martian stress benchmarks as baseline
+      }
+      when {
+        all dependency changes are applied
+      }
+      then {
+        parse + lint time is within 5% of baseline
+        no new allocations in hot paths
+      }
+    }
+  }
+}
+

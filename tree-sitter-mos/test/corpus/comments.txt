@@ -1,0 +1,33 @@
+==================
+Comment handling
+==================
+
+# Top-level comment
+contract "CON-1" {
+  # Inline comment
+  title = "Test"
+  status = "draft"
+}
+
+---
+
+(source_file
+  (comment)
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (comment)
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string)))))))

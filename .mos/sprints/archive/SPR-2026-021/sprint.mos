@@ -1,0 +1,7 @@
+sprint "SPR-2026-021" {
+  status = "complete"
+  title = "Tier 2: Medium ROI CLI & Lint Improvements"
+  goal = "Deliver Tier 2 CLI and lint improvements with medium ROI."
+  contracts = "CON-2026-190,CON-2026-117,CON-2026-096,CON-2026-112,CON-2026-121,BUG-2026-021"
+}
+

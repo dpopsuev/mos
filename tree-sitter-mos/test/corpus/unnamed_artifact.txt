@@ -1,0 +1,21 @@
+==================
+Unnamed artifact (config)
+==================
+
+config {
+  version = 1
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (block
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (integer)))))))

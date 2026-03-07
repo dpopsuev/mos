@@ -1,0 +1,8 @@
+blob
+sprint "SPR-2026-025" {
+  title = "VCS Collaboration: remote, push, pull, clone"
+  status = "complete"
+  goal = "Core VCS git parity for collaboration — manage remotes, push governance state, pull/fetch from remotes, clone remote governance repos."
+  contracts = "CON-2026-075,CON-2026-076,CON-2026-077,CON-2026-078"
+}
+

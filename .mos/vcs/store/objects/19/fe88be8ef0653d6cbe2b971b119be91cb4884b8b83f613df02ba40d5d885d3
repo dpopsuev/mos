@@ -1,0 +1,115 @@
+blob
+contract "CON-2026-027" {
+  title = "Rule-to-contract kind binding (scoped pre-prompts)"
+  status = "complete"
+  created_at = 2026-03-03T09:57:31Z
+  updated_at = 2026-03-03T09:57:31Z
+  goal = "Rules can declare which contract kinds they apply to via an applies_to field. A new mos contract context command resolves the contract metadata plus all applicable rules, producing a structured pre-prompt for agent consumption. Primitives-first: this is a schema addition to rules (applies_to list) and a read-only resolution command, not new enforcement machinery."
+  kind = "feature"
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Rule creation with applies_to, context resolution, filtering."
+    }
+
+    integration {
+      applies = true
+      rationale = "CLI round-trip: create rule with --applies-to, mos contract context."
+    }
+
+    contract {
+      applies = false
+    }
+
+    e2e {
+      applies = false
+    }
+
+    concurrency {
+      applies = false
+    }
+
+    security {
+      applies = false
+    }
+  }
+
+  feature "Rule-to-Contract Kind Binding" {
+
+    scenario "Create rule with applies_to kinds" {
+      status = "done"
+      given {
+        an initialized workspace
+      }
+      when {
+        "mos rule create R-BUG --type mechanical --applies-to bug,feature" is run
+      }
+      then {
+        the rule file contains applies_to = ["bug", "feature"]
+        the rule is valid per linter
+      }
+    }
+
+    scenario "Contract context resolves matching rules" {
+      status = "done"
+      given {
+        a rule R-BUG with applies_to = ["bug"]
+        a contract BUG-001 with kind = "bug"
+      }
+      when {
+        "mos contract context BUG-001" is run
+      }
+      then {
+        the output includes the contract metadata (title, kind, goal, status)
+        the output includes rule R-BUG content
+      }
+    }
+
+    scenario "Rules without applies_to excluded from context" {
+      status = "done"
+      given {
+        a rule R-GENERAL with no applies_to field
+        a contract CON-001 with kind = "feature"
+      }
+      when {
+        "mos contract context CON-001" is run
+      }
+      then {
+        R-GENERAL does not appear in the context output
+      }
+    }
+
+    scenario "Multiple matching rules concatenated" {
+      status = "done"
+      given {
+        rule R-BUG-A with applies_to = ["bug"]
+        rule R-BUG-B with applies_to = ["bug", "feature"]
+        a contract BUG-001 with kind = "bug"
+      }
+      when {
+        "mos contract context BUG-001" is run
+      }
+      then {
+        both R-BUG-A and R-BUG-B appear in the context output
+      }
+    }
+
+    scenario "Context includes contract metadata" {
+      status = "done"
+      given {
+        a contract CON-001 with title, kind, goal, and status fields
+        a matching rule exists
+      }
+      when {
+        "mos contract context CON-001" is run
+      }
+      then {
+        the output begins with contract ID, title, kind, goal, and status
+        rules section follows the metadata section
+      }
+    }
+  }
+}
+

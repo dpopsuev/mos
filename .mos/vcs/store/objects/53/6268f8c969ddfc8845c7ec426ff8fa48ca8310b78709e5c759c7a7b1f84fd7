@@ -1,0 +1,149 @@
+blob
+contract "CON-2026-006" {
+  title = "DSL v1 to v3 Migration"
+  status = "complete"
+  goal = "Migrate `moslib/dsl/` from DSL v1 (capitalized Gherkin inside `spec {}`) to DSL v3 (lowercase, brace-delimited, unified grammar) and propagate changes to stressgen and tests."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Parser, lexer, formatter for all v3 constructs. AST node types."
+    }
+
+    integration {
+      applies = true
+      rationale = "Parse -> format -> re-parse round-trip (formatter idempotency). Stressgen -> parse pipeline."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API"
+    }
+
+    e2e {
+      applies = false
+      rationale = "No user-facing command changes in this contract"
+    }
+
+    performance {
+      applies = true
+      rationale = "Stressgen benchmarks re-run to confirm v3 meets or beats v1 performance"
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Parser is single-threaded"
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundaries -- local file parsing only"
+    }
+  }
+
+  feature "DSL v3 Grammar Migration" {
+
+    scenario "All artifact types parse with v3 syntax" {
+      given {
+        a rule, contract, config, declaration, vocabulary, and layers file written in v3 syntax
+      }
+      when {
+        each file is parsed by the updated parser
+      }
+      then {
+        each file produces a valid AST without error
+        feature blocks are FeatureBlock nodes, not SpecBlock
+        step blocks contain free-text lines, not keyword+text Steps
+      }
+    }
+
+    scenario "Scenario with sut, test, and case fields" {
+      given {
+        a rule with a scenario containing sut, test, and case fields
+      }
+      when {
+        the file is parsed
+      }
+      then {
+        the Scenario AST node has SUT, Test, and Case populated
+      }
+    }
+
+    scenario "Formatter round-trip with v3" {
+      given {
+        a valid v3 DSL file
+      }
+      when {
+        it is parsed to AST and formatted back to text
+        the text is re-parsed to AST and formatted again
+      }
+      then {
+        both formatted outputs are byte-for-byte identical
+      }
+    }
+
+    scenario "Inline feature without spec wrapper" {
+      given {
+        a v3 rule file with a feature block directly inside the artifact
+      }
+      when {
+        the file is parsed
+      }
+      then {
+        the FeatureBlock is a direct child of ArtifactBlock
+        no SpecBlock node exists in the AST
+      }
+    }
+
+    scenario "Multi-file composition via spec with includes" {
+      given {
+        a v3 rule file with spec { include "features/a.cst" }
+      }
+      when {
+        the file is parsed
+      }
+      then {
+        a SpecBlock node exists containing an IncludeDirective
+        the include path is "features/a.cst"
+      }
+    }
+
+    scenario "Mixed inline and included features in spec" {
+      given {
+        a v3 rule file with spec { include "a.cst" and an inline feature }
+      }
+      when {
+        the file is parsed
+      }
+      then {
+        the SpecBlock contains both an IncludeDirective and a FeatureBlock
+      }
+    }
+
+    scenario "Stressgen produces valid v3 output" {
+      given {
+        GenerateDSL is called with the Kubernetes profile
+      }
+      when {
+        every generated .cst file is parsed
+      }
+      then {
+        all files parse without error
+      }
+    }
+
+    scenario "Performance maintained" {
+      given {
+        the Kubernetes and Linux Kernel stress profiles
+      }
+      when {
+        DSL v3 parse benchmarks are run
+      }
+      then {
+        v3 parse times are within 20% of v1 baselines
+      }
+    }
+  }
+}
+

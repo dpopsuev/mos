@@ -1,0 +1,126 @@
+contract "CON-2026-028" {
+  title = "Schema migration for governance artifacts"
+  status = "complete"
+  created_at = 2026-03-03T10:00:14Z
+  updated_at = 2026-03-03T10:00:14Z
+  goal = "When artifact type schemas evolve (new fields, new defaults, new scopes), existing instances can be automatically backfilled. Primitives: schema version on artifact_type definitions, default values on field definitions, a mos migrate command that walks instances, diffs against current schema, and inserts missing fields with defaults. Dry-run by default, --apply to write. Builds on the CRD field definitions and generic file walker from CON-2026-023."
+  kind = "feature"
+  depends_on = ["CON-2026-023"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Schema version parsing, default field backfill, diff computation."
+    }
+
+    integration {
+      applies = true
+      rationale = "mos migrate dry-run and --apply round-trip."
+    }
+
+    contract {
+      applies = false
+    }
+
+    e2e {
+      applies = false
+    }
+
+    concurrency {
+      applies = false
+    }
+
+    security {
+      applies = false
+    }
+  }
+
+  feature "Schema Migration" {
+
+    scenario "FieldDef supports default values" {
+      status = "done"
+      given {
+        an artifact_type block with a field that has default = "value"
+      }
+      when {
+        the registry is loaded
+      }
+      then {
+        the FieldDef for that field has Default = "value"
+      }
+    }
+
+    scenario "ArtifactTypeDef supports version" {
+      status = "done"
+      given {
+        an artifact_type block with version = "2"
+      }
+      when {
+        the registry is loaded
+      }
+      then {
+        the ArtifactTypeDef has Version = "2"
+      }
+    }
+
+    scenario "Dry-run lists missing fields with defaults" {
+      status = "done"
+      given {
+        a custom artifact type with field priority having default = "medium"
+        an existing instance missing the priority field
+      }
+      when {
+        mos migrate is run without --apply
+      }
+      then {
+        the output reports the instance needs priority = "medium" backfilled
+        no files are modified
+      }
+    }
+
+    scenario "Apply inserts missing fields with defaults" {
+      status = "done"
+      given {
+        a custom artifact type with field priority having default = "medium"
+        an existing instance missing the priority field
+      }
+      when {
+        mos migrate --apply is run
+      }
+      then {
+        the instance file now contains priority = "medium"
+        the file is valid and parseable
+      }
+    }
+
+    scenario "Up-to-date instances are skipped" {
+      status = "done"
+      given {
+        a custom artifact type with field priority having default = "medium"
+        an existing instance that already has priority = "high"
+      }
+      when {
+        mos migrate is run
+      }
+      then {
+        the instance is reported as up to date
+        the instance file is not modified
+      }
+    }
+
+    scenario "Built-in types can define defaults" {
+      status = "done"
+      given {
+        the contract type has a field kind with default = "feature"
+      }
+      when {
+        mos migrate --apply is run on a contract missing the kind field
+      }
+      then {
+        the contract now has kind = "feature"
+      }
+    }
+  }
+}
+

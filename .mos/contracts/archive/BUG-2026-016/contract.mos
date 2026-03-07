@@ -1,0 +1,29 @@
+contract "BUG-2026-016" {
+  title = "mos set double-quotes string values producing invalid DSL"
+  status = "complete"
+  created_at = 2026-03-04T20:47:51Z
+  updated_at = 2026-03-04T20:47:51Z
+  goal = "Running 'mos set <ID> sprint SPR-2026-012' produces sprint = \"\\\"SPR-2026-012\\\"\" instead of sprint = \"SPR-2026-012\". The set command unconditionally wraps the value in quotes when writing to the .mos file, but if the shell argument is already quoted the result is double-wrapped. Fix: either strip outer quotes from input before re-quoting, or detect that the value is already a valid DSL string literal and write it as-is."
+  sprint = "SPR-2026-012"
+  kind = "bug"
+
+  acceptance {
+
+    criterion "no-double-wrap" {
+      description = "mos set <ID> field 'value' produces field = \"value\" (single layer of quotes)"
+    }
+
+    criterion "unquoted-input" {
+      description = "mos set <ID> field value (no shell quotes) also produces field = \"value\""
+    }
+
+    criterion "idempotent" {
+      description = "Running mos set twice with the same value produces identical file content"
+    }
+
+    criterion "build-clean" {
+      description = "go build ./... and go test ./... pass with zero errors"
+    }
+  }
+}
+

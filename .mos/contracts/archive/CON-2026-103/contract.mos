@@ -1,0 +1,19 @@
+contract "CON-2026-103" {
+  title = "CON-2026-103"
+  status = "abandoned"
+  created_at = 2026-03-03T21:08:19Z
+  updated_at = 2026-03-03T21:27:51Z
+  name = "Graduated Governance: ceremony levels"
+  slug = "graduated-governance"
+  description = "Not all changes need the same ceremony. Graduated governance distinguishes executive action (small, immediate — a config tweak, a typo fix) from legislation (large, deliberative — architectural shifts, new standing rules). The ceremony level is determined by scope, impact, and the governance model the project chose. This prevents governance from becoming bureaucracy while preserving oversight where it matters. Includes the right to experiment safely in sandboxed forks and a mechanism to gather evidence before committing to change."
+
+  feature "Ceremony level classification" {
+  }
+
+  feature "Legislative path for high-impact changes" {
+  }
+
+  feature "Sandbox experimentation" {
+  }
+}
+

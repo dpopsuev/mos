@@ -1,0 +1,7 @@
+sprint "SPR-2026-020" {
+  status = "complete"
+  title = "Tier 1: Bugs + Lint/CLI Improvements"
+  goal = "Address bugs and deliver Tier 1 lint and CLI improvements."
+  contracts = "BUG-2026-017,BUG-2026-019,BUG-2026-022,CON-2026-189,CON-2026-191,CON-2026-192"
+}
+

@@ -1,0 +1,33 @@
+contract "CON-2026-171" {
+  title = "Split generic.go into generic_crud.go + generic_blocks.go"
+  status = "complete"
+  created_at = 2026-03-04T20:33:28Z
+  updated_at = 2026-03-04T20:33:28Z
+  goal = "Split the 824-LOC generic.go god file into generic_crud.go (Create, Update, Delete, Status, Rename, findGenericPath) and generic_blocks.go (AddSection, AddFeature, AddScenario, RemoveBlock, SetHarness, AddCoverage, AddBill, AddSpec, RemoveScenario). Quick win, no API change — purely structural decomposition to improve navigability and reduce per-file cognitive load."
+  kind = "refactor"
+
+  acceptance {
+
+    criterion "no-generic-go" {
+      description = "moslib/governance/generic.go no longer exists"
+    }
+
+    criterion "crud-file" {
+      description = "generic_crud.go contains Create, Update, Delete, Status, Rename, findGenericPath"
+    }
+
+    criterion "blocks-file" {
+      description = "generic_blocks.go contains AddSection, AddFeature, AddScenario, RemoveBlock, SetHarness, AddCoverage, AddBill, AddSpec, RemoveScenario"
+    }
+
+    criterion "loc-limit" {
+      description = "Neither file exceeds 450 LOC"
+    }
+
+    criterion "build-clean" {
+      description = "go build ./... and go test ./... pass with zero errors"
+    }
+  }
+  sprint = "SPR-2026-012"
+}
+

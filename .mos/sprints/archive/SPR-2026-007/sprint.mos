@@ -1,0 +1,8 @@
+sprint "SPR-2026-007" {
+  status = "complete"
+  title = "Branching + Plumbing"
+  goal = "Implement branch model, checkout, merge, rebase, tags, and plumbing commands for the governance VCS."
+  slug = "branching-plumbing"
+  contracts = "CON-2026-070,CON-2026-071,CON-2026-072,CON-2026-073,CON-2026-074,CON-2026-083,CON-2026-084,CON-2026-085,CON-2026-086"
+}
+

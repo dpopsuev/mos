@@ -1,0 +1,26 @@
+blob
+specification "SPEC-2026-014" {
+  title = "Rule Import with Fork Sync Protocol"
+  status = "active"
+  enforcement = "disabled"
+  name = "Rule Import with Fork Sync Protocol"
+  slug = "spec-rule-import-fork-sync"
+  description = "Import rules from external mos repositories with three sync levels per the Manifesto Fork Sync Protocol: isolated (one-time copy, no provenance), advisory (upstream drift surfaces as lint warnings), full (changes propagate automatically). Supports importing individual rules or named packs defined by upstream owners. Local overrides always allowed — defaults not mandates."
+
+  feature "Import rules from git" {
+
+    scenario "--scenario" {
+      given {
+        A rule imported with full sync
+      }
+      when {
+        Upstream publishes a new version
+      }
+      then {
+        mos sync pulls the update and applies it; local changes are logged as informational
+      }
+    }
+  }
+  justifies = "NEED-2026-001"
+}
+

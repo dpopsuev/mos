@@ -1,0 +1,25 @@
+specification "SPEC-2026-023" {
+  title = "Warm Start: zero-context bootstrap"
+  status = "active"
+  enforcement = "disabled"
+  name = "Warm Start: zero-context bootstrap"
+  slug = "spec-warm-start"
+  description = "No developer, no agent, and no project should ever begin from zero context. This spec defines the orchestrated onboarding flow: when a new participant (human or agent) joins an existing project, the system assembles all context pieces in sequence — Cabinet loads personal state, MOTD displays the collective north star, standing rules activate, vocabulary is available, the Declaration is readable, inherited organizational DNA applies. The warm start is the proof that Constitution eliminates cold starts. Manifesto Section 2."
+
+  feature "Developer onboarding sequence" {
+  }
+
+  feature "Agent warm start" {
+  }
+
+  feature "New project inherits org DNA" {
+  }
+  satisfies = "NEED-2026-002"
+
+  spec {
+    include "cmd/mos"
+  }
+  state = "current"
+  group = "cli"
+}
+

@@ -1,0 +1,8 @@
+blob
+sprint "SPR-2026-038" {
+  status = "complete"
+  title = "Git Masquerading: Forge E2E Verification"
+  goal = "Prove that governance refs survive a real forge round-trip (NEED-2026-004 C7)"
+  contracts = "CON-2026-244,CON-2026-245"
+}
+

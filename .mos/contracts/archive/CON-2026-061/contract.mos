@@ -1,0 +1,43 @@
+contract "CON-2026-061" {
+  title = "Git parity: status"
+  status = "complete"
+  created_at = 2026-03-03T18:57:01Z
+  updated_at = 2026-03-03T19:10:52Z
+  goal = "Show working tree status: modified, staged, and untracked artifacts plus lifecycle state summary. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-status"
+  depends_on = "CON-2026-063"
+
+  feature "Working tree status" {
+
+    scenario "clean state" {
+      status = "done"
+      given {
+        a governance repo with no changes since last commit
+      }
+      when {
+        mos vcs status is run
+      }
+      then {
+        output shows nothing to commit, working tree clean
+      }
+    }
+
+    scenario "modified and staged" {
+      status = "done"
+      given {
+        a governance repo with one modified file and one staged file
+      }
+      when {
+        mos vcs status is run
+      }
+      then {
+        output distinguishes staged changes and unstaged modifications
+      }
+    }
+  }
+  sprint = "SPR-2026-006"
+}
+

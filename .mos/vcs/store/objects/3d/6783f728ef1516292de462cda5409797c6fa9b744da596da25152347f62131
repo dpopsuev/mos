@@ -1,0 +1,15 @@
+blob
+contract "CON-2026-065" {
+  title = "Git parity: reset"
+  status = "draft"
+  created_at = 2026-03-03T18:57:17Z
+  updated_at = 2026-03-03T19:10:53Z
+  goal = "Unstage changes or revert governance state to a previous commit. Supports --soft, --mixed, --hard semantics adapted for governance artifacts. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-reset"
+  depends_on = "CON-2026-064"
+  sprint = "SPR-2026-006"
+}
+

@@ -1,0 +1,15 @@
+blob
+contract "CON-2026-085" {
+  title = "Git parity: ls-tree"
+  status = "draft"
+  created_at = 2026-03-03T18:58:25Z
+  updated_at = 2026-03-03T19:11:23Z
+  goal = "List the governance tree at a given commit. Shows all artifacts and their content addresses at a point in history. Store-dependent plumbing primitive. Reimplemented, no shelling out to git."
+  precondition = "SPEC-2026-001"
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-ls-tree"
+  depends_on = "CON-2026-064"
+}
+

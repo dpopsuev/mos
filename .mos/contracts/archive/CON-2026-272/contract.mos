@@ -1,0 +1,11 @@
+contract "CON-2026-272" {
+  title = "Architecture scanner: external dependency visibility layer"
+  status = "closed"
+  created_at = 2026-03-07T12:42:19Z
+  updated_at = 2026-03-07T12:42:19Z
+  goal = "Include external deps in scan output, show which packages pull heavy third-party deps for supply-chain and build-time visibility"
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+}
+

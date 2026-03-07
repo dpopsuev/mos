@@ -1,0 +1,29 @@
+==================
+When as nested block name (rules context)
+==================
+
+rule "example" {
+  when {
+    artifact_kind = "contract"
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (nested_block
+          (block_name
+            (identifier))
+          (block
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (string))))))))))

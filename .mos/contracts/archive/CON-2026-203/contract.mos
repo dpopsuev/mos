@@ -1,0 +1,10 @@
+contract "CON-2026-203" {
+  title = "Architecture specification: 3-tool decomposition"
+  status = "complete"
+  created_at = 2026-03-05T12:51:32Z
+  updated_at = 2026-03-05T12:51:32Z
+  goal = "Create a desired-state specification documenting the Govern/Insight/Guard sub-tool boundaries, layer rules, Interface A and Interface B contracts, the golden rule (artifact/ is the only .mos/ accessor), and the package layout as the canonical architecture reference."
+  priority = "p2"
+  sprint = "SPR-2026-018"
+}
+

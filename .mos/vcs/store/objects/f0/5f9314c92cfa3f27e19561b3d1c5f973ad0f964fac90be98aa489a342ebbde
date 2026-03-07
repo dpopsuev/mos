@@ -1,0 +1,7 @@
+blob
+sprint "SPR-2026-036" {
+  title = "Agent-Friendly Linter: Structured Output, Incremental Linting, Fast Governance"
+  status = "closed"
+  goal = "Make the mos linter and audit pipeline consumable by AI agents as a tight feedback loop. Enrich diagnostics with artifact IDs and fix suggestions, enable diff-aware incremental linting, and provide a fast governance-only audit mode that skips harness execution."
+  contracts = "CON-2026-234,CON-2026-235,CON-2026-236"
+}

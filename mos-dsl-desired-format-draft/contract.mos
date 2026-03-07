@@ -1,0 +1,284 @@
+# .mos/contracts/active/CON-2026-042/contract.mos
+# A contract is a time-boxed work agreement with acceptance criteria.
+# Named artifact -- the ID is the contract identifier.
+#
+# A contract is the repository-native representation of an issue tracker
+# ticket. The contract is the source of truth; external trackers (Jira,
+# GitHub Issues, Linear, etc.) are mirrors synced via adapters.
+#
+# Contracts can nest: a parent contract decomposes into sub-contracts.
+# Dependencies between siblings use `depends_on` (list of sibling IDs).
+# Ordering may be linear (A->B->C) or non-linear (DAG with diamond joins).
+#
+# Hierarchy mapping to trackers:
+#   contract (umbrella)    -> Epic / Initiative
+#   contract (nested)      -> Story / Task
+#   contract (leaf nested) -> Subtask
+#   depends_on             -> "blocks" / "is-blocked-by" links
+#   status                 -> Ticket status (adapter maps values)
+#   feature/scenario       -> Acceptance criteria
+
+contract "CON-2026-042" {
+  title  = "Implement API deprecation notices"
+  status = "active"
+  goal   = "All deprecated GA fields emit a warning in API responses."
+
+  bill {
+    introduced_by = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    introduced_at = 2026-02-15T00:00:00Z
+    intent        = "Implement KEP-1635 deprecation notice headers for all GA API types."
+  }
+
+  scope {
+    rules      = ["api-backward-compat", "api-deprecation-notice"]
+    packages   = ["staging/src/k8s.io/apiserver/pkg/endpoints/"]
+    depends_on = ["CON-2026-039"]
+  }
+
+  # Issue tracker adapters -- one named block per external system.
+  # The block name identifies the adapter; fields inside are adapter-specific.
+  # Adapters sync bidirectionally: contract <-> tracker.
+  # The contract is always the source of truth; on conflict, contract wins.
+  tracker "github" {
+    repo  = "kubernetes/kubernetes"
+    issue = 12345
+    url   = "https://github.com/kubernetes/kubernetes/issues/12345"
+    labels = ["sig/api-machinery", "kind/feature", "priority/important-soon"]
+    milestone = "v1.32"
+    assignees = ["liggitt", "deads2k"]
+    sync  = "bidirectional"
+  }
+
+  tracker "jira" {
+    project  = "K8S"
+    key      = "K8S-4567"
+    url      = "https://jira.k8s.io/browse/K8S-4567"
+    type     = "story"
+    epic     = "K8S-4000"
+    priority = "high"
+    sprint   = "2026-Q1-S3"
+    sync     = "bidirectional"
+  }
+
+  identity {
+    created_by         = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    created_at         = 2026-02-15T00:00:00Z
+    creation_signature = "-----BEGIN SSH SIGNATURE-----\nU1NIU0lH...\n-----END SSH SIGNATURE-----"
+    version            = 2
+    last_amended_by    = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIL..."
+    last_amended_at    = 2026-02-20T00:00:00Z
+  }
+
+  feature "Deprecation notice headers" {
+    background {
+      given {
+        the Kubernetes API server is running
+        deprecated GA fields exist in the API schema
+      }
+    }
+
+    scenario "Deprecated field in request triggers warning header" {
+      sut  = "staging/src/k8s.io/apiserver/pkg/endpoints/handlers/fieldmanager/"
+      test = "test/integration/apiserver/deprecation_test.go"
+      case = "TestDeprecationNotice/Deprecated field in request triggers warning header"
+      given {
+        a client sends a request using deprecated field "podCIDR"
+      }
+      when {
+        the API server processes the request
+      }
+      then {
+        the response includes a "Warning" header
+        the warning references the deprecation release
+        the warning includes a migration path
+      }
+    }
+
+    scenario "Non-deprecated field produces no warning" {
+      given {
+        a client sends a request using non-deprecated field "containers"
+      }
+      when {
+        the API server processes the request
+      }
+      then {
+        no "Warning" header is present
+      }
+    }
+  }
+}
+
+# --- Contract-of-contracts (nested, non-linear DAG) ---
+#
+# .mos/contracts/active/CON-2026-050/contract.mos
+# An umbrella contract decomposing into sub-contracts with a dependency DAG.
+# Sub-contracts A and B can proceed in parallel; C waits for both (diamond join).
+
+contract "CON-2026-050" {
+  title    = "Interplanetary IPC framework"
+  status   = "active"
+  ordering = "non-linear"
+
+  bill {
+    introduced_by = "terra-mars-joint-committee"
+    introduced_at = 2026-03-01T00:00:00Z
+    intent        = "Build reliable IPC across light-speed delay boundaries."
+  }
+
+  # Umbrella contract maps to Epic in both trackers.
+  # Sub-contracts map to Stories linked under this Epic.
+  tracker "github" {
+    repo  = "dunix/ipc"
+    issue = 1
+    url   = "https://github.com/dunix/ipc/issues/1"
+    labels = ["epic", "cross-planetary"]
+  }
+
+  tracker "jira" {
+    project = "DUNIX"
+    key     = "DUNIX-100"
+    url     = "https://jira.dunix.org/browse/DUNIX-100"
+    type    = "epic"
+  }
+
+  # Sub-contract A: no dependencies, starts immediately
+  # Maps to Story under the parent Epic.
+  contract "CON-2026-051" {
+    title      = "Terra-side message queue"
+    status     = "active"
+    depends_on = []
+
+    tracker "github" {
+      repo  = "dunix/ipc"
+      issue = 2
+      url   = "https://github.com/dunix/ipc/issues/2"
+      labels = ["terra", "mq"]
+    }
+
+    tracker "jira" {
+      project = "DUNIX"
+      key     = "DUNIX-101"
+      type    = "story"
+      epic    = "DUNIX-100"
+    }
+
+    feature "Terra MQ" {
+      scenario "local message delivery" {
+        given {
+          a Terra process enqueues a message
+        }
+        when {
+          the local MQ processes it
+        }
+        then {
+          the message is staged for relay
+        }
+      }
+    }
+  }
+
+  # Sub-contract B: no dependencies, runs in parallel with A
+  # Maps to Story; no "blocks"/"is-blocked-by" links in tracker.
+  contract "CON-2026-052" {
+    title      = "Mars-side message queue"
+    status     = "active"
+    depends_on = []
+
+    tracker "github" {
+      repo  = "dunix/ipc"
+      issue = 3
+      labels = ["mars", "mq"]
+    }
+
+    tracker "jira" {
+      project = "DUNIX"
+      key     = "DUNIX-102"
+      type    = "story"
+      epic    = "DUNIX-100"
+    }
+
+    feature "Mars MQ" {
+      scenario "local message receipt" {
+        given {
+          a relayed message arrives at Mars
+        }
+        when {
+          the Mars MQ dequeues it
+        }
+        then {
+          the destination process receives it within SLA
+        }
+      }
+    }
+  }
+
+  # Sub-contract C: diamond join -- depends on both A and B.
+  # Adapter maps depends_on to "is-blocked-by" links in tracker.
+  contract "CON-2026-053" {
+    title      = "Interplanetary relay protocol"
+    status     = "draft"
+    depends_on = ["CON-2026-051", "CON-2026-052"]
+
+    tracker "github" {
+      repo  = "dunix/ipc"
+      issue = 4
+      labels = ["relay", "cross-planetary"]
+    }
+
+    tracker "jira" {
+      project = "DUNIX"
+      key     = "DUNIX-103"
+      type    = "story"
+      epic    = "DUNIX-100"
+      blocked_by = ["DUNIX-101", "DUNIX-102"]
+    }
+
+    feature "Relay" {
+      scenario "light-delay tolerant transfer" {
+        given {
+          messages are queued on both planets
+        }
+        when {
+          the relay window opens
+        }
+        then {
+          messages arrive within 2x one-way light-delay
+          no messages are lost or duplicated
+        }
+      }
+    }
+  }
+}
+
+# --- Linear contract chain ---
+#
+# Contracts can also form a strictly sequential pipeline.
+# Each phase depends on the previous. The `sequence` field
+# is advisory metadata for tooling (the DAG is canonical).
+
+contract "CON-2026-060" {
+  title    = "Security hardening pipeline"
+  status   = "active"
+  ordering = "linear"
+
+  contract "CON-2026-061" {
+    title      = "Threat model"
+    status     = "complete"
+    depends_on = []
+    sequence   = 1
+  }
+
+  contract "CON-2026-062" {
+    title      = "Mitigation implementation"
+    status     = "active"
+    depends_on = ["CON-2026-061"]
+    sequence   = 2
+  }
+
+  contract "CON-2026-063" {
+    title      = "Penetration test"
+    status     = "draft"
+    depends_on = ["CON-2026-062"]
+    sequence   = 3
+  }
+}

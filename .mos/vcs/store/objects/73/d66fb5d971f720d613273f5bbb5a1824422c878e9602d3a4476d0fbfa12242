@@ -1,0 +1,16 @@
+blob
+contract "CON-2026-200" {
+  title = "Define Guard interface for VCS hooks"
+  status = "complete"
+  created_at = 2026-03-05T12:51:20Z
+  updated_at = 2026-03-05T12:51:20Z
+  goal = "Create a guard.PreCommitCheck interface that linter and harness implement. VCS hook logic calls this interface instead of importing linter/harness directly. Layer 2 Guard. Decouples VCS from quality internals."
+
+  scope {
+    depends_on = ["CON-2026-195"]
+  }
+  priority = "p2"
+  depends_on = "CON-2026-195"
+  sprint = "SPR-2026-017"
+}
+

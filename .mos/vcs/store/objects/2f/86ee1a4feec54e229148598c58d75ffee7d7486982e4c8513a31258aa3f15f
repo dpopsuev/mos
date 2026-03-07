@@ -1,0 +1,143 @@
+blob
+contract "CON-2026-114" {
+  title = "CLI help on every subcommand"
+  status = "complete"
+  justifies = "SPEC-2026-028"
+  sprint = "SPR-2026-004"
+  goal = "Every mos command and subcommand responds to --help / -h with usage, flags, and examples. Parent commands list subcommands. Help routes correctly through the command hierarchy — no greedy interception."
+  created_at = 2026-03-03T21:33:09Z
+  updated_at = 2026-03-04T09:29:49Z
+  name = "CLI help on every subcommand"
+  slug = "cli-help-subcommands"
+  description = "Every mos subcommand and nested subcommand must emit usage, flags, and examples when passed --help or -h. For agents, discoverability is critical — they cannot tab-complete or guess. Without help, every unknown flag is a failed round-trip costing tokens and time. This is the Console First principle applied to agent ergonomics."
+  batch = "BAT-2026-006"
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "checkHelp helper and each command's help output tested by invoking with --help and asserting exit 0 plus expected output on stderr."
+    }
+
+    integration {
+      applies = true
+      rationale = "Build mos binary, invoke every subcommand with --help, assert exit 0 and non-empty output."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = false
+      rationale = "Help is a local CLI concern, no end-to-end workflow."
+    }
+
+    performance {
+      applies = false
+      rationale = "Help output is instant — no I/O or computation."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "CLI commands are sequential."
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundaries — help text is static string output."
+    }
+  }
+
+  feature "Help on every leaf command" {
+
+    scenario "Root help lists all top-level commands" {
+      given {
+        the mos binary is built
+      }
+      when {
+        mos --help is invoked
+      }
+      then {
+        exit code is 0; output lists every registered top-level command; output includes a hint to run mos <command> --help
+      }
+    }
+
+    scenario "Every top-level command responds to --help" {
+      given {
+        the mos binary is built
+      }
+      when {
+        each of survey, lint, init, completion, query, update, audit, config, migrate, lsp is invoked with --help
+      }
+      then {
+        each exits 0; each prints a usage line, flag descriptions, and at least one example to stderr
+      }
+    }
+
+    scenario "Every subcommand under parent commands responds to --help" {
+      given {
+        the mos binary is built
+      }
+      when {
+        every subcommand of contract, rule, spec, binder, lexicon, config is invoked with --help
+      }
+      then {
+        each exits 0; each prints a usage line describing its flags and positional arguments
+      }
+    }
+
+    scenario "-h is equivalent to --help" {
+      given {
+        the mos binary is built
+      }
+      when {
+        any command or subcommand is invoked with -h instead of --help
+      }
+      then {
+        the output is identical to --help; exit code is 0
+      }
+    }
+  }
+
+  feature "Hierarchical help navigation" {
+
+    scenario "Parent command help lists its subcommands" {
+      given {
+        the mos binary is built
+      }
+      when {
+        mos contract --help is invoked
+      }
+      then {
+        output lists all contract subcommands (create, list, show, status, update, delete, ...); same pattern applies to rule, spec, binder, lexicon, config, harness
+      }
+    }
+
+    scenario "Help routes to the deepest matching command" {
+      given {
+        the mos binary is built
+      }
+      when {
+        mos contract update --help is invoked
+      }
+      then {
+        output shows contract update usage and flags, not the parent contract help or root help
+      }
+    }
+
+    scenario "Help stops flag parsing at --" {
+      given {
+        the mos binary is built
+      }
+      when {
+        mos contract create -- --help is invoked
+      }
+      then {
+        --help after -- is treated as a positional argument, not as a help request
+      }
+    }
+  }
+}
+

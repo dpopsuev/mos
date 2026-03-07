@@ -1,0 +1,17 @@
+contract "CON-2026-184" {
+  title = "Build reverse resolution engine: code path to governance spine"
+  status = "complete"
+  created_at = 2026-03-05T10:11:21Z
+  updated_at = 2026-03-05T10:11:21Z
+  goal = "A Resolve function that given a Go package path returns the full governance spine: covering specs, downstream contracts, upstream needs, sprint assignments. Uses spec include directives as cross-layer binding."
+  justifies = "NEED-2026-003"
+  kind = "task"
+  priority = "high"
+
+  scope {
+    depends_on = ["CON-2026-179", "CON-2026-180"]
+  }
+  slug = "reverse-resolver"
+  sprint = "SPR-2026-015"
+}
+

@@ -1,0 +1,11 @@
+blob
+contract "CON-2026-208" {
+  title = "Structured DSL blocks for desired architecture layers and sub-tools"
+  status = "complete"
+  created_at = 2026-03-05T14:40:26Z
+  updated_at = 2026-03-05T14:40:26Z
+  sprint = "SPR-2026-018"
+  priority = "p2"
+  description = "The ARCH-desired artifact currently stores layer rules, sub-tool mappings, and forbidden patterns as free-text in section blocks. The text parser is fragile and the sub-tool text contains human capability descriptions (init, CRUD, query) rather than Go package names, making cross-tool drift detection unreliable. Add first-class DSL block types: layer, sub_tool, exception. Migrate ARCH-desired to use them. Update arch.ParseDesiredArch to parse structured blocks instead of prose."
+}
+

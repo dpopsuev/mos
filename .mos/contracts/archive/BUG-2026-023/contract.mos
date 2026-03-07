@@ -1,0 +1,29 @@
+contract "BUG-2026-023" {
+  title = "vcs.Clone via PlainClone silently drops refs/mos/* when source has standard Git branches"
+  status = "complete"
+  severity = "high"
+  created_at = 2026-03-06T15:28:32Z
+  updated_at = 2026-03-06T15:28:32Z
+
+  feature "Silent data loss on clone" {
+
+    scenario "PlainClone succeeds but governance refs missing" {
+      given = "A remote repo with both refs/heads/main and refs/mos/heads/main"
+      when = "vcs.Clone is called"
+      then = "PlainClone succeeds (because refs/heads/main exists) but only fetches refs/heads/*. refs/mos/* are silently dropped. The cloneFallback path (which fetches +refs/*:refs/*) is never triggered."
+    }
+
+    scenario "cloneFallback only runs on PlainClone error" {
+      given = "A remote with standard Git branches alongside governance refs"
+      when = "PlainClone returns nil error"
+      then = "cloneFallback is skipped entirely, governance objects are not transported"
+    }
+
+    scenario "Expected fix" {
+      given = "vcs.Clone is called against any remote"
+      when = "PlainClone succeeds or fails"
+      then = "refs/mos/* are always fetched, either by configuring PlainClone with a custom refspec or by always running a post-clone fetch with +refs/mos/*:refs/mos/*"
+    }
+  }
+}
+

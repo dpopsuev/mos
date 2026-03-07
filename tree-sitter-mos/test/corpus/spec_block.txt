@@ -1,0 +1,25 @@
+==================
+Spec block with include
+==================
+
+rule "api-backward-compat" {
+  spec {
+    include "features/field-stability.mos"
+    include "features/serialization-roundtrip.mos"
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (spec_block
+          (include_dir
+            (string))
+          (include_dir
+            (string)))))))

@@ -1,0 +1,17 @@
+blob
+specification "SPEC-2026-025" {
+  title = "Locked Zones: concurrent write protection"
+  status = "active"
+  enforcement = "disabled"
+  name = "Locked Zones: concurrent write protection"
+  slug = "spec-locked-zones"
+  description = "Files under active work are locked from concurrent writes. When an operator or agent begins work under a Contract, the affected file scope is locked — visually distinct and communicating ownership, progress, and the Contract it belongs to. In single-user multi-agent mode: prevents two agents from editing the same file simultaneously. In multi-user mode: prevents cross-user conflicts. Locks are advisory (surface warnings) or mandatory (block writes) depending on the governance model. Lock state is tracked in .mos and surfaced in the TUI and CLI. Manifesto Section 7."
+
+  feature "Scope locking on contract activation" {
+  }
+
+  feature "Lock visibility and release" {
+  }
+  justifies = "NEED-2026-001"
+}
+

@@ -1,0 +1,14 @@
+blob
+contract "CON-2026-192" {
+  title = "Lint rule: flag terminal-status artifacts still in active directory"
+  status = "complete"
+  created_at = 2026-03-05T10:16:26Z
+  updated_at = 2026-03-05T10:16:26Z
+  goal = "Add a linter rule that reports an error when a contract, sprint, or other artifact with status complete, cancelled, or abandoned still resides in the active/ directory instead of archive/. Complements the existing auto-archive hook by catching cases where the hook did not fire."
+  justifies = "NEED-2026-001"
+  kind = "feat"
+  priority = "medium"
+  slug = "lint-terminal-in-active"
+  sprint = "SPR-2026-020"
+}
+

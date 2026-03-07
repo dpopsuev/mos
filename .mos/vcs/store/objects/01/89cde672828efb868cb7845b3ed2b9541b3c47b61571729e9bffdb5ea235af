@@ -1,0 +1,259 @@
+blob
+contract "CON-2026-129" {
+  title = "Shrink internal reserved lexicon to ~22 primitives (registry-only engine)"
+  status = "complete"
+  slug = "registry-only-engine"
+  justifies = "SPEC-2026-028"
+  sprint = "SPR-2026-005"
+  batch = "BAT-2026-006"
+  goal = "Audit identified ~145 internal reserved strings when the engine should have ~22 true primitives (on par with Go's 25 keywords). The remaining ~123 are 'standard library' items (artifact kinds, field names, lifecycle states, directory paths, gate names) hardcoded as string literals across query.go, chain.go, audit.go, generic.go, linter/schema.go, and linter/context.go. These should flow exclusively from the Registry and config.mos. Every hardcoded string is a place where a Custom Artifact Description can silently fail because the engine doesn't know about it — and a combinatorial test case that must exist but currently doesn't. Reducing the surface makes CAD extensions first-class citizens and dramatically shrinks the test matrix."
+  created_at = 2026-03-04T13:00:00Z
+  updated_at = 2026-03-04T11:27:54Z
+
+  scope {
+    depends_on = ["CON-2026-125"]
+  }
+
+  feature "Registry-only artifact resolution" {
+
+    scenario "Engine resolves artifact kind from registry" {
+      labels = ["happy_path"]
+      given {
+        a config.mos defining artifact_type "initiative" with directory = "initiatives" and prefix = "INI"
+      }
+      when {
+        QueryArtifacts is called with kind = "initiative"
+      }
+      then {
+        the engine discovers instances under .mos/initiatives/active/ without any hardcoded reference to "initiative" in query.go
+      }
+    }
+
+    scenario "No hardcoded kind strings outside constants.go and registry.go" {
+      labels = ["happy_path"]
+      given {
+        the Mos codebase after this refactor
+      }
+      when {
+        rg is run searching for string literals of built-in kind names in engine code excluding constants.go, registry.go, init.go, and test files
+      }
+      then {
+        zero matches are found — all kind resolution flows through registry.Types
+      }
+    }
+
+    scenario "Chain traversal uses registry TraceFields for custom types" {
+      labels = ["regression"]
+      given {
+        a custom artifact_type "design" with justifies link field pointing to specification
+      }
+      when {
+        WalkChain is called on a specification
+      }
+      then {
+        the chain discovers design artifacts linked via their registry-declared trace fields
+      }
+    }
+  }
+
+  feature "Delete fallback lists — registry is authoritative" {
+
+    scenario "Empty TraceFields means no traceability" {
+      labels = ["happy_path"]
+      given {
+        an artifact type with no link fields marked as trace fields
+      }
+      when {
+        WalkChain traverses through that type
+      }
+      then {
+        no links are followed — the engine does not fall back to hardcoded field names
+      }
+    }
+
+    scenario "Orphan detection uses registry link fields only" {
+      labels = ["happy_path"]
+      given {
+        a contract with a custom link field "tracks" defined in registry
+      }
+      when {
+        audit runs findOrphanContracts
+      }
+      then {
+        the "tracks" field is checked for parent linkage without any hardcoded fallback list
+      }
+    }
+  }
+
+  feature "Registry-driven transition gates" {
+
+    scenario "Custom gate name dispatches from registry" {
+      labels = ["happy_path"]
+      given {
+        an artifact_type with lifecycle.transition gate = "review_approval" from "review" to "approved"
+        and a gate handler registered for "review_approval"
+      }
+      when {
+        GenericUpdate transitions the artifact from "review" to "approved"
+      }
+      then {
+        the "review_approval" gate handler executes — no switch statement on gate name strings
+      }
+    }
+
+    scenario "Unknown gate name returns clear error" {
+      labels = ["sad_path"]
+      given {
+        a gate name in config that has no registered handler
+      }
+      when {
+        the transition fires
+      }
+      then {
+        a descriptive error is returned naming the unknown gate and suggesting available gates
+      }
+    }
+  }
+
+  feature "Configurable rule types and enforcement enums" {
+
+    scenario "Rule type enum comes from config" {
+      labels = ["happy_path"]
+      given {
+        config.mos defines rule_types = ["mechanical", "interpretive", "advisory"]
+      }
+      when {
+        the linter validates a rule with type = "advisory"
+      }
+      then {
+        the rule passes validation — "advisory" is a valid type because config says so
+      }
+    }
+
+    scenario "Enforcement enum comes from config" {
+      labels = ["happy_path"]
+      given {
+        config.mos defines enforcement_levels = ["disabled", "warn", "enforced", "strict"]
+      }
+      when {
+        a spec has enforcement = "strict"
+      }
+      then {
+        the linter treats it as a valid enforcement level
+      }
+    }
+  }
+
+  feature "Decompose generic.go into focused modules" {
+
+    scenario "Slug and path resolution in resolve.go" {
+      labels = ["happy_path"]
+      given {
+        generic.go split into resolve.go, lifecycle.go, links.go, coverage.go
+      }
+      when {
+        ResolvePath is called
+      }
+      then {
+        execution flows through resolve.go with no change in behavior
+      }
+    }
+
+    scenario "All existing tests pass after decomposition" {
+      labels = ["regression"]
+      given {
+        generic.go decomposed into 4 focused files
+      }
+      when {
+        go test ./... is run
+      }
+      then {
+        all tests pass — the decomposition is purely structural
+      }
+    }
+  }
+
+  feature "Combinatorial CAD test matrix" {
+
+    scenario "Custom type links to custom type" {
+      labels = ["happy_path"]
+      given {
+        artifact_type "epic" links to artifact_type "initiative" via justifies field
+      }
+      when {
+        an epic is created with justifies = "INI-2026-001"
+      }
+      then {
+        link validation succeeds and query resolves the reference
+      }
+    }
+
+    scenario "Custom type with lifecycle gate fires correctly" {
+      labels = ["integration"]
+      given {
+        a custom artifact_type with a lifecycle transition gate
+      }
+      when {
+        the artifact transitions through the gated status change
+      }
+      then {
+        the gate evaluates and blocks or allows as configured
+      }
+    }
+
+    scenario "Two custom types sharing directory causes error" {
+      labels = ["sad_path"]
+      given {
+        two artifact_type blocks with directory = "items"
+      }
+      when {
+        LoadRegistry parses config.mos
+      }
+      then {
+        a validation error is returned identifying the directory collision
+      }
+    }
+
+    scenario "Config redefines built-in contract with fewer fields" {
+      labels = ["adversarial"]
+      given {
+        config.mos redefines artifact_type "contract" with fields that omit "justifies"
+      }
+      when {
+        mergeFieldDefs runs
+      }
+      then {
+        the default "justifies" field is preserved — built-in link fields cannot be removed via config
+      }
+    }
+
+    scenario "Full lifecycle with custom type" {
+      labels = ["integration"]
+      given {
+        a freshly initialized project with a custom artifact_type
+      }
+      when {
+        the full lifecycle is exercised: create, update, query, lint, audit, chain, archive
+      }
+      then {
+        every operation succeeds using only registry-derived metadata
+      }
+    }
+  }
+
+  coverage {
+
+    unit {
+      applies = true
+    }
+
+    integration {
+      applies = true
+    }
+
+    contract {
+      applies = true
+    }
+  }
+}
+

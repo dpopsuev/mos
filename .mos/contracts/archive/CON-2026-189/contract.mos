@@ -1,0 +1,13 @@
+contract "CON-2026-189" {
+  title = "Bulk ID operations: --ids flag for set, status, and append"
+  status = "complete"
+  created_at = 2026-03-05T10:16:15Z
+  updated_at = 2026-03-05T10:16:15Z
+  goal = "Support --ids CON-1,CON-2,CON-3 on mos set, mos contract status, and mos append to apply the same operation to multiple artifacts in one call. Eliminates bash for-loops for repetitive field updates."
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+  slug = "bulk-id-operations"
+  sprint = "SPR-2026-020"
+}
+

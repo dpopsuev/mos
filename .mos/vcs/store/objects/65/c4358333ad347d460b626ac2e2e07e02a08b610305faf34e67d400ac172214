@@ -1,0 +1,7 @@
+blob
+sprint "SPR-2026-028" {
+  title = "ObjectStore Adapters"
+  status = "cancelled"
+  contracts = "CON-2026-090,CON-2026-091,CON-2026-092"
+}
+

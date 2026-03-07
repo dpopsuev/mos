@@ -1,0 +1,11 @@
+blob
+contract "CON-2026-218" {
+  title = "Scalability baseline: benchmark mos against stressgen profiles"
+  status = "complete"
+  created_at = 2026-03-05T20:58:48Z
+  updated_at = 2026-03-05T20:58:48Z
+  goal = "Use the existing testkit/stressgen profiles (Linux Kernel: 2700 artifacts, Kubernetes: 1800 artifacts) to establish performance baselines for core mos operations. Benchmark mos lint, mos status, mos fmt, and mos query against each profile. Record wall-clock time, peak RSS, and artifact-count scaling curves. Set ceiling thresholds (e.g. mos lint < 3s at Kubernetes scale). This is the first performance gate — it tells us where we stand before optimizing. Precondition: stressgen already exists in testkit/stressgen/."
+  kind = "feature"
+  slug = "scalability-baseline"
+}
+

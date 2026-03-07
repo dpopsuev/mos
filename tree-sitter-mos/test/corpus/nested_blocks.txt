@@ -1,0 +1,55 @@
+==================
+Nested blocks with names
+==================
+
+contract "CON-1" {
+  scope {
+    depends_on = ["A", "B"]
+  }
+  tracker "github" {
+    repo = "org/repo"
+    issue = 123
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (nested_block
+          (block_name
+            (identifier))
+          (block
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (list
+                    (value
+                      (string))
+                    (value
+                      (string)))))))))
+      (block_item
+        (nested_block
+          (block_name
+            (identifier))
+          (string)
+          (block
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (string))))
+            (block_item
+              (field
+                (key
+                  (identifier))
+                (value
+                  (integer))))))))))

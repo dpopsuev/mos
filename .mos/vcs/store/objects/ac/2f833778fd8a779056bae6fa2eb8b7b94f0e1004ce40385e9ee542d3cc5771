@@ -1,0 +1,33 @@
+blob
+contract "CON-2026-244" {
+  title = "Gitea Forge backend for testkit"
+  status = "complete"
+  created_at = 2026-03-06T14:20:17Z
+  updated_at = 2026-03-06T14:20:17Z
+  goal = "Implement a Forge backend that spins up a real Gitea instance via testcontainers-go, enabling E2E tests against a real HTTP Git forge"
+  justifies = "NEED-2026-004"
+  kind = "feature"
+
+  feature "Gitea container forge" {
+
+    scenario "Gitea container starts with admin access" {
+      given = "Docker is available on the test host"
+      when = "forge.Gitea(t) is called"
+      then = "a Gitea container starts with an admin user and API access"
+    }
+
+    scenario "CreateRepo returns clonable HTTP URL" {
+      given = "a running Gitea forge"
+      when = "CreateRepo('test') is called"
+      then = "an HTTP clone URL is returned and the repo is clonable via git clone"
+    }
+
+    scenario "container is torn down on test cleanup" {
+      given = "a running Gitea forge"
+      when = "the test ends"
+      then = "the container is torn down via t.Cleanup"
+    }
+  }
+  sprint = "SPR-2026-038"
+}
+

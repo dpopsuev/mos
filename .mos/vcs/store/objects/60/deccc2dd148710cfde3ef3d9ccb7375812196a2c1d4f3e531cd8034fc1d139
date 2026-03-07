@@ -1,0 +1,183 @@
+blob
+contract "CON-2026-003" {
+  title = "Context-Aware Linter"
+  status = "complete"
+  goal = "`mos lint <path>` validates `.mos/` artifacts with full context-awareness -- schema compliance, Gherkin validity, `@include` resolution, cross-artifact references, vocabulary resolution, and template conformance."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Gherkin parser, schema validators per artifact type, vocabulary merger, @include resolution, context loader"
+    }
+
+    integration {
+      applies = true
+      rationale = "Full lint pipeline: context load -> validate -> diagnostics against fixture .cst/ directories"
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API"
+    }
+
+    e2e {
+      applies = true
+      rationale = "mos lint against a valid fixture produces zero diagnostics; against invalid fixtures produces correct diagnostics"
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Linter is single-threaded, no shared state"
+    }
+
+    security {
+      applies = false
+      rationale = "Identity integrity (signature verification) deferred to Phase 2"
+    }
+  }
+
+  feature "Mos Linter" {
+
+    scenario "Valid .cst/ directory passes lint" {
+      given {
+        a .cst/ directory with valid config, declaration, and rules
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        no diagnostics are reported
+        exit code is 0
+      }
+    }
+
+    scenario "Missing required fields produce errors" {
+      given {
+        a rule TOML file missing the [spec] section
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        an error diagnostic is reported for the missing section
+        the diagnostic includes file path, severity "error", and message
+      }
+    }
+
+    scenario "Invalid Gherkin produces errors" {
+      given {
+        a rule with an embedded [spec].feature that has invalid Gherkin syntax
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        an error diagnostic is reported for the Gherkin parse failure
+      }
+    }
+
+    scenario "@include resolves and validates" {
+      given {
+        a rule with [spec].feature = "@include spec.feature"
+        the file spec.feature exists with valid Gherkin
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        no diagnostics are reported for the include
+      }
+    }
+
+    scenario "@include with missing file produces error" {
+      given {
+        a rule with [spec].feature = "@include missing.feature"
+        the file missing.feature does not exist
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        an error diagnostic is reported for the unresolved include
+      }
+    }
+
+    scenario "Cross-artifact reference validation" {
+      given {
+        a contract referencing rule ID "no-unused-imports"
+        the rule "no-unused-imports" exists in .cst/rules/
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        no cross-reference errors are reported
+      }
+    }
+
+    scenario "Undefined vocabulary term produces warning" {
+      given {
+        a rule using a term not defined in the merged vocabulary
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        a warning diagnostic is reported for the undefined term
+      }
+    }
+
+    scenario "Invalid scope reference produces error" {
+      given {
+        a rule with scope = "galaxy"
+        "galaxy" is not defined in .cst/resolution/layers.toml
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        an error diagnostic is reported for the invalid scope
+      }
+    }
+
+    scenario "Project vocabulary overrides are respected" {
+      given {
+        a project.toml that renames "Rule" to "Pre-Prompt"
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        the merged vocabulary includes "Pre-Prompt" as a valid label
+      }
+    }
+
+    scenario "Template conformance" {
+      given {
+        a .cst/templates/contract.toml with a required [risk] section
+        a contract missing the [risk] section
+      }
+      when {
+        "mos lint ." is executed
+      }
+      then {
+        a warning diagnostic is reported for the missing template section
+      }
+    }
+
+    scenario "JSON output mode" {
+      given {
+        a .cst/ directory with lint findings
+      }
+      when {
+        "mos lint . --format json" is executed
+      }
+      then {
+        the output is valid JSON
+        each diagnostic has file, line, severity, rule, and message fields
+      }
+    }
+  }
+}
+

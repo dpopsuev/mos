@@ -1,0 +1,58 @@
+need "NEED-2026-001" {
+  title = "Mechanically enforceable lifecycle traceability"
+  status = "validated"
+  originating = "true"
+  sensation = "In distributed, multi-stakeholder systems, the sources of truth (needs, specifications, architecture, code, documentation) are fragmented across different tools with no mechanically enforceable traceability between them. The governance graph -- who decided what, why, when, and why not -- is either implicit, scattered, or absent. When the chain breaks, accountability is impossible, drift is undetectable, and warnings go unconnected to the failures they predicted."
+  urgency = "critical"
+
+  scope {
+    includes = [
+      "governance graph",
+      "lifecycle chain enforcement",
+      "system compilation",
+      "version control",
+      "harness execution",
+      "autodoc generation",
+      "cross-repo federation",
+      "audit and seals",
+      "adjudication",
+    ]
+    excludes = [
+      "authoring application code",
+      "authoring specifications or needs",
+      "making governance decisions",
+      "domain-specific business logic",
+      "project management methodology",
+    ]
+  }
+
+  acceptance {
+
+    criterion "C1" {
+      description = "Every artifact kind is traceable to at least one upstream kind via justifies/implements/documents"
+      verified_by = "linter"
+    }
+
+    criterion "C2" {
+      description = "The governance graph is machine-verifiable: the linter detects broken chains, orphans, and scope violations without human judgment"
+      verified_by = "linter"
+    }
+
+    criterion "C3" {
+      description = "Lifecycle transitions are gated: no artifact moves downstream without mechanical proof of upstream coverage"
+      verified_by = "harness"
+    }
+
+    criterion "C4" {
+      description = "The system works across multiple repos, sites, locales, and governance models without a single canonical authority"
+      verified_by = "harness"
+    }
+
+    criterion "C5" {
+      description = "Every governance decision is auditable: who, when, why, and the graph state at decision time"
+      verified_by = "harness"
+    }
+  }
+  slug = "lifecycle-traceability"
+}
+

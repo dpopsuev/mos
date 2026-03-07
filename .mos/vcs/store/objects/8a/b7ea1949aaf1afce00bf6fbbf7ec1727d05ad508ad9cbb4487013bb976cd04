@@ -1,0 +1,81 @@
+blob
+contract "CON-2026-040" {
+  title = "Scope Violation Detection"
+  status = "complete"
+  goal = "Elevate negative-space from read-only reporting to enforcement. Linter rule scope-violation checks downstream artifacts against upstream scope.excludes. Architecture forbidden blocks are validated against edges. Generalizable via optional negative_field on CAD lifecycle schema."
+
+  feature "Scope violation enforcement" {
+
+    scenario "Spec title overlapping need excludes is flagged" {
+      status = "done"
+      given {
+        a need NEED-001 with scope excludes containing migration
+        a specification SPEC-001 that justifies NEED-001 with title Database migration strategy
+      }
+      when {
+        the linter runs
+      }
+      then {
+        a scope-violation error is raised for SPEC-001
+        the message identifies migration as the overlapping term
+      }
+    }
+
+    scenario "Spec title not overlapping excludes is clean" {
+      status = "done"
+      given {
+        a need NEED-001 with scope excludes containing migration
+        a specification SPEC-001 that justifies NEED-001 with title Pipeline parallelization
+      }
+      when {
+        the linter runs
+      }
+      then {
+        no scope-violation diagnostic is raised for SPEC-001
+      }
+    }
+
+    scenario "Architecture forbidden edge violation is flagged" {
+      status = "done"
+      given {
+        an architecture artifact with forbidden from CLI to Database
+        the same architecture has an edge from CLI to Database
+      }
+      when {
+        the linter runs
+      }
+      then {
+        a scope-violation error is raised for the architecture
+        the message identifies the forbidden dependency
+      }
+    }
+
+    scenario "Architecture with no forbidden violations is clean" {
+      status = "done"
+      given {
+        an architecture artifact with forbidden from CLI to Database
+        the architecture has no edge from CLI to Database
+      }
+      when {
+        the linter runs
+      }
+      then {
+        no scope-violation diagnostic is raised
+      }
+    }
+
+    scenario "CAD with negative_field declares exclusion source" {
+      status = "done"
+      given {
+        a custom artifact type with negative_field set to non_goals in its lifecycle schema
+      }
+      when {
+        a downstream artifact contains terms from the upstream non_goals
+      }
+      then {
+        a scope-violation error is raised using the generalized negative_field mechanism
+      }
+    }
+  }
+}
+

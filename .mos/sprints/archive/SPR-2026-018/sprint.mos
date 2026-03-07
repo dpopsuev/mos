@@ -1,0 +1,7 @@
+sprint "SPR-2026-018" {
+  status = "complete"
+  title = "3-Tool CLI: Sub-tool directories + DI rewire + Docs"
+  goal = "Restructure CLI into sub-tool directories, rewire dependency injection, and update docs."
+  contracts = "CON-2026-201,CON-2026-202,CON-2026-203,CON-2026-204,CON-2026-208,CON-2026-209"
+}
+

@@ -1,0 +1,14 @@
+blob
+contract "CON-2026-073" {
+  title = "Git parity: rebase"
+  status = "draft"
+  created_at = 2026-03-03T18:57:44Z
+  updated_at = 2026-03-03T19:10:53Z
+  goal = "Reapply governance commits onto a different base. Linear history rewriting for governance state. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-rebase"
+  depends_on = "CON-2026-070"
+}
+

@@ -1,0 +1,8 @@
+blob
+batch "BAT-2026-005" {
+  status = "planned"
+  title = "CLI Maturity Gate"
+  goal = "Collect all CLI capability gaps and bugs that must be resolved before the object store layer can assume CLI-only mutations"
+  slug = "cli-maturity"
+}
+

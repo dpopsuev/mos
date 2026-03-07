@@ -1,0 +1,52 @@
+rule "api-backward-compat" {
+  name = "API Backward Compatibility"
+  type = "mechanical"
+  scope = "organization"
+  enforcement = "error"
+  applicability = "glob"
+  glob = "staging/src/k8s.io/api/**/*.go"
+  priority = 100
+  tags = ["api", "stability", "ga-policy"]
+
+  harness {
+    command = "go run ./cmd/api-compat-check --baseline=release-1.31 --current=HEAD"
+    success_exit_code = 0
+    timeout = "5m"
+  }
+
+  identity {
+    created_by = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    created_at = 2024-06-15T00:00:00Z
+    creation_signature = """
+-----BEGIN SSH SIGNATURE-----
+U1NIU0lH...
+-----END SSH SIGNATURE-----"""
+    version = 6
+    last_amended_by = "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG..."
+    last_amended_at = 2026-02-01T00:00:00Z
+  }
+
+  governance {
+    owning_sig = "sig-api-machinery"
+    approvers = [
+      "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIG...",
+      "ssh-ed25519:AAAAC3NzaC1lZDI1NTE5AAAAIL...",
+    ]
+    exception_process = "bill"
+    exception_requires_approvers = 2
+  }
+
+  dependencies {
+    requires_rules = ["api-review-required", "openapi-schema-valid"]
+    suggested_with = ["api-deprecation-notice"]
+  }
+
+  spec {
+    include "features/field-stability.mos"
+    include "features/serialization-roundtrip.mos"
+    include "features/deprecation-lifecycle.mos"
+    include "features/default-value-stability.mos"
+    include "features/rate-limiting.mos"
+  }
+}
+

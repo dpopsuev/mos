@@ -1,0 +1,7 @@
+sprint "SPR-2026-016" {
+  status = "complete"
+  title = "3-Tool Foundation: Store + Registry + Artifact extraction"
+  goal = "Establish the 3-tool foundation by extracting Store, Registry, and Artifact packages."
+  contracts = "CON-2026-193,CON-2026-194,CON-2026-195,CON-2026-196"
+}
+

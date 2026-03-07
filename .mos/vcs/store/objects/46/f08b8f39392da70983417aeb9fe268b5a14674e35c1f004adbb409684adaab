@@ -1,0 +1,7 @@
+blob
+sprint "SPR-2026-002" {
+  title = "Dog-fooding: eat what we cook"
+  status = "complete"
+  goal = "Zero lint errors, harness covers all preamble criteria, all active contracts are batched or cancelled"
+}
+

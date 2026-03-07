@@ -1,0 +1,99 @@
+contract "CON-2026-228" {
+  title = "Trajectory analysis: convergence, stall, oscillation, drift velocity"
+  status = "complete"
+  created_at = 2026-03-05T22:16:14Z
+  updated_at = 2026-03-05T22:16:14Z
+  kind = "feature"
+  slug = "trajectory-analysis"
+  depends_on = "CON-2026-217"
+  justifies = "NEED-2026-005"
+  batch = "BAT-2026-007"
+  goal = "Read the commit state snapshot series (produced by CON-2026-217 Phase 0) and detect multi-commit patterns in the displacement vector sequence. Four detectors: (1) Convergence: is distance-to-goal decreasing over the last K commits? Report per-axis and aggregate convergence rate. (2) Stall: are the last K displacement vectors near-zero magnitude on a given axis? Flag as lint warning trajectory-stall. (3) Oscillation: are vectors alternating sign on the same axis over K commits? Flag as trajectory-churn. (4) Drift velocity: is the drift violation count growing faster than it is being fixed? The detectors power both mos audit --trajectory (human-readable report) and a set of lint rules (trajectory-stall, trajectory-churn, trajectory-regression) that fire during mos lint when snapshot history is available. For agentic workflows, the trajectory report is the steering signal: the agent reads which axes are stalled or regressing and prioritizes accordingly."
+
+  feature "Convergence detection" {
+
+    scenario "mos audit reports convergence rate per axis" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        the VCS has 10 commits with snapshots showing decreasing lint errors
+      }
+      when {
+        mos audit --trajectory is run
+      }
+      then {
+        the lint axis shows converging with rate and estimated commits to zero
+      }
+    }
+  }
+
+  feature "Stall detection" {
+
+    scenario "trajectory-stall lint rule fires on stagnant axis" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        the structural axis has zero displacement over 8 consecutive commits
+      }
+      when {
+        mos lint runs with snapshot history available
+      }
+      then {
+        a warning diagnostic trajectory-stall is emitted for the structural axis
+      }
+    }
+  }
+
+  feature "Oscillation detection" {
+
+    scenario "trajectory-churn lint rule detects alternating regressions" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        lint errors alternate plus 3 minus 2 plus 4 minus 3 over 6 commits
+      }
+      when {
+        mos lint runs with snapshot history available
+      }
+      then {
+        a warning diagnostic trajectory-churn is emitted for the lint axis
+      }
+    }
+  }
+
+  feature "Drift velocity" {
+
+    scenario "drift velocity detects growing debt" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        drift violations are 2, 3, 5, 7, 11 over 5 consecutive commits
+      }
+      when {
+        mos audit --trajectory is run
+      }
+      then {
+        drift velocity is reported as increasing and flagged as trajectory-regression
+      }
+    }
+  }
+
+  feature "Agent steering signal" {
+
+    scenario "agent reads trajectory and prioritizes stalled axis" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        functional axis is converging at minus 2 per commit
+        structural axis is stalled for 8 commits
+      }
+      when {
+        mos audit --trajectory --format json is run
+      }
+      then {
+        JSON output includes per-axis status and the agent can select structural work
+      }
+    }
+  }
+}
+

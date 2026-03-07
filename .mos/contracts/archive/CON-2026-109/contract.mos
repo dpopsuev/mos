@@ -1,0 +1,19 @@
+contract "CON-2026-109" {
+  title = "CON-2026-109"
+  status = "abandoned"
+  created_at = 2026-03-03T21:19:49Z
+  updated_at = 2026-03-03T21:29:26Z
+  name = "Full Onboarding Wizard for mos init"
+  slug = "init-wizard"
+  description = "Extend mos init from basic scaffolding to a full interactive onboarding wizard. The wizard walks through: LLM provider selection, Gateway configuration for external systems, writing the project Declaration interactively, choosing a governance model (BDFL, committee, consensus, or custom), setting governance defaults (graduated ceremony levels), identity registration (SSH key detection), and optional parent constitution for organizational inheritance. The result is a .mos/ initialized with the project founding document, chosen rules of self-governance, and first identity. Manifesto Section 5."
+
+  feature "Governance model selection" {
+  }
+
+  feature "Interactive Declaration drafting" {
+  }
+
+  feature "Identity and parent registration" {
+  }
+}
+

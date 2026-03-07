@@ -1,0 +1,148 @@
+blob
+contract "CON-2026-010" {
+  title = "Language-Agnostic Scanner"
+  status = "complete"
+  goal = "Generalize the model layer from Go-only to language-agnostic, build a generic LSP-based scanner that works with any language server, and add auto-detection with fallback chain."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Model constructors, JSON round-trip with new types, SymbolKind mapping, LSP client framing, auto-detection logic"
+    }
+
+    integration {
+      applies = true
+      rationale = "PackagesScanner -> model pipeline, LSPScanner -> model pipeline against real gopls, AutoScanner fallback chain"
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API"
+    }
+
+    e2e {
+      applies = true
+      rationale = "mos survey . and cst-tui . against mos/ with each scanner backend"
+    }
+
+    performance {
+      applies = true
+      rationale = "LSP scanner startup/shutdown overhead vs GoScanner baseline"
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Scanner calls are sequential per invocation"
+    }
+
+    security {
+      applies = true
+      rationale = "LSP server is a child process -- validate ServerCmd, no shell injection"
+    }
+  }
+
+  feature "Multi-Language Scanner Architecture" {
+
+    scenario "Model types are language-agnostic" {
+      given {
+        the model package with renamed types
+      }
+      when {
+        a Project is created with Language = LangGo
+      }
+      then {
+        Namespace, DependencyGraph, and all 26 SymbolKinds are available
+        JSON round-trip preserves all fields including Language
+        existing GoScanner tests pass against the new types
+      }
+    }
+
+    scenario "PackagesScanner enriches symbol data" {
+      given {
+        a Go module with functions that import external packages
+      }
+      when {
+        PackagesScanner scans the module
+      }
+      then {
+        Symbol.Dependencies lists the import paths each symbol touches
+        the dependency graph includes transitive type information
+        results are a superset of GoScanner output
+      }
+    }
+
+    scenario "LSPScanner works with gopls" {
+      given {
+        gopls is available on PATH
+        a Go module exists at the scan root
+      }
+      when {
+        LSPScanner scans with ServerCmd = "gopls serve"
+      }
+      then {
+        symbols are extracted via workspace/symbol
+        SymbolKind values match the LSP specification
+        the LSP server is cleanly shut down after scanning
+      }
+    }
+
+    scenario "LSPScanner works with rust-analyzer" {
+      given {
+        rust-analyzer is available on PATH
+        a Rust project with Cargo.toml exists at the scan root
+      }
+      when {
+        LSPScanner scans with ServerCmd = "rust-analyzer"
+      }
+      then {
+        Rust symbols (structs, traits, impls, functions) appear in the model
+        Language is set to LangRust
+        the same LSPScanner code handles both Go and Rust
+      }
+    }
+
+    scenario "AutoScanner selects best available backend" {
+      given {
+        a Go module with gopls available
+      }
+      when {
+        AutoScanner scans with default settings
+      }
+      then {
+        PackagesScanner is selected (preferred for Go)
+        if PackagesScanner fails, LSPScanner(gopls) is attempted
+        if LSPScanner fails, GoScanner is used as final fallback
+      }
+    }
+
+    scenario "Symbol-level graph in TUI" {
+      given {
+        cst-tui is running with PackagesScanner data
+        a symbol with non-empty Dependencies is selected
+      }
+      when {
+        the graph panel renders
+      }
+      then {
+        the graph shows that symbol's dependency edges, not the package-level graph
+        when cursor moves back to a package node, the graph reverts to package-level
+      }
+    }
+
+    scenario "Dog-food with enriched scanner" {
+      given {
+        all scanner backends implemented
+      }
+      when {
+        cst survey . and cst-tui . are run against mos/
+      }
+      then {
+        AutoScanner selects the richest available backend
+        output is a superset of the original GoScanner results
+        symbol-level dependencies are populated for Go functions
+      }
+    }
+  }
+}
+

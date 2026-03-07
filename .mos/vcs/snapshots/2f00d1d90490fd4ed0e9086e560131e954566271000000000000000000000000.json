@@ -1,0 +1,106 @@
+{
+  "timestamp": "2026-03-07T12:41:00.621379396Z",
+  "commit_hash": "2f00d1d90490fd4ed0e9086e560131e954566271000000000000000000000000",
+  "integrity_score": 37.77777777777778,
+  "vectors": [
+    {
+      "kind": "functional",
+      "score": 33.33333333333333,
+      "pass": false,
+      "details": [
+        {
+          "rule_id": "go-build-pass",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "test-coverage",
+          "pass": false,
+          "score": 0
+        },
+        {
+          "rule_id": "tests-pass",
+          "pass": false,
+          "score": 0
+        }
+      ]
+    },
+    {
+      "kind": "structural",
+      "score": 80,
+      "pass": false,
+      "details": [
+        {
+          "rule_id": "fan-out",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "flatten-nesting",
+          "pass": false,
+          "score": 0
+        },
+        {
+          "rule_id": "function-length",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "loc-per-file",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "params-per-function",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "fan-out",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "flatten-nesting",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "function-length",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "loc-per-file",
+          "pass": true,
+          "score": 100
+        },
+        {
+          "rule_id": "params-per-function",
+          "pass": true,
+          "score": 100
+        }
+      ]
+    },
+    {
+      "kind": "performance",
+      "score": 0,
+      "pass": false,
+      "details": [
+        {
+          "rule_id": "benchmarks-regression",
+          "pass": false,
+          "score": 0
+        }
+      ]
+    }
+  ],
+  "lint_errors": 2,
+  "lint_warnings": 812,
+  "structural_metrics": {
+    "fan-out": 1,
+    "function-length": 682,
+    "loc-per-file": 17,
+    "params-per-function": 12
+  }
+}

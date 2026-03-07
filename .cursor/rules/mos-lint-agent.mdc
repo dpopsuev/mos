@@ -1,0 +1,74 @@
+---
+description: How to consume mos lint output as an agent — no glue code
+alwaysApply: true
+---
+
+# Mos Lint: Agent Consumption
+
+## Golden rule
+
+**Never pipe `mgate lint` output through Python, awk, or any glue script.** The CLI has built-in flags for every agent use case. If a flag is missing, that's a feature gap — file a bug, don't work around it.
+
+## Quick reference
+
+```bash
+# Grouped summary (text, human-readable)
+mgate lint --severity error --summary
+
+# Grouped summary with sample diagnostics (text)
+mgate lint --severity error --summary -v
+
+# Machine-readable JSON summary with samples
+mgate lint --severity error --summary -v --format json
+
+# Full diagnostic list as JSON array
+mgate lint --format json
+
+# Only VCS-changed files
+mgate lint --changed
+
+# Suppress pre-existing baseline diagnostics
+mgate lint --changed --new-only
+```
+
+Also accessible as `mos gate lint ...`.
+
+## Exit codes
+
+| Code | Meaning |
+|---|---|
+| 0 | Clean — no findings |
+| 1 | Findings present |
+| 2 | Internal linter error |
+
+## JSON summary shape
+
+```json
+[
+  {
+    "severity": "error",
+    "rule": "terminal-in-active",
+    "count": 52,
+    "samples": [
+      {
+        "file": ".mos/contracts/active/CON-2026-069/contract.mos",
+        "message": "...",
+        "artifact_id": "CON-2026-069",
+        "suggested_action": "Move the artifact with terminal status to archive/"
+      }
+    ]
+  }
+]
+```
+
+## When you need per-artifact IDs
+
+Use `--format json` (full output) with `jq`, not Python:
+
+```bash
+mgate lint --severity error --format json | jq -r '.[] | select(.rule=="terminal-in-active") | .artifact_id'
+```
+
+## Check current flags
+
+Flags change. Run `mgate lint --help` at session start if unsure.

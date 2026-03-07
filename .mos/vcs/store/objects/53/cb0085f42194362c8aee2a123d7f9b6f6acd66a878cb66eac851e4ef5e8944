@@ -1,0 +1,259 @@
+blob
+contract "CON-2026-015" {
+  title = "Full CRUD & Contract Migration"
+  status = "complete"
+  goal = "Mos's governance CLI provides full artifact CRUD (vocabulary, contract, rule lifecycle), composed building blocks (feature specs, coverage, environment requirements, open fields), and all 19 markdown contracts are migrated to `.mos/` DSL format via CLI with zero lint errors."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "parseSpecFile, parseCoverageFile helpers, CreateContract with spec/coverage options. ListTerms, AddTerm, RemoveTerm vocabulary functions. ListContracts, ShowContract, UpdateContractStatus contract lifecycle. ListRules, ShowRule rule lifecycle."
+    }
+
+    integration {
+      applies = true
+      rationale = "Full pipeline: create contract with --spec-file -> lint -> verify feature blocks preserved. Contract status update with directory move. Vocabulary add -> list roundtrip."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "All 19 contracts in .cst/ format, linted, cross-referenced."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Sequential migration."
+    }
+
+    security {
+      applies = false
+      rationale = "Local file operations only."
+    }
+  }
+
+  feature "Enhanced Contract Model + Migration" {
+
+    scenario "Spec file composes feature blocks into contracts" {
+      given {
+        a valid .cst/ scaffold
+        a spec file containing DSL feature/scenario blocks
+      }
+      when {
+        cst contract create CON-TEST --title "Test" --status draft --spec-file spec.cst is run
+      }
+      then {
+        the produced contract.cst contains the feature/scenario blocks from the spec file
+        the feature blocks are valid DSL (parseable, formattable)
+        cst lint . passes with zero diagnostics
+      }
+    }
+
+    scenario "Coverage block composes into contracts" {
+      given {
+        a valid .cst/ scaffold
+        a coverage file containing pillar blocks with applies fields
+      }
+      when {
+        cst contract create CON-TEST --title "Test" --status draft --coverage-file coverage.cst is run
+      }
+      then {
+        the produced contract.cst contains a coverage block
+        pillar names are project-defined (vocabulary terms), not schema keywords
+        cst lint . passes with zero diagnostics
+      }
+    }
+
+    scenario "Requires block composes into harness" {
+      given {
+        a valid .cst/ scaffold
+      }
+      when {
+        cst rule create test-rule --type mechanical --enforcement error --harness-cmd "make test" --harness-requires "platform=linux,go_version=>=1.25" is run
+      }
+      then {
+        the produced rule.cst contains a harness block with a requires sub-block
+        requires fields are open (vocabulary-driven)
+        cst lint . passes with zero diagnostics
+      }
+    }
+
+    scenario "Vocabulary template shows ALM absorption pattern" {
+      given {
+        an empty directory
+      }
+      when {
+        cst init . is run
+      }
+      then {
+        .cst/vocabulary/default.cst contains commented examples of ALM-absorbable terms
+        the terms are not enforced by the linter (just documentation)
+      }
+    }
+
+    scenario "Vocabulary term added via CLI" {
+      given {
+        a valid .cst/ scaffold with an empty vocabulary
+      }
+      when {
+        cst vocabulary add pillar --description "A test category" is run
+      }
+      then {
+        .cst/vocabulary/default.cst contains a field pillar = "A test category" inside the terms block
+        cst vocabulary list shows the term
+        cst lint . passes with zero diagnostics
+      }
+    }
+
+    scenario "Vocabulary term removed via CLI" {
+      given {
+        a vocabulary containing terms: pillar, component
+      }
+      when {
+        cst vocabulary remove pillar is run
+      }
+      then {
+        .cst/vocabulary/default.cst no longer contains the pillar field
+        cst vocabulary list shows only component
+      }
+    }
+
+    scenario "Vocabulary list shows all terms" {
+      given {
+        a vocabulary with 3 terms
+      }
+      when {
+        cst vocabulary list is run
+      }
+      then {
+        all 3 terms are displayed with their descriptions
+        cst vocabulary list --format json produces valid JSON
+      }
+    }
+
+    scenario "Contract list shows all contracts" {
+      given {
+        .cst/contracts/ contains 3 active contracts and 1 archived contract
+      }
+      when {
+        cst contract list is run
+      }
+      then {
+        all 4 contracts are displayed with id, title, and status
+        cst contract list --status active shows only 3 contracts
+      }
+    }
+
+    scenario "Contract show displays full content" {
+      given {
+        a contract CON-TEST exists in .cst/contracts/
+      }
+      when {
+        cst contract show CON-TEST is run
+      }
+      then {
+        the full contract content is displayed (formatted DSL)
+      }
+    }
+
+    scenario "Contract status update moves between directories" {
+      given {
+        an active contract CON-TEST in .cst/contracts/active/
+      }
+      when {
+        cst contract status CON-TEST complete is run
+      }
+      then {
+        the contract directory moves to .cst/contracts/archive/CON-TEST/
+        the status field in contract.cst reads "complete"
+        cst lint . passes with zero diagnostics
+      }
+    }
+
+    scenario "Rule list shows all rules" {
+      given {
+        .cst/rules/ contains 2 mechanical rules and 1 interpretive rule
+      }
+      when {
+        cst rule list is run
+      }
+      then {
+        all 3 rules are displayed with id, name, and type
+        cst rule list --type mechanical shows only 2 rules
+      }
+    }
+
+    scenario "Rule show displays full content" {
+      given {
+        a rule go-build-pass exists in .cst/rules/
+      }
+      when {
+        cst rule show go-build-pass is run
+      }
+      then {
+        the full rule content is displayed (formatted DSL)
+      }
+    }
+
+    scenario "All contracts migrated to DSL format" {
+      given {
+        CON-2026-015 Phase 1 is complete (building block enhancements)
+        19 markdown contracts exist in contracts/
+      }
+      when {
+        the agent reads each markdown file and calls cst contract create with --spec-file and --coverage-file
+      }
+      then {
+        19 contract artifacts exist in .cst/contracts/
+        each contract preserves: status, goal, title, acceptance criteria, coverage, dependencies
+        cst lint . passes with zero diagnostics
+      }
+    }
+
+    scenario "Original markdown deleted" {
+      given {
+        all contracts are migrated to .cst/ format
+      }
+      when {
+        migration is complete
+      }
+      then {
+        no contracts/CON-2026-*.md files remain
+        .cst/contracts/ is the single source of truth
+      }
+    }
+
+    scenario "CLI-only constraint verified" {
+      given {
+        the migration is complete
+      }
+      when {
+        the agent's command history is reviewed
+      }
+      then {
+        every .cst/contracts/ file was produced by cst contract create
+        no direct file writes to .cst/contracts/ occurred
+      }
+    }
+
+    scenario "Open fields work without grammar changes" {
+      given {
+        a vocabulary with custom terms (pillar, component, priority)
+      }
+      when {
+        a contract is created with --spec-file containing scenarios with open fields
+      }
+      then {
+        the produced contract.cst contains the open fields verbatim
+        no parser errors occur
+        the linter does not reject unknown field names inside scenarios
+      }
+    }
+  }
+}
+

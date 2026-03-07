@@ -1,0 +1,121 @@
+blob
+contract "CON-2026-009" {
+  title = "Multi-Keymap & Themes"
+  status = "complete"
+  goal = "Multi-keymap (vim/emacs/vscode) and terminal-aware theme support for `curia`, with full user customization via `~/.config/curia/config.toml`."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Keymap Match() with exact/partial/none, preset construction, config merging"
+    }
+
+    integration {
+      applies = false
+      rationale = "TUI rendering is visual; tested via dog-food"
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API"
+    }
+
+    e2e {
+      applies = true
+      rationale = "Dog-food: cst-tui . with each preset"
+    }
+
+    performance {
+      applies = false
+      rationale = "Not in scope"
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Single-threaded TUI"
+    }
+
+    security {
+      applies = false
+      rationale = "Config file is user-owned, no trust boundary"
+    }
+  }
+
+  feature "TUI Keymap and Theme Customization" {
+
+    scenario "Auto-detect keymap from EDITOR" {
+      given {
+        EDITOR is set to "nvim"
+      }
+      when {
+        cst-tui launches with keymap.preset = "auto"
+      }
+      then {
+        vim keybindings are active (j/k navigate, G goes to end, g g goes to top)
+      }
+    }
+
+    scenario "Multi-key sequence gg in vim preset" {
+      given {
+        cst-tui is running with vim keymap
+        cursor is not at the top
+      }
+      when {
+        user presses g then g within 300ms
+      }
+      then {
+        cursor jumps to the first node
+      }
+    }
+
+    scenario "Emacs keybindings" {
+      given {
+        cst-tui is running with emacs keymap
+      }
+      when {
+        user presses ctrl+n and ctrl+p
+      }
+      then {
+        cursor moves down and up respectively
+      }
+    }
+
+    scenario "Theme auto-detection" {
+      given {
+        terminal has a dark background
+      }
+      when {
+        cst-tui launches with theme.preset = "auto"
+      }
+      then {
+        dark palette colors are used
+      }
+    }
+
+    scenario "Config file overrides" {
+      given {
+        ~/.config/cst-tui/config.toml contains keymap.preset = "emacs" and theme.preset = "light"
+      }
+      when {
+        cst-tui launches
+      }
+      then {
+        emacs keybindings and light theme are active
+      }
+    }
+
+    scenario "CLI flags override config" {
+      given {
+        config.toml has keymap.preset = "vim"
+      }
+      when {
+        cst-tui launches with --keymap emacs
+      }
+      then {
+        emacs keybindings are active
+      }
+    }
+  }
+}
+

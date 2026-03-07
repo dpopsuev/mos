@@ -1,0 +1,195 @@
+blob
+contract "CON-2026-016" {
+  title = "Multi-Repo Linter"
+  status = "draft"
+  justifies = "NEED-2026-001"
+  goal = "The Mos linter resolves `upstream` blocks, `git://` cross-repo include paths, and product manifests across a multi-repo workspace, producing per-repo diagnostics from a single `LintWorkspace` call. An agent given any single repo can crawl the governance graph to discover all related repos."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "ResolveUpstream, ResolveInclude, ResolveProductGraph helpers. InitWithUpstream, AddSpecInclude, WriteProductManifest, AddCrossRepoBlock scaffolding functions."
+    }
+
+    integration {
+      applies = true
+      rationale = "LintWorkspace across a multi-repo workspace with upstream chains and cross-repo includes."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Full pipeline: scaffold 4-repo PTP scenario, lint workspace, verify diagnostics."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Sequential resolution within a workspace."
+    }
+
+    security {
+      applies = false
+      rationale = "Local file operations only. No network access (offline-first)."
+    }
+  }
+
+  feature "Cross-Repo Include Resolver" {
+
+    scenario "Multi-repo participant supports multiple repos" {
+      given {
+        a test world with 2 users
+      }
+      when {
+        2 repos are created via CreateRepo
+      }
+      then {
+        each user has 2 separate clone directories
+        PushRepo and PullRepo work independently per repo
+        existing single-repo tests still pass
+      }
+    }
+
+    scenario "InitWithUpstream scaffolds upstream blocks" {
+      given {
+        an empty directory
+      }
+      when {
+        InitWithUpstream is called with one upstream pointing at a parent repo
+      }
+      then {
+        config.cst contains an upstream block with name, url, ref, and scope
+        cst lint . passes with zero errors
+      }
+    }
+
+    scenario "LintWorkspace resolves upstream references" {
+      given {
+        a workspace with 2 repos where repo-B points upstream at repo-A
+      }
+      when {
+        LintWorkspace is called
+      }
+      then {
+        the linter resolves repo-B upstream to repo-A ProjectContext
+        no "upstream not found" diagnostics are emitted
+        per-repo diagnostics are returned
+      }
+    }
+
+    scenario "LintWorkspace resolves cross-repo includes" {
+      given {
+        a workspace where repo-A contract includes git://org/repo-B@main:path/file.cst
+        repo-B exists in the workspace map
+      }
+      when {
+        LintWorkspace is called
+      }
+      then {
+        the include resolves to the local path of repo-B
+        no "include not found" diagnostics are emitted
+      }
+    }
+
+    scenario "LintWorkspace resolves product graph" {
+      given {
+        a workspace where repo-A has a product.cst listing repo-B and repo-C as components
+      }
+      when {
+        LintWorkspace is called
+      }
+      then {
+        the product graph includes all 3 repos
+        all component repos are linted
+      }
+    }
+
+    scenario "Graph crawl discovers all repos from single entry point" {
+      given {
+        a 4-repo PTP scenario with upstream chains and cross-repo includes
+        all repos available via LocalFetcher
+      }
+      when {
+        Crawl is called with only the ptp-operator repo path
+      }
+      then {
+        the workspace contains all 4 repos
+        upstream edges are correct (daemon -> operator, proxy -> operator)
+        include edges are correct (operator contract -> eco-gotests spec)
+        the graph is a valid DAG (no cycles)
+      }
+    }
+
+    scenario "Graph crawl detects and rejects cycles" {
+      given {
+        repo-A upstream -> repo-B
+        repo-B upstream -> repo-A (cycle)
+      }
+      when {
+        Crawl is called with repo-A
+      }
+      then {
+        an error is returned indicating a cycle between repo-A and repo-B
+        no workspace is produced
+      }
+    }
+
+    scenario "WalkGraph visits all reachable repos" {
+      given {
+        a crawled workspace with 4 repos
+        a visitor function that records repo names
+      }
+      when {
+        WalkGraph is called
+      }
+      then {
+        all 4 repo names are recorded
+        repos are visited in topological order (upstream before downstream)
+      }
+    }
+
+    scenario "PTP Operator 4-repo workspace lints clean" {
+      given {
+        a workspace simulating the PTP scenario:
+        ptp-operator (primary, with upstream)
+        linuxptp-daemon (upstream -> ptp-operator)
+        cloud-event-proxy (upstream -> ptp-operator)
+        eco-gotests (cross-repo include from ptp-operator contracts)
+      }
+      when {
+        LintWorkspace is called
+      }
+      then {
+        all 4 repos lint with zero error-severity diagnostics
+        upstream chains are fully resolved
+        cross-repo includes are fully resolved
+      }
+    }
+
+    scenario "Offline workspace map as crawl fallback" {
+      given {
+        a workspace map built from local filesystem paths (no network)
+      }
+      when {
+        LoadWorkspace is called with the explicit map
+      }
+      then {
+        no network access occurs
+        the produced workspace is identical to one built by Crawl
+        LintWorkspace produces the same diagnostics
+      }
+    }
+  }
+
+  scope {
+    depends_on = ["CON-2026-001"]
+  }
+  updated_at = 2026-03-03T19:10:38Z
+  batch = "BAT-2026-003"
+  slug = "multi-repo-linter"
+}
+

@@ -1,0 +1,94 @@
+blob
+contract "CON-2026-139" {
+  title = "Structural vector: batteries-included static analysis"
+  status = "complete"
+  slug = "structural-vector"
+  justifies = "NEED-2026-005"
+  depends_on = "CON-2026-134"
+  kind = "feature"
+  goal = "Provide zero-config Structural verification with bidirectional thresholds (floor and ceiling). Blue: nesting depth, fan-out, symbols per type, LOC per file, methods per type, params per function. Red: co-change coupling analysis, abstraction-hell detection (too many tiny types). Language-agnostic indentation-based scanner with per-language overrides. Extends CON-2026-134 with batteries-included defaults."
+
+  feature "Blue Team: static metric enforcement" {
+
+    scenario "nesting depth violations are reported as warnings" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go function with nesting depth 5
+        the flatten-nesting rule has ceiling 3
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning is emitted with file, line, function name, and depth
+      }
+    }
+
+    scenario "file with too few symbols triggers merge suggestion" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go file with 1 exported symbol
+        structural rule floor for exported_symbols_per_file is 2
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        an info diagnostic suggests merging the file into a neighbor
+      }
+    }
+  }
+
+  feature "Red Team: coupling and abstraction analysis" {
+
+    scenario "co-change analysis detects misplaced coupling" {
+      labels = ["red_team"]
+      actor = "agent"
+      given {
+        files A.go and B.go co-change 90 percent of the time but live in different packages
+      }
+      when {
+        mos audit runs co-change analysis
+      }
+      then {
+        an info diagnostic reports the coupling
+      }
+    }
+
+    scenario "abstraction hell detector flags over-decomposition" {
+      labels = ["red_team"]
+      actor = "agent"
+      given {
+        a package with 20 types averaging 1.2 methods each
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning suggests consolidating types
+      }
+    }
+  }
+
+  feature "Language-agnostic scanner" {
+
+    scenario "structural checks work on Python files with space indentation" {
+      labels = ["happy_path"]
+      actor = "contributor"
+      given {
+        a rule with glob **/*.py and indent_unit space and indent_size 4
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        nesting depth is correctly measured using 4-space indentation
+      }
+    }
+  }
+  batch = "BAT-2026-007"
+  sprint = "SPR-2026-032"
+}
+

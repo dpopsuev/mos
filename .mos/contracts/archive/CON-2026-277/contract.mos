@@ -1,0 +1,10 @@
+contract "CON-2026-277" {
+  title = "Audit moslib/primitive: confirm external-only consumption or remove dead code"
+  status = "closed"
+  created_at = 2026-03-07T12:42:31Z
+  updated_at = 2026-03-07T12:42:31Z
+  goal = "Scanner reveals moslib/primitive has zero internal edges. Determine if consumed by Asterisk/external, or dead code. Prune or document accordingly"
+  kind = "feat"
+  priority = "low"
+}
+

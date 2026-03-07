@@ -1,0 +1,20 @@
+blob
+rule "params-per-function" {
+  name = "Parameter Count Per Function"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "warning"
+  vector = "structural"
+  glob = "**/*.go"
+
+  config {
+    metric = "params_per_function"
+    ceiling = 5
+  }
+
+  harness {
+    command = "go build ./..."
+    timeout = "30s"
+  }
+}
+

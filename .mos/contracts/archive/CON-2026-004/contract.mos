@@ -1,0 +1,238 @@
+contract "CON-2026-004" {
+  title = "LSP Intelligence"
+  status = "complete"
+  goal = "`mos lsp` provides real-time TOML + embedded Gherkin intelligence for `.mos/` files -- diagnostics, completion, hover, and cross-reference navigation."
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "JSON-RPC framing, document store operations, completion item generation, hover text extraction"
+    }
+
+    integration {
+      applies = true
+      rationale = "Full LSP session: initialize -> open file -> receive diagnostics -> request completion -> shutdown; stress benchmarks at Linux Kernel and Kubernetes scale"
+    }
+
+    contract {
+      applies = true
+      rationale = "LSP protocol conformance: correct JSON-RPC framing, valid LSP method responses, Content-Length headers"
+    }
+
+    e2e {
+      applies = false
+      rationale = "Editor integration testing deferred -- protocol-level tests are sufficient for PoC"
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Single-client server, sequential request processing (sufficient for PoC)"
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundaries -- local stdio transport, reads local .cst/ files only"
+    }
+  }
+
+  feature "Mos LSP Server" {
+
+    scenario "LSP initializes over stdio" {
+      given {
+        the "mos lsp" server is started on stdio
+      }
+      when {
+        the client sends an "initialize" request
+      }
+      then {
+        the server responds with capabilities including textDocumentSync, completionProvider, hoverProvider, and definitionProvider
+        the client sends "initialized" notification
+        the server is ready
+      }
+    }
+
+    scenario "Real-time diagnostics on file change" {
+      given {
+        the LSP server is initialized
+        a .cst/rules/mechanical/bad.toml file is open with a missing [spec] section
+      }
+      when {
+        the client sends textDocument/didOpen
+      }
+      then {
+        the server publishes diagnostics containing "missing required section [spec]"
+        the diagnostic has severity "error"
+      }
+    }
+
+    scenario "TOML field completion for rule files" {
+      given {
+        a rule .toml file is open
+      }
+      when {
+        the client requests completion at the top level
+      }
+      then {
+        the completion list includes "[rule]", "[spec]", "[metadata]"
+        completing "[rule]" offers fields: id, name, type, scope, enforcement
+      }
+    }
+
+    scenario "Gherkin keyword completion inside spec" {
+      given {
+        a rule .toml file is open
+        the cursor is inside a [spec].feature multi-line string after a "Given" step
+      }
+      when {
+        the client requests completion
+      }
+      then {
+        the completion list includes "When", "Then", "And", "But"
+      }
+    }
+
+    scenario "Hover on TOML field shows documentation" {
+      given {
+        a config.toml file is open
+      }
+      when {
+        the client requests hover on "[mos].version"
+      }
+      then {
+        the hover response contains a description of the version field
+      }
+    }
+
+    scenario "Go-to-definition for rule ID reference" {
+      given {
+        a contract.toml with [execution].rules_override = ["R-001"]
+        the rule R-001 exists in .cst/rules/mechanical/no-binaries.toml
+      }
+      when {
+        the client requests definition on "R-001"
+      }
+      then {
+        the response points to .cst/rules/mechanical/no-binaries.toml
+      }
+    }
+
+    scenario "Go-to-definition for @include path" {
+      given {
+        a rule.toml with [spec].feature = "@include spec.feature"
+        the file spec.feature exists in the rule's directory
+      }
+      when {
+        the client requests definition on the @include path
+      }
+      then {
+        the response points to spec.feature
+      }
+    }
+
+    scenario "Clean shutdown" {
+      given {
+        the LSP server is running
+      }
+      when {
+        the client sends "shutdown" followed by "exit"
+      }
+      then {
+        the server exits with code 0
+      }
+    }
+
+    scenario "Linux Kernel scale -- context loading" {
+      given {
+        a synthetic .cst/ directory at Linux Kernel scale
+        rules: 2000, active_contracts: 200, archived_contracts: 500, resolution_layers: 6, vocabulary_terms: 2000, include_files: 1000
+      }
+      when {
+        LoadContext is called
+      }
+      then {
+        it completes in under 2 seconds
+        the ProjectContext contains all 2000 rule IDs
+        the vocabulary has 2000 merged terms
+      }
+    }
+
+    scenario "Linux Kernel scale -- full lint sweep" {
+      given {
+        the Linux Kernel scale .cst/ directory
+      }
+      when {
+        Linter.Lint runs a full sweep
+      }
+      then {
+        it completes in under 10 seconds
+        produces diagnostics for all 2700 artifact files
+      }
+    }
+
+    scenario "Linux Kernel scale -- single file diagnostic latency" {
+      given {
+        the Linux Kernel scale .cst/ directory with context pre-loaded
+      }
+      when {
+        a single rule file is validated
+      }
+      then {
+        the diagnostic response completes in under 50 milliseconds
+      }
+    }
+
+    scenario "Kubernetes scale -- context loading" {
+      given {
+        a synthetic .cst/ directory at Kubernetes scale
+        rules: 500, active_contracts: 300, archived_contracts: 1000, resolution_layers: 5, vocabulary_terms: 800, include_files: 400
+      }
+      when {
+        LoadContext is called
+      }
+      then {
+        it completes in under 1 second
+        the ProjectContext contains all 500 rule IDs
+      }
+    }
+
+    scenario "Kubernetes scale -- full lint sweep" {
+      given {
+        the Kubernetes scale .cst/ directory
+      }
+      when {
+        Linter.Lint runs a full sweep
+      }
+      then {
+        it completes in under 8 seconds
+        produces diagnostics for all 1800 artifact files
+      }
+    }
+
+    scenario "Completion response under load" {
+      given {
+        the Linux Kernel scale .cst/ directory with context pre-loaded
+      }
+      when {
+        a completion request is made for a rule file
+      }
+      then {
+        the response completes in under 20 milliseconds
+      }
+    }
+
+    scenario "Hover response under load" {
+      given {
+        the Kubernetes scale .cst/ directory with context pre-loaded
+        a contract referencing rule "R-0042"
+      }
+      when {
+        a hover request is made on the rule ID
+      }
+      then {
+        the response completes in under 20 milliseconds
+      }
+    }
+  }
+}
+

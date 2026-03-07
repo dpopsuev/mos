@@ -1,0 +1,14 @@
+blob
+contract "CON-2026-093" {
+  title = "Watch: timed sentinels with trigger conditions"
+  status = "complete"
+  created_at = 2026-03-03T19:22:48Z
+  updated_at = 2026-03-04T09:26:05Z
+  goal = "Introduce a watch primitive — lightweight, time-scoped sentinels attached to artifacts or contexts with trigger conditions (e.g. when CON-X completes, remind to do Y), extending Git's note/config model for governance workflows"
+  precondition = "BAT-2026-005"
+  batch = "BAT-2026-005"
+  kind = "feature"
+  slug = "watch"
+  sprint = "SPR-2026-022"
+}
+

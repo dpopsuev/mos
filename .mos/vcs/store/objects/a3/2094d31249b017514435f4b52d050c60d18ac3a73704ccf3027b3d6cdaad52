@@ -1,0 +1,23 @@
+blob
+rule "single-active-sprint" {
+  name = "Single Active Sprint"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "error"
+  applies_to = ["sprint"]
+
+  harness {
+    command = "mos lint --rule single-active-sprint"
+  }
+
+  section "rationale" {
+    text = """
+At most one sprint may have status 'active' at any time. Multiple active sprints fragment focus, create ambiguous priority, and make progress tracking unreliable. Additional sprints may exist in 'planned' status as a pipeline, but only one sprint is in-flight. When the active sprint completes, the next planned sprint is activated."""
+  }
+
+  section "invariants" {
+    text = """
+1. At most one sprint in .mos/sprints/active/ may have status = 'active' at any given time. 2. Multiple sprints with status 'planned' are permitted (sprint pipeline/backlog). 3. The linter must report an error if two or more sprints have status 'active'. 4. Sprint activation must check for an existing active sprint and reject if one is found."""
+  }
+}
+

@@ -1,0 +1,140 @@
+contract "CON-2026-031" {
+  title = "Ledger: opt-in append-only mutation log for artifact types"
+  status = "complete"
+  created_at = 2026-03-03T12:00:00Z
+  updated_at = 2026-03-03T12:00:00Z
+  goal = "Add ledger = true as an artifact_type trait. When enabled, every field mutation on instances of that type appends a timestamped entry to a co-located ledger.mos file. Entries record event type, field name, old value, new value, and ISO timestamp. The ledger is append-only, human-readable mos DSL, and git-diffable. mos contract history CON-ID reconstructs the timeline. The built-in contract type ships with ledger = true as a sane default. This is a generic primitive: any artifact_type can opt in. The specification compiler audit trail emerges from the combination of hooks (029) + ordered enums (030) + ledger (031)."
+  kind = "feature"
+  depends_on = ["CON-2026-029", "CON-2026-030"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Ledger append, entry formatting, timeline reconstruction."
+    }
+
+    integration {
+      applies = true
+      rationale = "Field mutation triggers ledger append, mos contract history reads it."
+    }
+
+    contract {
+      applies = false
+    }
+
+    e2e {
+      applies = false
+    }
+
+    concurrency {
+      applies = true
+      rationale = "Append-only ledger must handle concurrent writes via atomic append."
+    }
+
+    security {
+      applies = false
+    }
+  }
+
+  feature "Artifact Ledger" {
+
+    scenario "Ledger trait parsed from artifact_type" {
+      status = "done"
+      given {
+        an artifact_type definition with ledger = true
+      }
+      when {
+        the registry is loaded
+      }
+      then {
+        the ArtifactTypeDef has Ledger = true
+      }
+    }
+
+    scenario "Ledger file created on first mutation" {
+      status = "done"
+      given {
+        an artifact type with ledger = true
+        a new instance with no ledger.mos file
+      }
+      when {
+        a field is mutated on the instance
+      }
+      then {
+        ledger.mos is created alongside the artifact
+        it contains one entry with event type, field, new value, and timestamp
+      }
+    }
+
+    scenario "Subsequent mutations append to ledger" {
+      status = "done"
+      given {
+        an instance with an existing ledger.mos containing 2 entries
+      }
+      when {
+        a field is mutated
+      }
+      then {
+        the ledger now contains 3 entries
+        the first 2 entries are unchanged
+        the third entry records the new mutation
+      }
+    }
+
+    scenario "Ledger records old and new values" {
+      status = "done"
+      given {
+        an instance with status = active
+      }
+      when {
+        status is changed to complete
+      }
+      then {
+        the ledger entry shows old_value = active and new_value = complete
+      }
+    }
+
+    scenario "mos contract history reconstructs timeline" {
+      status = "done"
+      given {
+        a contract that has gone through created, active, implemented, verified, complete
+      }
+      when {
+        mos contract history CON-ID is run
+      }
+      then {
+        the output shows a chronological list of all events with timestamps
+      }
+    }
+
+    scenario "Default contract type ships with ledger enabled" {
+      status = "done"
+      given {
+        a fresh mos init workspace
+      }
+      when {
+        the built-in contract artifact_type is inspected
+      }
+      then {
+        ledger = true is present on the contract type definition
+      }
+    }
+
+    scenario "Concurrent appends do not corrupt the ledger" {
+      status = "done"
+      given {
+        an instance with ledger enabled
+      }
+      when {
+        10 concurrent field mutations occur
+      }
+      then {
+        all 10 entries appear in the ledger
+        no entries are lost or corrupted
+        the file is valid mos DSL
+      }
+    }
+  }
+}
+

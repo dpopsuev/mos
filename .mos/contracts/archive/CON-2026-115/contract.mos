@@ -1,0 +1,76 @@
+contract "CON-2026-115" {
+  title = "Full content in show commands"
+  status = "complete"
+  goal = "The show subcommand renders full artifact content by default: description, features, scenarios with Given/When/Then, sections, coverage, and all metadata. Agents must not need --verbose or raw file reads to inspect content."
+  justifies = "SPEC-2026-028"
+  sprint = "SPR-2026-004"
+  created_at = 2026-03-03T21:33:18Z
+  updated_at = 2026-03-04T09:29:49Z
+  name = "Full content in show commands"
+  slug = "show-full-content"
+  description = "The show subcommand on all artifact types must render full content by default: description, features, scenarios with Given/When/Then, all metadata fields. Currently show only emits title, status, and dates. Agents must read raw .mos files to inspect content, bypassing the CLI entirely. This violates Console First — if the CLI cannot show what the file contains, it is not the primary interface."
+  batch = "BAT-2026-006"
+
+  feature "Full artifact rendering" {
+
+    scenario "Show renders description" {
+      given {
+        a contract with a description field exists
+      }
+      when {
+        mos contract show CON-ID is run without flags
+      }
+      then {
+        the output includes the description text
+      }
+    }
+
+    scenario "Show renders features and scenarios" {
+      given {
+        a contract with features and Gherkin scenarios exists
+      }
+      when {
+        mos contract show CON-ID is run
+      }
+      then {
+        the output includes each feature name and its scenarios with given/when/then blocks
+      }
+    }
+
+    scenario "Show renders sections" {
+      given {
+        a contract or need with section blocks exists
+      }
+      when {
+        mos contract show CON-ID is run
+      }
+      then {
+        the output includes each section name and its text content
+      }
+    }
+
+    scenario "Short flag provides summary only" {
+      given {
+        a contract with full content exists
+      }
+      when {
+        mos contract show CON-ID --short is run
+      }
+      then {
+        the output shows only title, status, goal, and metadata
+      }
+    }
+  }
+
+  coverage {
+
+    unit {
+      applies = true
+    }
+
+    integration {
+      applies = true
+    }
+  }
+}
+

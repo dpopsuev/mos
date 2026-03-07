@@ -1,0 +1,10 @@
+contract "CON-2026-055" {
+  title = "Harness stubs for C3/C4/C5 preamble criteria"
+  status = "complete"
+  created_at = 2026-03-03T17:02:20Z
+  updated_at = 2026-03-03T17:06:23Z
+  goal = "Three interpretive harness rules exist (transition-gate-coverage, multi-repo-federation, audit-trail) tracking acceptance criteria C3, C4, C5. They are interpretive stubs until the features land."
+  justifies = "NEED-2026-001"
+  sprint = "SPR-2026-002"
+}
+

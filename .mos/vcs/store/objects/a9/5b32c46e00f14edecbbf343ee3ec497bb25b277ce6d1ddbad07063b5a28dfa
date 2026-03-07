@@ -1,0 +1,12 @@
+blob
+contract "BUG-2026-017" {
+  title = "Lifecycle-chain linter reports false positives for sprint contract references"
+  status = "complete"
+  created_at = 2026-03-05T08:16:22Z
+  updated_at = 2026-03-05T08:16:22Z
+  goal = "The lifecycle-chain lint rule cannot correctly resolve comma-separated contract IDs in sprint 'contracts' fields and/or cannot locate contracts in archive directories, producing false-positive 'does not exist' errors."
+  kind = "bug"
+  slug = "lifecycle-chain-false-positives"
+  sprint = "SPR-2026-020"
+}
+

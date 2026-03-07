@@ -1,0 +1,11 @@
+contract "CON-2026-275" {
+  title = "Architecture scanner: test topology layer (testkit blast radius)"
+  status = "closed"
+  created_at = 2026-03-07T12:42:27Z
+  updated_at = 2026-03-07T12:42:27Z
+  goal = "Add --include-tests mode that maps testkit import footprint, revealing which test packages cover which production components"
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+}
+

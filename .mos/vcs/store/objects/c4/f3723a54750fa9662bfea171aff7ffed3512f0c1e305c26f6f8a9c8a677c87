@@ -1,0 +1,18 @@
+blob
+contract "CON-2026-185" {
+  title = "Implement mos mesh CLI command"
+  status = "complete"
+  created_at = 2026-03-05T10:11:25Z
+  updated_at = 2026-03-05T10:11:25Z
+  goal = "A top-level mos mesh command that takes a file or package path and outputs the unified context mesh in text, JSON, or Mermaid format. The pre-flight context check for AI agents."
+  justifies = "NEED-2026-003"
+  kind = "feat"
+  priority = "high"
+
+  scope {
+    depends_on = ["CON-2026-184"]
+  }
+  slug = "mos-mesh-command"
+  sprint = "SPR-2026-015"
+}
+

@@ -1,0 +1,20 @@
+blob
+specification "SPEC-2026-013" {
+  title = "Constitutional Inheritance"
+  status = "active"
+  enforcement = "disabled"
+  name = "Constitutional Inheritance"
+  slug = "constitutional-inheritance"
+  description = "Defines how projects under the same umbrella inherit constitutional DNA from a parent. Organizations are federations — a parent constitution defines shared rules, vocabulary, governance model defaults, templates, and harness presets that propagate downward as defaults, not mandates. Each child project-state can override, extend, or opt out entirely. Inheritance resolution order: Organization > Group > Domain > Individual (Profile/Cabinet). This spec generalizes Rule Import (CON-2026-099) and Portable Context (SPEC-2026-009) into a hierarchical inheritance model. Manifesto Section 6."
+
+  feature "Parent-child inheritance" {
+  }
+
+  feature "Override and opt-out" {
+  }
+
+  feature "Resolution layer ordering" {
+  }
+  justifies = "NEED-2026-001"
+}
+

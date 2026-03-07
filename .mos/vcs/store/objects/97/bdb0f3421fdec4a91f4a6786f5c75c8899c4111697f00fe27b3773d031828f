@@ -1,0 +1,144 @@
+blob
+contract "CON-2026-018" {
+  title = "Macro IDE Architecture"
+  status = "deferred"
+  justifies = "NEED-2026-001"
+  goal = "Mos has a documented architecture for the Macro agentic IDE (TUI client) and Macro Server (headless daemon) that evaluates editor embedding strategies, maps Origami circuit integration, and recommends a phased implementation combining Macro Server daemon + Macro TUI + Origami/Sumi + Ollama BYOB."
+
+  coverage {
+
+    unit {
+      applies = false
+      rationale = "Research contract -- no code produced."
+    }
+
+    integration {
+      applies = false
+      rationale = "Research contract -- no code produced."
+    }
+
+    contract {
+      applies = false
+      rationale = "Research contract -- no code produced."
+    }
+
+    e2e {
+      applies = false
+      rationale = "Research contract -- no code produced."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Research contract -- no code produced."
+    }
+
+    security {
+      applies = false
+      rationale = "Research contract -- no code produced."
+    }
+  }
+
+  feature "Macro IDE Architecture Research" {
+
+    scenario "All case studies documented" {
+      given {
+        Void Editor, Ollama, and Aider as reference subjects
+      }
+      when {
+        the research contract is complete
+      }
+      then {
+        each case study has: what it is, key architecture lessons, implication for Macro
+        Void case study addresses fork-vs-build trade-off
+        Ollama case study maps to Origami ProviderRouter
+        Aider case study positions Macro differentiation
+      }
+    }
+
+    scenario "Editor embedding evaluation complete" {
+      given {
+        4 editor embedding options (micro fork, Neovim RPC, Bubbletea-native, tcell custom)
+      }
+      when {
+        the evaluation matrix is complete
+      }
+      then {
+        each option has pros and cons documented
+        the tcell/Bubbletea tension is explicitly addressed
+        a single recommended option is identified with rationale
+      }
+    }
+
+    scenario "Origami integration designed" {
+      given {
+        Origami framework with Circuit, Walker, Dispatcher, Component, Kami
+      }
+      when {
+        the Origami integration design is complete
+      }
+      then {
+        Macro is positioned as an Origami consumer (like Asterisk/Achilles)
+        at least 2 IDE-domain circuit examples are sketched
+        ProviderRouter wiring to Ollama is documented
+        Sumi integration with Kami EventBridge is described
+      }
+    }
+
+    scenario "Headless daemon architecture designed" {
+      given {
+        the manifesto requires Multi-User by Default and Locked Zones
+        Neovim demonstrates headless + RPC as a proven pattern
+        Kami EventBridge already streams to multiple SSE/WebSocket clients
+      }
+      when {
+        the Macro Server architecture design is complete
+      }
+      then {
+        session persistence model is documented (daemon survives client disconnect)
+        multi-client attach/detach protocol is specified
+        remote execution mode is described (server-side agents, thin TUI client)
+        buffer locking for concurrent multi-user edits is addressed
+        at least 2 Macro-to-Macro-Server protocol options are evaluated
+      }
+    }
+
+    scenario "Operating modes designed" {
+      given {
+        the manifesto defines three operator modes: Observation, Direction, Intervention
+        auditing and research are read-only agent workflows that produce artifacts
+      }
+      when {
+        the operating modes architecture is complete
+      }
+      then {
+        Edit mode (read-write codebase) is distinguished from Audit and Research modes (read-only + artifacts)
+        Origami circuit types are mapped to operating modes
+        read-only mode enforcement is documented (no file writes except artifact output)
+        at least 2 audit circuit examples are sketched (governance compliance, security review)
+      }
+    }
+
+    scenario "Recommended architecture produced" {
+      given {
+        case studies, editor evaluation, Origami integration, Curia architecture, and operating modes analysis complete
+      }
+      when {
+        the recommendation is written
+      }
+      then {
+        a Mermaid diagram shows the full Macro/Macro Server architecture including client-server split
+        the diagram shows Mos (state) + Origami (plumbing) + Editor + Sumi + Ollama + Macro Server daemon
+        a phased implementation roadmap is included
+        the roadmap feeds directly into CON-2026-019
+      }
+    }
+  }
+
+  scope {
+    depends_on = ["CON-2026-019"]
+  }
+  updated_at = 2026-03-03T19:10:39Z
+  batch = "BAT-2026-003"
+  slug = "macro-ide-arch"
+}
+

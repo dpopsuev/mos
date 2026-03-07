@@ -1,0 +1,43 @@
+contract "CON-2026-063" {
+  title = "Git parity: add"
+  status = "complete"
+  created_at = 2026-03-03T18:57:17Z
+  updated_at = 2026-03-03T19:10:53Z
+  goal = "Stage artifact mutations for commit. Introduce a governance staging area concept analogous to git's index. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-add"
+  depends_on = "CON-2026-060"
+
+  feature "Staging artifacts" {
+
+    scenario "stage single artifact" {
+      status = "done"
+      given {
+        a governance repo with a modified contract file
+      }
+      when {
+        mos vcs add .mos/contracts/active/CON-XXX/contract.mos is run
+      }
+      then {
+        the artifact is hashed as a blob via ObjectStore and the index is updated
+      }
+    }
+
+    scenario "stage all" {
+      status = "done"
+      given {
+        a governance repo with multiple modified artifacts
+      }
+      when {
+        mos vcs add . is run
+      }
+      then {
+        all modified artifacts are staged in the index
+      }
+    }
+  }
+  sprint = "SPR-2026-006"
+}
+

@@ -1,0 +1,15 @@
+blob
+contract "CON-2026-066" {
+  title = "Git parity: log"
+  status = "draft"
+  created_at = 2026-03-03T18:57:32Z
+  updated_at = 2026-03-03T19:10:53Z
+  goal = "Walk commit history and show governance state changes over time. Support --oneline, --graph, --since/--until, --author filters. Reimplemented, no shelling out to git."
+  justifies = "NEED-2026-001"
+  batch = "BAT-2026-004"
+  kind = "feature"
+  slug = "git-log"
+  depends_on = "CON-2026-064"
+  sprint = "SPR-2026-006"
+}
+

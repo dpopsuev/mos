@@ -1,0 +1,220 @@
+blob
+contract "CON-2026-021" {
+  title = "Project Primitives"
+  status = "complete"
+  goal = "Contracts support configurable project namespaces (prefix + auto-ID), kind, labels, and priority fields -- enabling categorized workflows (features, bugs, etc.) without opinionated directory layout changes."
+  depends_on = ["CON-2026-015"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Project config parsing, auto-ID generation, label/kind/priority validation, list filtering."
+    }
+
+    integration {
+      applies = true
+      rationale = "Create contract via --project flag, verify auto-ID lands in correct namespace, list with filters returns correct subset."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Full CLI round-trip: configure project in config.mos, create contract, list by project/kind/label/priority."
+    }
+
+    concurrency {
+      applies = true
+      rationale = "Sequence counter increment must be atomic when multiple agents create contracts in the same project simultaneously."
+    }
+
+    security {
+      applies = false
+      rationale = "No new trust boundaries. Project definitions are local config."
+    }
+  }
+
+  feature "Project Namespace" {
+
+    scenario "Define a project in config.mos" {
+      status = "done"
+      given {
+        a .mos/config.mos file exists
+      }
+      when {
+        a project block is added with prefix and sequence fields
+      }
+      then {
+        mos lint validates the project block structure
+        the project is available for contract creation
+      }
+    }
+
+    scenario "Auto-ID generation from project prefix" {
+      status = "done"
+      given {
+        config.mos defines project "bugs" with prefix "BUG" and sequence 0
+      }
+      when {
+        mos contract create --project bugs "Fix progress rendering" is executed
+      }
+      then {
+        contract is created with ID "BUG-2026-001"
+        the project sequence in config.mos is bumped to 1
+      }
+    }
+
+    scenario "Default project fallback" {
+      status = "done"
+      given {
+        config.mos defines project "contracts" with prefix "CON" and default = true
+      }
+      when {
+        mos contract create without --project flag is executed
+      }
+      then {
+        the default project is used for ID generation
+      }
+    }
+
+    scenario "List contracts by project" {
+      status = "done"
+      given {
+        contracts exist across multiple projects (BUG-*, FEAT-*, CON-*)
+      }
+      when {
+        mos contract list --project bugs is executed
+      }
+      then {
+        only contracts with the BUG- prefix are returned
+      }
+    }
+  }
+
+  feature "Contract Kind" {
+
+    scenario "Assign kind to a contract" {
+      status = "done"
+      given {
+        a contract is created with --kind bug
+      }
+      when {
+        the contract is shown
+      }
+      then {
+        the kind field reads "bug"
+      }
+    }
+
+    scenario "Filter by kind" {
+      status = "done"
+      given {
+        contracts exist with kinds "bug", "feature", and "task"
+      }
+      when {
+        mos contract list --kind bug is executed
+      }
+      then {
+        only contracts with kind "bug" are returned
+      }
+    }
+  }
+
+  feature "Contract Labels" {
+
+    scenario "Assign labels to a contract" {
+      status = "done"
+      given {
+        a contract is created with --labels "harness,testability,dx"
+      }
+      when {
+        the contract is shown
+      }
+      then {
+        the labels field contains all three values
+      }
+    }
+
+    scenario "Filter by label" {
+      status = "done"
+      given {
+        contracts exist with various labels
+      }
+      when {
+        mos contract list --label harness is executed
+      }
+      then {
+        only contracts containing the "harness" label are returned
+      }
+    }
+  }
+
+  feature "Contract Priority" {
+
+    scenario "Assign priority to a contract" {
+      status = "done"
+      given {
+        a contract is created with --priority p1
+      }
+      when {
+        the contract is shown
+      }
+      then {
+        the priority field reads "p1"
+      }
+    }
+
+    scenario "Filter by priority" {
+      status = "done"
+      given {
+        contracts exist with priorities p1 through p5
+      }
+      when {
+        mos contract list --priority p1 is executed
+      }
+      then {
+        only p1 contracts are returned
+      }
+    }
+  }
+
+  feature "Sequence Atomicity" {
+
+    scenario "Concurrent contract creation in the same project" {
+      status = "done"
+      given {
+        config.mos defines project "bugs" with prefix "BUG" and sequence 0
+        two agents attempt to create contracts simultaneously
+      }
+      when {
+        both agents invoke mos contract create --project bugs concurrently
+      }
+      then {
+        each contract receives a unique sequential ID
+        no ID collisions occur
+        the final sequence value equals the number of created contracts
+      }
+    }
+  }
+
+  feature "Composable Filters" {
+
+    scenario "Combine project, kind, label, and priority filters" {
+      status = "done"
+      given {
+        contracts exist across multiple projects, kinds, labels, and priorities
+      }
+      when {
+        mos contract list --project bugs --kind bug --label harness --priority p1 is executed
+      }
+      then {
+        only contracts matching all four criteria are returned
+      }
+    }
+  }
+}
+

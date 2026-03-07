@@ -1,0 +1,11 @@
+contract "CON-2026-258" {
+  title = "Add --depth N flag to mtrace architecture sync for structural grouping at arbitrary directory levels"
+  status = "closed"
+  created_at = 2026-03-07T11:41:10Z
+  updated_at = 2026-03-07T11:41:10Z
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+  sprint = "SPR-2026-044"
+}
+

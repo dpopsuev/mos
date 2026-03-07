@@ -1,0 +1,250 @@
+contract "CON-2026-024" {
+  title = "Specification as a First-Class Artifact"
+  status = "complete"
+  goal = "Specifications exist as standalone artifacts independent of contracts, with enforcement levels (disabled/warn/enforced), traceability bindings to implementation symbols and harnesses, and organizational grouping via binders."
+  depends_on = ["CON-2026-023"]
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Specification CRUD, enforcement level transitions, binder containment, traceability binding resolution."
+    }
+
+    integration {
+      applies = true
+      rationale = "Create specifications and binders via CLI, reference from contracts, lint enforces based on enforcement level."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = true
+      rationale = "Full round-trip: define specification, bind to symbol and harness, set enforcement, lint validates, contract references spec."
+    }
+
+    concurrency {
+      applies = true
+      rationale = "Concurrent lint runs reading specification enforcement state."
+    }
+
+    security {
+      applies = true
+      rationale = "Enforcement level changes must be auditable; binder cross-references must not allow path traversal."
+    }
+  }
+
+  feature "Specification Artifact" {
+
+    scenario "Create a standalone specification" {
+      status = "done"
+      given {
+        artifact_type "specification" is registered via the schema registry
+      }
+      when {
+        mos spec create is executed with title and enforcement level
+      }
+      then {
+        the file is created at .mos/specifications/active/SPEC-NNN/specification.mos
+        the specification has the requested enforcement level
+        the specification exists independently of any contract
+      }
+    }
+
+    scenario "Specification persists beyond contract completion" {
+      status = "done"
+      given {
+        contract CON-001 references specification SPEC-001
+      }
+      when {
+        CON-001 is marked complete and archived
+      }
+      then {
+        SPEC-001 remains active and independently enforceable
+        the specification is not moved or archived with the contract
+      }
+    }
+
+    scenario "Specification enforcement level transitions" {
+      status = "done"
+      given {
+        a specification exists with enforcement = "disabled"
+      }
+      when {
+        enforcement is updated to "warn" then to "enforced"
+      }
+      then {
+        each transition is accepted
+        lint behavior changes to match the current enforcement level
+      }
+    }
+  }
+
+  feature "Contract-Specification Binding" {
+
+    scenario "Contract references one or more specifications" {
+      status = "done"
+      given {
+        specifications SPEC-001 and SPEC-002 exist
+      }
+      when {
+        a contract is created with specs referencing both
+      }
+      then {
+        the contract body includes spec references not spec definitions
+        mos contract show displays the referenced specifications
+      }
+    }
+
+    scenario "Specification created without a standing contract" {
+      status = "done"
+      given {
+        no active contracts reference a specification
+      }
+      when {
+        a specification is created standalone
+      }
+      then {
+        enforcement defaults to "disabled"
+        the specification is valid and lintable
+      }
+    }
+  }
+
+  feature "Binders" {
+
+    scenario "Create a binder to group specifications by topic" {
+      status = "done"
+      given {
+        artifact_type "binder" is registered via the schema registry
+      }
+      when {
+        mos binder create is executed with a title
+      }
+      then {
+        binder created at .mos/binders/active/BND-NNN/binder.mos
+        the binder can hold references to specifications
+      }
+    }
+
+    scenario "Bind specifications to a binder" {
+      status = "done"
+      given {
+        binder BND-001 and specifications SPEC-001 and SPEC-002 exist
+      }
+      when {
+        specifications are assigned to the binder
+      }
+      then {
+        mos binder show lists both specifications
+        navigation from binder to individual specs works
+      }
+    }
+
+    scenario "Binder shows enforcement rollup" {
+      status = "done"
+      given {
+        binder with 3 specifications at different enforcement levels
+      }
+      when {
+        mos binder show is executed
+      }
+      then {
+        output shows enforcement distribution across bound specifications
+      }
+    }
+  }
+
+  feature "Traceability Triangle" {
+
+    scenario "Specification binds to implementation symbol" {
+      status = "done"
+      given {
+        a specification SPEC-001 exists
+      }
+      when {
+        implementation binding is set via symbol field
+      }
+      then {
+        the specification tracks which code symbol implements it
+        mos spec show displays the symbol binding
+      }
+    }
+
+    scenario "Specification binds to harness" {
+      status = "done"
+      given {
+        a specification with a symbol binding exists
+      }
+      when {
+        harness binding is set via harness field
+      }
+      then {
+        the full traceability chain spec to symbol to harness is established
+        mos spec show displays all three vertices of the triangle
+      }
+    }
+
+    scenario "Traceability report across binder" {
+      status = "done"
+      given {
+        a binder with specifications that have symbol and harness bindings
+      }
+      when {
+        mos binder trace is executed
+      }
+      then {
+        a report shows spec to symbol to harness for each specification
+        unbound specifications are flagged
+      }
+    }
+  }
+
+  feature "Enforcement Semantics" {
+
+    scenario "Disabled specification produces no diagnostics" {
+      status = "done"
+      given {
+        specification with enforcement = "disabled" and missing symbol binding
+      }
+      when {
+        mos lint runs
+      }
+      then {
+        no diagnostics related to the specification are emitted
+      }
+    }
+
+    scenario "Warn specification produces warnings" {
+      status = "done"
+      given {
+        specification with enforcement = "warn" and missing harness binding
+      }
+      when {
+        mos lint runs
+      }
+      then {
+        warning diagnostic emitted for incomplete traceability
+        lint exit code is 0
+      }
+    }
+
+    scenario "Enforced specification blocks on violations" {
+      status = "done"
+      given {
+        specification with enforcement = "enforced" and missing harness binding
+      }
+      when {
+        mos lint runs
+      }
+      then {
+        error diagnostic emitted for incomplete traceability
+        lint exit code is 1
+      }
+    }
+  }
+}
+

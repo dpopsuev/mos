@@ -1,0 +1,18 @@
+blob
+contract "CON-2026-118" {
+  title = "JSON output on all commands"
+  status = "draft"
+  created_at = 2026-03-03T21:33:46Z
+  updated_at = 2026-03-04T09:25:51Z
+  name = "JSON output on all commands"
+  slug = "json-output"
+  description = "All mos commands — list, show, create, update, mutation — must support --format json for machine-parseable output. Agents need structured responses to conditionally branch, extract IDs, and chain commands without regex parsing. The query command already supports --format json; this extends it to every command surface."
+
+  feature "JSON on show" {
+  }
+
+  feature "JSON on mutation" {
+  }
+  batch = ""
+}
+

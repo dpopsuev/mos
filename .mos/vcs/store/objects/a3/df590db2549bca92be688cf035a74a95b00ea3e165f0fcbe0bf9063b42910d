@@ -1,0 +1,7 @@
+blob
+sprint "SPR-2026-033" {
+  title = "Integrity Index: Aggregate Quality Scoring"
+  status = "closed"
+  goal = "Combine the three quality vectors into the Integrity Index — a single numeric score per artifact and project, enabling trajectory analysis."
+  contracts = "CON-2026-141"
+}

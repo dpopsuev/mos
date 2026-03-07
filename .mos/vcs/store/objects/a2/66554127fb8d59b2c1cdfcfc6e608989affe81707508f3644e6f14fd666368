@@ -1,0 +1,15 @@
+blob
+rule "code-normalization" {
+  name = "Code Normalization"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "warning"
+  glob = "**/*.go"
+  applies_to = ["contract", "specification"]
+
+  harness {
+    command = "go vet ./..."
+    timeout = "60s"
+  }
+}
+

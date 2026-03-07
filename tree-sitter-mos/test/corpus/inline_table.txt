@@ -1,0 +1,31 @@
+==================
+Inline table value
+==================
+
+config {
+  meta = { key = "value", count = 42 }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (block
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (inline_table
+              (field
+                (key
+                  (identifier))
+                (value
+                  (string)))
+              (field
+                (key
+                  (identifier))
+                (value
+                  (integer))))))))))

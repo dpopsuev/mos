@@ -1,0 +1,8 @@
+sprint "SPR-2026-008" {
+  status = "complete"
+  title = "Registry-Only Engine"
+  goal = "Finish CON-2026-129's undelivered promise: make the Registry the single source of truth for all artifact kinds, fields, lifecycle states, and gates. Shrink the reserved lexicon from ~253 scattered string literals to ~24 true primitives. Fix mos create for all artifact types (BUG-2026-010)."
+  slug = "sprint-registry-only-engine"
+  contracts = "CON-2026-143,BUG-2026-010"
+}
+

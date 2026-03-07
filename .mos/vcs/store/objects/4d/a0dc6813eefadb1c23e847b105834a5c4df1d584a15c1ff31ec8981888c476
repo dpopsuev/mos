@@ -1,0 +1,9 @@
+blob
+sprint "SPR-2026-012" {
+  title = "Artifact Factory — Wide Walls"
+  status = "complete"
+  goal = "Build a declarative command factory for artifact CRUD, reducing boilerplate across CLI subpackages. Split generic.go, extract cmd/mos/factory, migrate spec/binder/lexicon/contract/rule to factory registrations. Fix verb-create directory structure bug, add missing add-criterion CLI command, and add lint rule + auto-archive hook for stale artifacts."
+  slug = "artifact-factory"
+  contracts = "CON-2026-171,CON-2026-172,CON-2026-173,CON-2026-174,BUG-2026-009,BUG-2026-015,BUG-2026-016,CON-2026-175,CON-2026-176"
+}
+

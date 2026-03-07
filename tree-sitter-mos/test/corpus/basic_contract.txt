@@ -1,0 +1,29 @@
+==================
+Basic contract
+==================
+
+contract "CON-1" {
+  title = "Test"
+  status = "draft"
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string)))))))

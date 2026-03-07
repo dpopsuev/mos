@@ -1,0 +1,14 @@
+blob
+specification "SPEC-2026-033" {
+  status = "active"
+  title = "Artifact Mutation Audit Trail"
+  justifies = "NEED-2026-001"
+  addresses = "C5"
+  slug = "governance-audit-trail"
+
+  section "Decision Auditability" {
+    text = """
+Every governance decision in Mos is recorded through three complementary mechanisms: (1) updated_at timestamps on every artifact mutation capturing when, (2) bill blocks with introduced_by and intent fields capturing who and why, and (3) VCS commit linkage preserving the complete graph state at decision time. Together these ensure that any governance transition can be reconstructed from the artifact history alone."""
+  }
+}
+

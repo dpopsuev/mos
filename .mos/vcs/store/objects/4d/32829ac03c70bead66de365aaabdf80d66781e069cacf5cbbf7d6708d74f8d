@@ -1,0 +1,10 @@
+blob
+specification "SPEC-2026-003" {
+  title = "Machine-Verifiable Traceability Graph"
+  status = "active"
+  addresses = "C2"
+  enforcement = "warn"
+  justifies = "NEED-2026-001"
+  slug = "traceability-graph"
+}
+

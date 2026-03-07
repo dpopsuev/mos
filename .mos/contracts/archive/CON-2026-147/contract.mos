@@ -1,0 +1,12 @@
+contract "CON-2026-147" {
+  title = "Machine-readable JSON output for all read commands via --format json"
+  status = "complete"
+  created_at = 2026-03-04T16:04:22Z
+  updated_at = 2026-03-04T16:04:22Z
+  goal = "mos show, mos query, mos status, mos chain, mos lint all emit human-formatted DSL or plain text. Agents parsing this output must regex structured data out of prose. Add --format json flag to all read-path commands that emits a JSON object with typed fields. For mos show: emit the artifact's fields, blocks, and scenarios as a JSON document. For mos query: emit an array of matching artifacts. For mos lint: emit diagnostics array with file, line, severity, rule, message. For mos status: emit sprint, open contracts, lint summary as structured JSON. This is the single highest-leverage change for agent consumption of Mos output."
+  kind = "feature"
+  justifies = "NEED-2026-002"
+  sprint = "SPR-2026-013"
+  slug = "json-output-format"
+}
+

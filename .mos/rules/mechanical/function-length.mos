@@ -1,0 +1,28 @@
+rule "function-length" {
+  name = "Function Length Boundaries"
+  type = "mechanical"
+  scope = "project"
+  enforcement = "warning"
+  vector = "structural"
+  glob = "**/*.go"
+
+  section "rationale" {
+    text = "Functions beyond 60 lines signal mixed responsibilities. Functions below 3 lines (excluding trivial getters) may indicate over-decomposition. Both extremes hurt navigability and review velocity."
+  }
+
+  config {
+    metric = "function_length"
+    ceiling = 60
+    floor = 3
+
+    language "go" {
+      ceiling = 80
+    }
+  }
+
+  harness {
+    command = "go build ./..."
+    timeout = "30s"
+  }
+}
+

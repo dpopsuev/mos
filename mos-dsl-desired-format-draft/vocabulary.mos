@@ -1,0 +1,35 @@
+vocabulary {
+
+  terms {
+    rule = "A governance directive that constrains or validates project behavior"
+    contract = "A time-boxed work agreement with acceptance criteria"
+    bill = "A proposal to amend an existing rule, requiring quorum approval"
+    amendment = "A signed change to an existing governance artifact"
+    exception = "A scoped, time-limited waiver of a rule for a specific contract"
+    sig = "Special Interest Group -- a team owning a domain of governance"
+    harness = "Mechanical validation command attached to a rule"
+    sut = "System Under Test -- the code a specification validates"
+    case = "Test case identifier -- grep-able string linking a scenario to a specific test case within the test file"
+  }
+
+  artifact_labels {
+    rule = "Rule"
+    contract = "Contract"
+    bill = "Bill"
+    amendment = "Amendment"
+    exception = "Exception"
+  }
+
+  enforcement_levels {
+    error = "Blocks the action. Non-negotiable."
+    warning = "Flags the action. Proceed with caution."
+    info = "Informational. No enforcement."
+  }
+
+  project_terms {
+    kep = "Kubernetes Enhancement Proposal"
+    ga = "Generally Available -- stable API guaranteed"
+    deprecation = "Marking an API element for future removal"
+  }
+}
+

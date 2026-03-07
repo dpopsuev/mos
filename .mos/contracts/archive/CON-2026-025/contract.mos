@@ -1,0 +1,117 @@
+contract "CON-2026-025" {
+  title = "Contract scenario CLI"
+  status = "complete"
+  created_at = 2026-03-03T09:52:51Z
+  updated_at = 2026-03-03T09:52:51Z
+  goal = "Add mos contract scenario sub-command to list, filter, and update scenario statuses within a contract. Eliminates the need for sed-piped-to-apply workarounds when marking steps done. Covers: list scenarios with status, mark individual scenario done/pending, mark all done, filter by status (pending/done)."
+  kind = "feature"
+
+  coverage {
+
+    unit {
+      applies = true
+      rationale = "Scenario list, status mutation, filter logic."
+    }
+
+    integration {
+      applies = true
+      rationale = "CLI sub-command round-trip: list, mark done, mark pending, mark all done, filter."
+    }
+
+    contract {
+      applies = false
+      rationale = "No external API."
+    }
+
+    e2e {
+      applies = false
+      rationale = "CLI-only, covered by integration tests."
+    }
+
+    concurrency {
+      applies = false
+      rationale = "Single-user CLI operation."
+    }
+
+    security {
+      applies = false
+      rationale = "No trust boundary changes."
+    }
+  }
+
+  feature "Contract Scenario Management" {
+
+    scenario "List scenarios with status" {
+      status = "done"
+      given {
+        a contract exists with a feature block containing three scenarios
+        two scenarios have status "done" and one has no status
+      }
+      when {
+        "mos contract scenario CON-ID" is run
+      }
+      then {
+        all three scenarios are listed with their names
+        done scenarios show "[done]" marker
+        the scenario without status shows "[pending]"
+      }
+    }
+
+    scenario "Mark individual scenario done" {
+      status = "done"
+      given {
+        a contract has a scenario named "My Scenario" with no status field
+      }
+      when {
+        "mos contract scenario CON-ID done My Scenario" is run
+      }
+      then {
+        the scenario's status field is set to "done"
+        other scenarios are unchanged
+        the contract file is valid after the mutation
+      }
+    }
+
+    scenario "Revert scenario to pending" {
+      status = "done"
+      given {
+        a contract has a scenario named "My Scenario" with status "done"
+      }
+      when {
+        "mos contract scenario CON-ID pending My Scenario" is run
+      }
+      then {
+        the scenario's status field is set to "pending"
+        other scenarios are unchanged
+      }
+    }
+
+    scenario "Mark all scenarios done" {
+      status = "done"
+      given {
+        a contract has three scenarios with mixed statuses
+      }
+      when {
+        "mos contract scenario CON-ID --all-done" is run
+      }
+      then {
+        all three scenarios have status "done"
+      }
+    }
+
+    scenario "Filter scenarios by status" {
+      status = "done"
+      given {
+        a contract has two done scenarios and one pending scenario
+      }
+      when {
+        "mos contract scenario CON-ID --filter pending" is run
+      }
+      then {
+        only the pending scenario is listed
+        done scenarios are excluded from the output
+      }
+    }
+  }
+}
+

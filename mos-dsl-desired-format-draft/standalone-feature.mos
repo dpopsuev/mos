@@ -1,0 +1,64 @@
+# .mos/rules/mechanical/features/field-stability.mos
+# Standalone feature file -- included by other artifacts via spec { include }.
+# A .mos file containing just a feature block (no wrapping artifact).
+# This enables splitting large specifications across multiple files.
+
+feature "Field Stability" {
+  GA API fields must not be removed, renamed, or have their type changed
+  without a full deprecation cycle.
+
+  background {
+    given {
+      the Kubernetes source tree at HEAD
+      the baseline release is "1.31"
+      the API compatibility checker is configured with strict mode
+    }
+  }
+
+  group "No field removal from GA types" {
+    scenario "Stable field exists in both versions" {
+      sut  = "staging/src/k8s.io/api/core/v1/types.go"
+      test = "test/integration/api/field_compat_test.go"
+      case = "TestFieldCompat/Stable field exists in both versions"
+      given {
+        a GA API type "PodSpec" in "core/v1"
+        the field "containers" exists in the baseline
+      }
+      when {
+        I compare the field list between baseline and HEAD
+      }
+      then {
+        the field "containers" exists in HEAD
+        its type has not changed
+      }
+    }
+
+    scenario "Field removed from GA type" {
+      given {
+        a GA API type with a field present in the baseline
+      }
+      when {
+        that field is absent in HEAD
+      }
+      then {
+        the compatibility check fails
+        the violation message includes "field removed from GA type"
+      }
+    }
+  }
+
+  group "No type changes on existing fields" {
+    scenario "Field type narrowed" {
+      given {
+        a GA API type with a field of type "string" in the baseline
+      }
+      when {
+        the field type changes to "enum" in HEAD
+      }
+      then {
+        the compatibility check fails
+        the violation message includes "field type changed"
+      }
+    }
+  }
+}

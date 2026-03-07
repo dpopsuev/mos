@@ -1,0 +1,70 @@
+==================
+Various field types
+==================
+
+artifact "X" {
+  s = "hello"
+  n = 42
+  f = 3.14
+  b = true
+  b2 = false
+  dt = 2026-03-04T16:59:28Z
+  list = ["a", "b", "c"]
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (string))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (integer))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (float))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (boolean))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (boolean))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (datetime))))
+      (block_item
+        (field
+          (key
+            (identifier))
+          (value
+            (list
+              (value
+                (string))
+              (value
+                (string))
+              (value
+                (string)))))))))

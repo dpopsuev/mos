@@ -1,0 +1,7 @@
+sprint "SPR-2026-024" {
+  title = "DX Ceremony Reduction"
+  status = "complete"
+  goal = "Reduce manual ceremony across the most common mos workflows. Sprint close, auto-status from git, doctor health check, lineage tracing, agent protocol mode, and sprint auto-planning. Every feature here pays dividends on every subsequent sprint."
+  contracts = "CON-2026-219,CON-2026-220,CON-2026-221,CON-2026-222,CON-2026-223,CON-2026-224"
+}
+

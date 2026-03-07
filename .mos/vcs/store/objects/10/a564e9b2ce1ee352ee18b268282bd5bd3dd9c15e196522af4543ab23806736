@@ -1,0 +1,50 @@
+blob
+contract "CON-2026-151" {
+  title = "Extract CLI handlers from main.go into subpackages"
+  status = "complete"
+  created_at = 2026-03-04T16:59:31Z
+  updated_at = 2026-03-04T16:59:31Z
+  goal = "Split 5,944 LOC god file into cmd/mos/ subpackages using spf13/cobra as the CLI framework. Cobra replaces 56 hand-rolled flag-parsing loops (pflag), 111 checkHelp calls (built-in --help), 30+ case switch dispatch (command tree), and the hand-written moslib/completion/ package (159 LOC) with Cobra built-in Bash/Zsh/Fish/PowerShell completion. This contract subsumes CON-2026-154 (command registry) since Cobra IS the command registry. All handlers return error; os.Exit only in main(). Delete moslib/completion/ in favor of Cobra built-in."
+  sprint = "SPR-2026-010"
+  kind = "feature"
+
+  acceptance {
+
+    criterion "main-under-500-loc" {
+      description = "cmd/mos/main.go is under 500 LOC after extraction"
+    }
+
+    criterion "handlers-return-errors" {
+      description = "All extracted handler functions return error, never call os.Exit"
+    }
+
+    criterion "stdlib-flag-parsing" {
+      description = "All flag parsing uses stdlib flag.FlagSet, zero hand-rolled for-loops"
+    }
+
+    criterion "single-exit-point" {
+      description = "os.Exit called only in main(), converting returned errors to exit codes"
+    }
+
+    criterion "subpackage-per-domain" {
+      description = "At least contract, vcs, rule, config, generic exist as separate packages under cmd/mos/"
+    }
+
+    criterion "no-behavior-change" {
+      description = "All existing tests pass, go build succeeds, CLI output is byte-identical"
+    }
+
+    criterion "handler-unit-tests" {
+      description = "At least 3 extracted handlers have direct unit tests not via process exec"
+    }
+
+    criterion "cobra-framework" {
+      description = "CLI uses spf13/cobra; moslib/completion/ package is deleted in favor of Cobra built-in completion"
+    }
+
+    criterion "con154-subsumed" {
+      description = "All CON-2026-154 acceptance criteria (registry pattern, no switch, self-documenting help, one-line registration) are met by Cobra"
+    }
+  }
+}
+

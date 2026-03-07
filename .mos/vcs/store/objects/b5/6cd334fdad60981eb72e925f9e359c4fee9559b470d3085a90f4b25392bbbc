@@ -1,0 +1,190 @@
+blob
+contract "CON-2026-134" {
+  title = "Structural linter: bidirectional static metrics with floor/ceiling thresholds"
+  status = "draft"
+  slug = "structural-linter"
+  justifies = "SPEC-2026-028"
+  kind = "feature"
+  created_at = 2026-03-04T11:31:58Z
+  updated_at = 2026-03-04T11:31:58Z
+  goal = "Performance has benchmarks. Structure has nothing. Add a structural linter that enforces bidirectional thresholds (floor and ceiling) on cheap static metrics. Every 'too big, split' warning has a symmetric 'too small, merge' warning — this prevents the one-way ratchet toward abstraction hell. Metrics are computed via AST walking (no dataflow analysis needed). A co-change analysis layer uses git history to detect misplaced coupling. Rules are declared in .mos/rules/mechanical/ with configurable thresholds per metric, per language."
+
+  feature "Bidirectional file-scope metrics" {
+
+    scenario "File with too many exported symbols triggers split warning" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go file with 18 exported symbols
+        structural rule ceiling for exported_symbols_per_file is 15
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning is emitted: file exceeds symbol ceiling, consider splitting
+      }
+    }
+
+    scenario "File with too few exported symbols triggers merge warning" {
+      labels = ["sad_path"]
+      actor = "agent"
+      given {
+        a Go file with 1 exported symbol
+        structural rule floor for exported_symbols_per_file is 2
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        an info diagnostic is emitted: file below symbol floor, consider merging
+      }
+    }
+  }
+
+  feature "Type-scope metrics" {
+
+    scenario "Type with too many methods triggers split warning" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go struct with 12 methods
+        structural rule ceiling for methods_per_type is 10
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning is emitted: type exceeds method ceiling, consider extracting a facet
+      }
+    }
+
+    scenario "Type with zero or one method triggers merge warning" {
+      labels = ["sad_path"]
+      actor = "agent"
+      given {
+        a Go struct with 1 method
+        structural rule floor for methods_per_type is 2
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        an info diagnostic is emitted: type has too few methods, consider a function instead
+      }
+    }
+  }
+
+  feature "Function-scope metrics" {
+
+    scenario "Function with too many parameters triggers config struct suggestion" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go function with 6 parameters
+        structural rule ceiling for params_per_function is 5
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning is emitted: function exceeds parameter ceiling, consider an options struct
+      }
+    }
+
+    scenario "Function with excessive cyclomatic complexity triggers decompose warning" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go function with cyclomatic complexity 18
+        structural rule ceiling for cyclomatic_complexity is 15
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning is emitted: function exceeds complexity ceiling, consider decomposing
+      }
+    }
+  }
+
+  feature "Package fan-out metrics" {
+
+    scenario "File importing too many distinct packages triggers coupling warning" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        a Go file importing 10 distinct packages
+        structural rule ceiling for package_fan_out is 8
+      }
+      when {
+        mos lint runs structural checks
+      }
+      then {
+        a warning is emitted: file exceeds import ceiling, likely a coupling hub
+      }
+    }
+  }
+
+  feature "Co-change analysis from git history" {
+
+    scenario "Files with high co-change rate in different packages emit coupling hint" {
+      labels = ["happy_path"]
+      actor = "agent"
+      given {
+        files A.go and B.go appear in the same commit 90 percent of the time
+        A.go is in package alpha and B.go is in package beta
+      }
+      when {
+        mos audit runs co-change analysis
+      }
+      then {
+        an info diagnostic is emitted: files have high co-change rate but live in different packages
+      }
+    }
+
+    scenario "File imports package it never co-changes with" {
+      labels = ["sad_path"]
+      actor = "agent"
+      given {
+        file C.go imports package gamma
+        C.go has never changed alongside any file in gamma
+      }
+      when {
+        mos audit runs co-change analysis
+      }
+      then {
+        an info diagnostic is emitted: import may be unnecessary coupling
+      }
+    }
+  }
+
+  feature "Configurable rule DSL" {
+
+    scenario "User declares structural rule with floor and ceiling" {
+      labels = ["happy_path"]
+      actor = "contributor"
+      given {
+        a rule file in .mos/rules/mechanical/ with metric, floor, ceiling, and actions
+      }
+      when {
+        mos lint loads the rule
+      }
+      then {
+        the structural linter applies the declared thresholds during analysis
+      }
+    }
+  }
+
+  coverage {
+
+    unit {
+      applies = true
+    }
+
+    integration {
+      applies = true
+    }
+  }
+}
+

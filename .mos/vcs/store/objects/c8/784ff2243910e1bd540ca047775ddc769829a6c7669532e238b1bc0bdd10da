@@ -1,0 +1,12 @@
+blob
+contract "BUG-2026-006" {
+  title = "Bug: add-feature uses flag name as feature label"
+  status = "complete"
+  goal = "mos contract add-feature, add-scenario, and add-section all use the literal flag key --name as the block label instead of consuming the next argument as the value. Reproduction: mos contract add-feature CON-X --name My-Feature produces feature \"--name\" instead of feature \"My-Feature\"."
+  created_at = 2026-03-04T09:07:50Z
+  updated_at = 2026-03-04T09:18:14Z
+  batch = "BAT-2026-006"
+  slug = "add-feature-flag-name-bug"
+  sprint = "SPR-2026-004"
+}
+

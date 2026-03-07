@@ -1,0 +1,17 @@
+blob
+specification "SPEC-2026-002" {
+  title = "Lifecycle Chain Enforcement"
+  status = "active"
+  addresses = "C1"
+  enforcement = "warn"
+  justifies = "NEED-2026-001"
+  slug = "lifecycle-chain"
+
+  spec {
+    include "moslib/linter"
+    include "moslib/governance"
+  }
+  state = "current"
+  group = "linter"
+}
+

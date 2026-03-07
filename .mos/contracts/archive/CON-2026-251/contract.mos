@@ -1,0 +1,38 @@
+contract "CON-2026-251" {
+  title = "Concurrent Governance Push-Pull-Merge"
+  status = "complete"
+  created_at = 2026-03-06T15:17:43Z
+  updated_at = 2026-03-06T15:17:43Z
+  goal = "Test that two developers making concurrent governance changes through a forge correctly handle non-fast-forward rejection, pull-merge, conflict detection, and merged push"
+  justifies = "NEED-2026-004"
+  kind = "feature"
+
+  feature "Concurrent governance changes are safely merged" {
+
+    scenario "Non-conflicting divergence merges cleanly" {
+      given = "Alice and Bob both clone from the same forge"
+      when = "Alice adds contract-A and pushes, Bob adds contract-B and pulls"
+      then = "Bob receives a merge commit containing both contracts"
+    }
+
+    scenario "Second push is rejected until pull" {
+      given = "Alice pushed first, advancing refs/mos/heads/main"
+      when = "Bob tries to push without pulling"
+      then = "push fails with non-fast-forward error"
+    }
+
+    scenario "Conflicting governance artifacts produce conflicts" {
+      given = "Alice and Bob both modify the same rule differently and Alice pushes first"
+      when = "Bob pulls from the forge"
+      then = "Pull returns MergeResult with Conflicts listing the contested artifact path"
+    }
+
+    scenario "Merged result pushes successfully" {
+      given = "Bob resolved the divergence via pull-merge"
+      when = "Bob pushes the merged commit"
+      then = "the forge refs/mos/heads/main contains both change sets"
+    }
+  }
+  sprint = "SPR-2026-041"
+}
+

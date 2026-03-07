@@ -1,0 +1,11 @@
+blob
+contract "BUG-2026-014" {
+  title = "Fix acceptance criterion block serialization — missing criterion keyword"
+  status = "complete"
+  created_at = 2026-03-04T18:54:33Z
+  updated_at = 2026-03-04T18:54:33Z
+  goal = "When mos CLI adds acceptance criteria to a contract, the output writes bare block names (e.g. 'my-criterion { ... }') instead of the canonical 'criterion \"my-criterion\" { ... }' format. Fix the serializer/formatter to emit the criterion keyword consistently. All existing contracts with bare criterion blocks should be migrated on next fmt."
+  kind = "bug"
+  sprint = "SPR-2026-011"
+}
+

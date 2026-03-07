@@ -1,0 +1,44 @@
+==================
+Given/when/then with free text
+==================
+
+contract "X" {
+  feature "Test" {
+    scenario "Test" {
+  given {
+    the Kubernetes API server is running
+    deprecated GA fields exist in the API schema
+  }
+  when {
+    the API server processes the request
+  }
+  then {
+    the response includes a "Warning" header
+    the warning references the deprecation release
+  }
+  }
+  }
+}
+
+---
+
+(source_file
+  (artifact
+    (artifact_type
+      (identifier))
+    (string)
+    (block
+      (block_item
+        (feature_block
+          (string)
+          (scenario_block
+            (string)
+            (scenario_content
+              (given_block
+                (step_line)
+                (step_line))
+              (when_block
+                (step_line))
+              (then_block
+                (step_line)
+                (step_line)))))))))
