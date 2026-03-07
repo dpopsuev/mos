@@ -1,0 +1,10 @@
+contract "CON-2026-257" {
+  title = "Decompose moslib/vcs God package into sub-packages: store, staging, history, transport, merge"
+  status = "closed"
+  created_at = 2026-03-07T09:05:19Z
+  updated_at = 2026-03-07T09:05:19Z
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+}
+

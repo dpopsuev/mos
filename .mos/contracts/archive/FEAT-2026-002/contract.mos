@@ -1,0 +1,36 @@
+contract "FEAT-2026-002" {
+  title = "mos query field-based filtering -- agents need --satisfies, --derives-from, and arbitrary field filters"
+  status = "complete"
+  priority = "high"
+  justifies = "NEED-2026-002"
+  created_at = 2026-03-06T17:00:00Z
+  updated_at = 2026-03-06T17:00:00Z
+
+  feature "Field-based artifact filtering in mos query" {
+
+    scenario "Filter specs by satisfies target" {
+      given = "28 specifications exist, satisfying 5 different needs"
+      when = "mos query --kind specification --where satisfies=NEED-2026-001 is run"
+      then = "Only specs whose satisfies field equals NEED-2026-001 are returned"
+    }
+
+    scenario "Filter needs by derives_from" {
+      given = "5 needs exist, 4 of which derive from NEED-2026-001"
+      when = "mos query --kind need --where derives_from=NEED-2026-001 is run"
+      then = "Only the 4 derived needs are returned"
+    }
+
+    scenario "Filter contracts by justifies" {
+      given = "Contracts exist justifying different specs"
+      when = "mos query --kind contract --where justifies=SPEC-2026-003 is run"
+      then = "Only contracts justifying SPEC-2026-003 are returned"
+    }
+
+    scenario "Multiple filters combined" {
+      given = "Specs exist with various statuses and satisfies targets"
+      when = "mos query --kind specification --where satisfies=NEED-2026-002 --where status=active is run"
+      then = "Only specs matching both conditions are returned"
+    }
+  }
+}
+

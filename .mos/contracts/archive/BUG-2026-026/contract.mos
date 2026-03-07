@@ -1,0 +1,42 @@
+contract "BUG-2026-026" {
+  title = "mos vcs log missing --oneline, -n, --format json, and proper multi-line message rendering"
+  status = "complete"
+  severity = "medium"
+  justifies = "NEED-2026-002"
+  created_at = 2026-03-06T18:15:00Z
+  updated_at = 2026-03-06T18:15:00Z
+
+  feature "Agent-friendly mos vcs log output" {
+
+    scenario "Oneline format for quick scanning" {
+      given = "A governance repo with 10 commits"
+      when = "mos vcs log --oneline is run"
+      then = "Each commit is shown as a single line: short hash followed by first line of message"
+    }
+
+    scenario "Shorthand -n limit" {
+      given = "A governance repo with 10 commits"
+      when = "mos vcs log -n 3 is run"
+      then = "Only the 3 most recent commits are shown, matching git convention"
+    }
+
+    scenario "JSON output for programmatic consumption" {
+      given = "A governance repo with commits"
+      when = "mos vcs log --format json is run"
+      then = "A JSON array of commit objects is returned with hash, author, date, message, and parents"
+    }
+
+    scenario "Multi-line messages render correctly" {
+      given = "A commit with a multi-line message (subject + body)"
+      when = "mos vcs log is run in default format"
+      then = "Each line of the message body is indented consistently, not just the first line"
+    }
+
+    scenario "Stat output shows changed files" {
+      given = "A commit that modified 5 governance artifacts"
+      when = "mos vcs log --stat -n 1 is run"
+      then = "The commit is shown followed by a list of changed file paths"
+    }
+  }
+}
+

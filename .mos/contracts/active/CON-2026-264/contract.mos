@@ -1,0 +1,10 @@
+contract "CON-2026-264" {
+  title = "Change impact analysis: transitive blast radius computation from import graph and test topology"
+  status = "draft"
+  created_at = 2026-03-07T11:50:56Z
+  updated_at = 2026-03-07T11:50:56Z
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+}
+

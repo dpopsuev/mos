@@ -1,0 +1,10 @@
+contract "CON-2026-266" {
+  title = "Convention fingerprinting: scan and emit project coding patterns as a deterministic style profile for agents"
+  status = "draft"
+  created_at = 2026-03-07T11:50:56Z
+  updated_at = 2026-03-07T11:50:56Z
+  justifies = "NEED-2026-002"
+  kind = "feat"
+  priority = "medium"
+}
+
