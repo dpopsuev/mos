@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-005" {
-  status = "complete"
-  title = "Governance Primitives: Link Validation, Test Matrix, Scenario Labels"
-  contracts = "CON-2026-125,CON-2026-126"
-  goal = "Implement link-field validation, ROGYB test matrix, scenario labels, Gherkin personas, verb-first CLI, jq-style DSL editing, and registry-only engine refactor."
-}
-

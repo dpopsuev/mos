@@ -3,8 +3,6 @@ package lsp
 import (
 	"fmt"
 	"strings"
-
-	"github.com/dpopsuev/mos/moslib/linter"
 )
 
 // HoverResult represents the content of a hover response.
@@ -51,7 +49,7 @@ var fieldDocs = map[string]map[string]string{
 }
 
 // Hover returns hover information for the given position.
-func Hover(path, content string, line, character int, ctx *linter.ProjectContext) *HoverResult {
+func Hover(path, content string, line, character int, ctx *ProjectContext) *HoverResult {
 	lines := strings.Split(content, "\n")
 	if line >= len(lines) {
 		return nil

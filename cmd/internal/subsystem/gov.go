@@ -1,73 +1,22 @@
 package subsystem
 
-import (
-	"github.com/spf13/cobra"
+import "github.com/spf13/cobra"
 
-	"github.com/dpopsuev/mos/cmd/mos/binder"
-	"github.com/dpopsuev/mos/cmd/mos/config"
-	"github.com/dpopsuev/mos/cmd/mos/contract"
-	"github.com/dpopsuev/mos/cmd/mos/generic"
-	"github.com/dpopsuev/mos/cmd/mos/govern"
-	"github.com/dpopsuev/mos/cmd/mos/lexicon"
-	"github.com/dpopsuev/mos/cmd/mos/rule"
-	"github.com/dpopsuev/mos/cmd/mos/spec"
-	"github.com/dpopsuev/mos/cmd/mos/tracecmd"
-	"github.com/dpopsuev/mos/moslib/registry"
-)
-
-// GovCmd returns the "gov" subsystem command with all governance authoring
-// subcommands registered.
+// GovCmd returns the deprecated "gov" subsystem command.
+// Artifact management has moved to the scribe CLI.
 func GovCmd() *cobra.Command {
-	cmd := &cobra.Command{
+	return &cobra.Command{
 		Use:   "gov",
-		Short: "Governance authoring & lifecycle",
-		Long: `Artifact CRUD, field manipulation, formatting, project setup.
-
-Resource-first: contract, rule, spec, binder, lexicon, config
-Verb-first:     show, create, get, set, append, why, chain
-Operations:     query, update, fmt, init, migrate, reclassify, archive, status`,
+		Short: "[DEPRECATED] Use scribe for artifact management",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cmd.Println("mgov is deprecated. Use 'scribe' for artifact management.")
+			cmd.Println()
+			cmd.Println("  scribe create --kind contract --title \"...\"")
+			cmd.Println("  scribe show <ID>")
+			cmd.Println("  scribe list [--kind ...] [--scope ...]")
+			cmd.Println("  scribe status <ID> <status>")
+			cmd.Println("  scribe set <ID> <field> <value>")
+			return nil
+		},
 	}
-
-	spec.Cmd.AddCommand(tracecmd.SpecGenCmd)
-
-	cmd.AddCommand(
-		contract.Cmd,
-		rule.Cmd,
-		spec.Cmd,
-		binder.Cmd,
-		lexicon.Cmd,
-		config.Cmd,
-		contract.ChainCmd,
-	)
-
-	cmd.AddCommand(
-		govern.ShowCmd,
-		govern.GetCmd,
-		govern.SetCmd,
-		govern.AppendCmd,
-		govern.VerbCreateCmd,
-		govern.WhyCmd,
-	)
-
-	cmd.AddCommand(
-		govern.StatusCmd,
-		govern.QueryCmd,
-		govern.UpdateCmd,
-		govern.MigrateCmd,
-		govern.InitProjectCmd,
-		govern.FmtCmd,
-		govern.ReclassifyCmd,
-		govern.ArchiveCmd,
-	)
-
-	reg, err := registry.LoadRegistry(".")
-	if err == nil {
-		for _, td := range reg.Types {
-			if !registry.CoreKinds[td.Kind] {
-				cmd.AddCommand(generic.NewCmd(td))
-			}
-		}
-	}
-
-	return cmd
 }

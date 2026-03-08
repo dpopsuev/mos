@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-010" {
-  title = "Architectural Hardening + DSL Formalization"
-  status = "complete"
-  goal = "Address structural debt surfaced by architectural audit. Formalize the Mos DSL as an ANTLR grammar (via antlr-ng) for multi-language parser generation. Split main.go god file into testable subpackages using spf13/cobra (subsumes command registry). Expand astutil helpers using stdlib slices and migrate governance to reduce AST-walking bloat. Split test monoliths and close coverage gaps. CON-2026-154 merged into CON-2026-151."
-  contracts = "CON-2026-150,CON-2026-151,CON-2026-152,CON-2026-153,CON-2026-154,CON-2026-155,CON-2026-156,CON-2026-157,CON-2026-158,CON-2026-159,BUG-2026-013"
-}
-

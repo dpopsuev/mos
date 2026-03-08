@@ -1,9 +1,0 @@
-blob
-sprint "SPR-2026-014" {
-  title = "Structural Multipliers"
-  status = "complete"
-  goal = "Tackle the high-leverage architectural improvements that multiply everything after them. Bulk artifact import via --from-file, separate governance I/O from domain logic behind a Repository interface, and unify the parallel governance/linter schema systems into a single source of truth."
-  slug = "structural-multipliers"
-  contracts = "CON-2026-113,CON-2026-160,CON-2026-144,CON-2026-134,CON-2026-142,CON-2026-145,CON-2026-146"
-}
-

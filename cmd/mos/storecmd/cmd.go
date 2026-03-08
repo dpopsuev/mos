@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/dpopsuev/mos/moslib/store"
+	"github.com/dpopsuev/mos/moslib/fsstore"
 )
 
 // StoreCmd is the top-level `mos store` command.
@@ -29,7 +29,7 @@ func init() {
 }
 
 func runStatus(cmd *cobra.Command, args []string) error {
-	entries, _ := store.ReadAuditLog(".")
+	entries, _ := fsstore.ReadAuditLog(".")
 
 	if storeStatusFormat == "json" {
 		data, _ := json.MarshalIndent(map[string]interface{}{
@@ -51,7 +51,7 @@ var verifyCmd = &cobra.Command{
 	Use:   "verify",
 	Short: "Run store integrity verification",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		obj := store.DefaultObjectStore
+		obj := fsstore.DefaultObjectStore
 		errs, err := obj.Verify(".")
 		if err != nil {
 			return err
@@ -73,7 +73,7 @@ var logCmd = &cobra.Command{
 	Use:   "log",
 	Short: "Print recent audit log entries",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		entries, err := store.ReadAuditLog(".")
+		entries, err := fsstore.ReadAuditLog(".")
 		if err != nil {
 			return err
 		}

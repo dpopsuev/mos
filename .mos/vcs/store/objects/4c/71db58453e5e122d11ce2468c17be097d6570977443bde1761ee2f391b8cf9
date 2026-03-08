@@ -1,9 +1,0 @@
-blob
-batch "BAT-2026-007" {
-  status = "planned"
-  title = "Three Vectors: Quality Measurement System"
-  goal = "Implement batteries-included verification for all three quality vectors (Functional, Structural, Performance) with Blue/Red modes, configurable rules DSL, and Integrity Index aggregation."
-  slug = "three-quality-vectors"
-  depends_on = "NEED-2026-005"
-}
-

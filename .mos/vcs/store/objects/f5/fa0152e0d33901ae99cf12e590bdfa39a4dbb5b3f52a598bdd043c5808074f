@@ -1,8 +1,0 @@
-blob
-rule "transition-gate-coverage" {
-  name = "Lifecycle Transition Gates"
-  type = "interpretive"
-  scope = "project"
-  enforcement = "info"
-}
-

@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dpopsuev/mos/moslib/artifact"
 	"github.com/dpopsuev/mos/moslib/names"
-	"github.com/dpopsuev/mos/moslib/registry"
 )
 
 // ErrNonZeroExit signals a non-zero exit code without printing an error message.
@@ -26,33 +24,13 @@ var CoreKindDirs = map[string]string{
 }
 
 // ApplyOverflowFields applies CAD-driven overflow fields via GenericUpdate.
-// Used by dedicated handlers to pass through unknown --flags to the generic layer.
+// With the artifact package removed, returns nil for empty overflow and
+// an error for non-empty (update not supported).
 func ApplyOverflowFields(kind, id string, overflow map[string]string) error {
 	if len(overflow) == 0 {
 		return nil
 	}
-	if kind == names.KindRule {
-		if err := artifact.UpdateRuleFields(".", id, overflow); err != nil {
-			return fmt.Errorf("mos %s update: %w", kind, err)
-		}
-		return nil
-	}
-	reg, err := registry.LoadRegistry(".")
-	if err != nil {
-		return fmt.Errorf("mos %s update: loading registry for overflow fields: %w", kind, err)
-	}
-	td, ok := reg.Types[kind]
-	if !ok {
-		dir, known := CoreKindDirs[kind]
-		if !known {
-			return fmt.Errorf("mos %s update: kind %q not found in registry", kind, kind)
-		}
-		td = registry.ArtifactTypeDef{Kind: kind, Directory: dir}
-	}
-	if err := artifact.GenericUpdate(".", td, id, overflow); err != nil {
-		return fmt.Errorf("mos %s update: %w", kind, err)
-	}
-	return nil
+	return fmt.Errorf("artifact update not supported: DSL package removed")
 }
 
 // ParseKVArgs extracts --key value pairs and positional arguments from a raw

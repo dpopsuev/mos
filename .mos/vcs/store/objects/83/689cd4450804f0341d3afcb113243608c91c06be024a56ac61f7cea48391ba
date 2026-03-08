@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-006" {
-  status = "complete"
-  title = "ObjectStore + Local Solo Loop"
-  goal = "Implement ObjectStore interface with GitStore and FSStore backends, core VCS commands (init, add, status, commit, log, diff, show, reset, config), and backend migration."
-  slug = "objectstore-solo-loop"
-}
-

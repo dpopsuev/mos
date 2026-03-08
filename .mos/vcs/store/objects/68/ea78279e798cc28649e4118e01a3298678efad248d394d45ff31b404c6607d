@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-003" {
-  title = "CLI Maturity — unblock the vault"
-  status = "complete"
-  goal = "Complete BAT-2026-005 critical path: nested block mutations, multi-value refs, naming enforcement. Unblocks CON-2026-089 (FSPlain vault adapter)."
-  slug = "cli-maturity-sprint"
-}
-

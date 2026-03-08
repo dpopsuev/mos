@@ -52,6 +52,8 @@ func (s *AutoScanner) resolve(root string) Scanner {
 		return &RustScanner{}
 	case "typescript":
 		return &TypeScriptScanner{}
+	case "python":
+		return &PythonScanner{}
 	case "composite":
 		return &CompositeScanner{}
 	}
@@ -65,6 +67,8 @@ func (s *AutoScanner) resolve(root string) Scanner {
 		return &RustScanner{}
 	case model.LangTypeScript:
 		return &TypeScriptScanner{}
+	case model.LangPython:
+		return &PythonScanner{}
 	case model.LangC, model.LangCpp:
 		if _, err := exec.LookPath("ctags"); err == nil {
 			return &CtagsScanner{}

@@ -1,7 +1,0 @@
-sprint "SPR-2026-031" {
-  title = "Unified Graph Exporter: Sophia Bridge"
-  status = "closed"
-  goal = "Export all four data planes (governance, survey, mesh, architecture) as a single typed graph for Sophia ingestion. Highest ROI: directly enables the agentic memory layer."
-  contracts = "CON-2026-230"
-}
-

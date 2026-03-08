@@ -73,6 +73,7 @@ func init() {
 		subsystem.GateCmd(),
 		subsystem.TraceCmd(),
 		subsystem.StoreCmd(),
+		subsystem.ContextCmd(),
 		lspCmd,
 		completionCmd,
 	)

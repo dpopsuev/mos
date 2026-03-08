@@ -1,7 +1,0 @@
-sprint "SPR-2026-039" {
-  status = "complete"
-  title = "VCS Performance Benchmarks"
-  goal = "Establish VCS performance baselines at Kubernetes and LinuxKernel scale"
-  contracts = "CON-2026-246,CON-2026-247"
-}
-

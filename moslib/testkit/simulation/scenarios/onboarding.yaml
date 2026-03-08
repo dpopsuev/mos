@@ -1,0 +1,21 @@
+name: onboarding
+steps:
+  - tool: scan_project
+    params:
+      path: "."
+    assert_keys: ["architecture"]
+  - tool: get_rules
+    params:
+      path: "."
+  - tool: get_skills
+    params:
+      path: "."
+  - tool: ingest_file
+    params:
+      path: "testdata/sample-contract.md"
+      goal: "Ingest a sample contract for testing"
+  - tool: list_contracts
+    params: {}
+  - tool: resolve_lexicon
+    params:
+      path: "."

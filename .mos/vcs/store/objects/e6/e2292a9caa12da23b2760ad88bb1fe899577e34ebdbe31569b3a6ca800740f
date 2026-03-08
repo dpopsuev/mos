@@ -1,8 +1,0 @@
-blob
-rule "bdd-specs-required" {
-  name = "BDD Specs Required"
-  type = "interpretive"
-  scope = "project"
-  enforcement = "warning"
-}
-

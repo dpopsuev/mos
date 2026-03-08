@@ -16,6 +16,7 @@ build:
     go build -o ./bin/mgate ./cmd/mgate
     go build -o ./bin/mtrace ./cmd/mtrace
     go build -o ./bin/mstore ./cmd/mstore
+    go build -o ./bin/mcontext ./cmd/mcontext
 
 hook:
     ./bin/mgate hook install

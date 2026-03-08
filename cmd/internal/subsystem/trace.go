@@ -15,12 +15,10 @@ func TraceCmd() *cobra.Command {
 		Long: `Cross-cutting traceability connecting needs, specs, architecture,
 implementation, and documentation.
 
-Commands: mesh, survey, clone, architecture sync`,
+Commands: survey, architecture sync`,
 	}
 
 	cmd.AddCommand(
-		tracecmd.MeshCmd,
-		tracecmd.CloneCmd,
 		tracecmd.SurveyCmd,
 		tracecmd.ArchSyncCmd,
 	)

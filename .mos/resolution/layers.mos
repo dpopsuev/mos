@@ -1,6 +1,0 @@
-layers {
-  layer "project" {
-    level = 1
-  }
-}
-

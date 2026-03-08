@@ -3,8 +3,6 @@ package lsp
 import (
 	"path/filepath"
 	"strings"
-
-	"github.com/dpopsuev/mos/moslib/linter"
 )
 
 // Location represents an LSP Location (file + range).
@@ -26,7 +24,7 @@ type Position struct {
 }
 
 // Definition returns go-to-definition results for the given position.
-func Definition(path, content string, line, character int, ctx *linter.ProjectContext) *Location {
+func Definition(path, content string, line, character int, ctx *ProjectContext) *Location {
 	if ctx == nil {
 		return nil
 	}

@@ -1,7 +1,0 @@
-sprint "SPR-2026-029" {
-  title = "Bug Cleanup + Blame Block"
-  status = "complete"
-  goal = "Fix the remaining open bug (CI stderr race) and implement the blame block feature for structured source references on bug contracts."
-  contracts = "CON-2026-225,CON-2026-227"
-}
-

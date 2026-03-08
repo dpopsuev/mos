@@ -1,0 +1,73 @@
+services:
+  daemon:
+    build:
+      context: ../../../
+      dockerfile: moslib/testkit/containers/Containerfile.daemon
+    environment:
+      MOSBUS_SOCKET: /data/mosbus.sock
+    volumes:
+      - mosbus:/data
+    healthcheck:
+      test: ["CMD", "test", "-S", "/data/mosbus.sock"]
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  ide-a1:
+    build:
+      context: ../../../
+      dockerfile: moslib/testkit/containers/Containerfile.scenariorunner
+    environment:
+      MOSBUS_SOCKET: /data/mosbus.sock
+      WORKSPACE_ROOTS: /workspace/project-a
+      SCENARIO_ID: a1
+    volumes:
+      - mosbus:/data
+    depends_on:
+      daemon:
+        condition: service_healthy
+
+  ide-a2:
+    build:
+      context: ../../../
+      dockerfile: moslib/testkit/containers/Containerfile.scenariorunner
+    environment:
+      MOSBUS_SOCKET: /data/mosbus.sock
+      WORKSPACE_ROOTS: /workspace/project-a
+      SCENARIO_ID: a2
+    volumes:
+      - mosbus:/data
+    depends_on:
+      daemon:
+        condition: service_healthy
+
+  ide-b1:
+    build:
+      context: ../../../
+      dockerfile: moslib/testkit/containers/Containerfile.scenariorunner
+    environment:
+      MOSBUS_SOCKET: /data/mosbus.sock
+      WORKSPACE_ROOTS: /workspace/project-b
+      SCENARIO_ID: b1
+    volumes:
+      - mosbus:/data
+    depends_on:
+      daemon:
+        condition: service_healthy
+
+  ide-b2:
+    build:
+      context: ../../../
+      dockerfile: moslib/testkit/containers/Containerfile.scenariorunner
+    environment:
+      MOSBUS_SOCKET: /data/mosbus.sock
+      WORKSPACE_ROOTS: /workspace/project-b
+      SCENARIO_ID: b2
+    volumes:
+      - mosbus:/data
+    depends_on:
+      daemon:
+        condition: service_healthy
+
+volumes:
+  mosbus:

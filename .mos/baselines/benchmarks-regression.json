@@ -1,8 +1,0 @@
-{
-  "rule_id": "benchmarks-regression",
-  "metrics": {
-    "allocs_op": 1465483,
-    "ns_op": 387918170
-  },
-  "timestamp": "2026-03-06T18:56:00.309221607Z"
-}

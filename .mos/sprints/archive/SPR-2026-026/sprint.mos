@@ -1,7 +1,0 @@
-sprint "SPR-2026-026" {
-  title = "VCS Utilities: stash, clean, grep, blame"
-  status = "complete"
-  goal = "VCS git parity for developer utilities — park in-progress work, clean untracked artifacts, search governance by pattern, line-level blame."
-  contracts = "CON-2026-079,CON-2026-080,CON-2026-081,CON-2026-069"
-}
-

@@ -1,8 +1,0 @@
-sprint "SPR-2026-013" {
-  title = "Agent-Ready CLI"
-  status = "complete"
-  goal = "Eliminate the most common CLI friction points for both human and agent workflows. Auto-ID generation for non-contract kinds, sprint/batch/need subcommand families for discoverability, list output that includes artifact names, and JSON output on all read commands for machine consumption."
-  slug = "agent-ready-cli"
-  contracts = "BUG-2026-012,CON-2026-148,CON-2026-116,CON-2026-118,CON-2026-147,BUG-2026-011"
-}
-

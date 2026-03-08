@@ -86,6 +86,11 @@ func (s *PackagesScanner) Scan(root string) (*model.Project, error) {
 			}
 		}
 
+		coupling := computeCoupling(pkg)
+		for impPath, c := range coupling {
+			proj.DependencyGraph.SetEdgeCoupling(pkg.PkgPath, impPath, c.callSites, c.locSurface)
+		}
+
 		proj.AddNamespace(ns)
 	}
 
@@ -198,6 +203,45 @@ func extractTypedSymbols(pkg *packages.Package, ns *model.Namespace) {
 			}
 		}
 	}
+}
+
+type couplingInfo struct {
+	callSites  int
+	locSurface int
+}
+
+// computeCoupling counts total call sites (every reference to an external
+// symbol, including duplicates) and LOC surface (distinct source lines that
+// reference an external package) per dependency.
+func computeCoupling(pkg *packages.Package) map[string]*couplingInfo {
+	result := make(map[string]*couplingInfo)
+	if pkg.TypesInfo == nil {
+		return result
+	}
+
+	linesSeen := make(map[string]map[int]bool)
+
+	for ident, obj := range pkg.TypesInfo.Uses {
+		if obj.Pkg() == nil || obj.Pkg() == pkg.Types {
+			continue
+		}
+		impPath := obj.Pkg().Path()
+
+		if result[impPath] == nil {
+			result[impPath] = &couplingInfo{}
+			linesSeen[impPath] = make(map[int]bool)
+		}
+
+		result[impPath].callSites++
+
+		pos := pkg.Fset.Position(ident.Pos())
+		if pos.IsValid() && !linesSeen[impPath][pos.Line] {
+			linesSeen[impPath][pos.Line] = true
+			result[impPath].locSurface++
+		}
+	}
+
+	return result
 }
 
 // countSymbolUsages counts how many distinct symbols are used from each

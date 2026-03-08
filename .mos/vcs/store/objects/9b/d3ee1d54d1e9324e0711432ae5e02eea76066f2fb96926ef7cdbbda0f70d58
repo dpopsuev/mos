@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-027" {
-  title = "Scalability Baseline: first performance gate"
-  status = "complete"
-  goal = "Run mos lint, status, fmt, query against stressgen profiles (Linux Kernel, Kubernetes scale). Establish wall-clock and memory baselines. Set ceiling thresholds. This is the first performance measurement before any optimization work."
-  contracts = "CON-2026-218"
-}
-

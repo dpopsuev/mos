@@ -1,0 +1,14 @@
+name: multi_workspace
+steps:
+  - tool: scan_project
+    params:
+      path: "/workspace/project-a"
+  - tool: scan_project
+    params:
+      path: "/workspace/project-b"
+  - tool: get_rules
+    params:
+      path: "/workspace/project-a"
+  - tool: get_rules
+    params:
+      path: "/workspace/project-b"

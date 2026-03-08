@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-017" {
-  status = "complete"
-  title = "3-Tool Domain: Arch + Clone + Mesh + Guard extraction"
-  goal = "Extract domain packages (Arch, Clone, Mesh, Guard) for the 3-tool architecture."
-  contracts = "CON-2026-197,CON-2026-198,CON-2026-199,CON-2026-200,CON-2026-205"
-}
-

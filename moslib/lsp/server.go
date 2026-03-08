@@ -5,9 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/dpopsuev/mos/moslib/linter"
 	"github.com/dpopsuev/mos/moslib/names"
 )
 
@@ -15,7 +13,7 @@ import (
 type Server struct {
 	transport *Transport
 	docs      *DocumentStore
-	ctx       *linter.ProjectContext
+	ctx       *ProjectContext
 	rootPath  string
 	shutdown  bool
 }
@@ -120,11 +118,9 @@ func (s *Server) loadProjectContext() {
 	if s.rootPath == "" {
 		return
 	}
-	mosDir := filepath.Join(s.rootPath, names.MosDir)
-	ctx, err := linter.LoadContext(mosDir)
-	if err == nil {
-		s.ctx = ctx
-	}
+	_ = filepath.Join(s.rootPath, names.MosDir) // unused; linter package removed
+	// With the linter package removed, use empty context (no rule/spec resolution).
+	s.ctx = &ProjectContext{RuleIDs: map[string]string{}}
 }
 
 type textDocumentItem struct {
@@ -198,67 +194,13 @@ func (s *Server) handleDidClose(msg *RequestMessage) error {
 }
 
 func (s *Server) publishDiagnostics(uri string) {
-	filePath := URIToPath(uri)
-
-	mosDir := ""
-	if s.rootPath != "" {
-		mosDir = filepath.Join(s.rootPath, names.MosDir)
-	} else {
-		mosDir = findMosDir(filePath)
-	}
-
-	if mosDir == "" {
-		return
-	}
-
-	l := &linter.Linter{}
-	diags, err := l.Lint(filepath.Dir(mosDir))
-	if err != nil {
-		return
-	}
-
-	var lspDiags []map[string]any
-	for _, d := range diags {
-		if !strings.HasSuffix(d.File, filepath.Base(filePath)) && d.File != filePath {
-			normDiag := filepath.Clean(d.File)
-			normFile := filepath.Clean(filePath)
-			if normDiag != normFile {
-				continue
-			}
-		}
-
-		var severity int
-		switch d.Severity {
-		case linter.SeverityWarning:
-			severity = 2
-		case linter.SeverityInfo:
-			severity = 3
-		default:
-			severity = 1 // error
-		}
-
-		lspDiags = append(lspDiags, map[string]any{
-			"range": map[string]any{
-				"start": map[string]int{"line": max(0, d.Line-1), "character": 0},
-				"end":   map[string]int{"line": max(0, d.Line-1), "character": 0},
-			},
-			"severity": severity,
-			"source":   "mos-lint",
-			"code":     d.Rule,
-			"message":  d.Message,
-		})
-	}
-
-	if lspDiags == nil {
-		lspDiags = []map[string]any{}
-	}
-
+	// With the linter package removed, publish no diagnostics.
 	_ = s.transport.WriteNotification(&NotificationMessage{
 		JSONRPC: "2.0",
 		Method:  "textDocument/publishDiagnostics",
 		Params: map[string]any{
 			"uri":         uri,
-			"diagnostics": lspDiags,
+			"diagnostics": []map[string]any{},
 		},
 	})
 }

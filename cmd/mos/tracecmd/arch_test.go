@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dpopsuev/mos/moslib/artifact"
+	"github.com/dpopsuev/mos/moslib/arch"
 	"github.com/dpopsuev/mos/moslib/model"
 )
 
@@ -26,9 +26,9 @@ func TestInferDefaultGroupsDepth1(t *testing.T) {
 		"moslib/arch",
 	})
 
-	groups := inferDefaultGroups(proj, "example.com/test", 1)
+	groups := arch.InferDefaultGroups(proj, "example.com/test", 1)
 
-	groupMap := make(map[string]artifact.ComponentGroup)
+	groupMap := make(map[string]arch.ComponentGroup)
 	for _, g := range groups {
 		groupMap[g.Name] = g
 	}
@@ -60,9 +60,9 @@ func TestInferDefaultGroupsDepth2(t *testing.T) {
 		"cmd/server",
 	})
 
-	groups := inferDefaultGroups(proj, "example.com/test", 2)
+	groups := arch.InferDefaultGroups(proj, "example.com/test", 2)
 
-	groupMap := make(map[string]artifact.ComponentGroup)
+	groupMap := make(map[string]arch.ComponentGroup)
 	for _, g := range groups {
 		groupMap[g.Name] = g
 	}
@@ -88,9 +88,9 @@ func TestInferDefaultGroupsDepth3(t *testing.T) {
 		"x/y",
 	})
 
-	groups := inferDefaultGroups(proj, "example.com/test", 3)
+	groups := arch.InferDefaultGroups(proj, "example.com/test", 3)
 
-	groupMap := make(map[string]artifact.ComponentGroup)
+	groupMap := make(map[string]arch.ComponentGroup)
 	for _, g := range groups {
 		groupMap[g.Name] = g
 	}
@@ -112,9 +112,9 @@ func TestDetectProjectPathGo(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "go.mod", "module example.com/mymod\n\ngo 1.21\n")
 
-	path := detectProjectPath(dir)
+	path := arch.DetectProjectPath(dir)
 	if path != "example.com/mymod" {
-		t.Errorf("detectProjectPath = %q, want example.com/mymod", path)
+		t.Errorf("DetectProjectPath = %q, want example.com/mymod", path)
 	}
 }
 
@@ -125,9 +125,9 @@ name = "my-rust-app"
 version = "0.1.0"
 `)
 
-	path := detectProjectPath(dir)
+	path := arch.DetectProjectPath(dir)
 	if path != "my-rust-app" {
-		t.Errorf("detectProjectPath = %q, want my-rust-app", path)
+		t.Errorf("DetectProjectPath = %q, want my-rust-app", path)
 	}
 }
 
@@ -135,9 +135,9 @@ func TestDetectProjectPathPackageJSON(t *testing.T) {
 	dir := t.TempDir()
 	writeFile(t, dir, "package.json", `{"name": "@scope/my-lib", "version": "1.0.0"}`)
 
-	path := detectProjectPath(dir)
+	path := arch.DetectProjectPath(dir)
 	if path != "@scope/my-lib" {
-		t.Errorf("detectProjectPath = %q, want @scope/my-lib", path)
+		t.Errorf("DetectProjectPath = %q, want @scope/my-lib", path)
 	}
 }
 

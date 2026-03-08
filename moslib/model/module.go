@@ -227,6 +227,17 @@ func (g *DependencyGraph) AddEdge(from, to string, external bool) {
 	g.Edges = append(g.Edges, DependencyEdge{From: from, To: to, External: external, Weight: 1})
 }
 
+// SetEdgeCoupling updates CallSites and LOCSurface for an existing edge.
+func (g *DependencyGraph) SetEdgeCoupling(from, to string, callSites, locSurface int) {
+	for i := range g.Edges {
+		if g.Edges[i].From == from && g.Edges[i].To == to {
+			g.Edges[i].CallSites = callSites
+			g.Edges[i].LOCSurface = locSurface
+			return
+		}
+	}
+}
+
 // EdgesFrom returns all edges originating from the given namespace.
 func (g *DependencyGraph) EdgesFrom(ns string) []DependencyEdge {
 	var out []DependencyEdge
@@ -239,10 +250,14 @@ func (g *DependencyGraph) EdgesFrom(ns string) []DependencyEdge {
 }
 
 // DependencyEdge represents a dependency from one namespace to another.
-// Weight counts the number of imported symbols (0 = unknown/not computed).
+// Weight counts the number of distinct imported symbols (0 = unknown/not computed).
+// CallSites counts total invocations of symbols from the dependency.
+// LOCSurface counts distinct source lines that reference the dependency.
 type DependencyEdge struct {
-	From     string `json:"from"`
-	To       string `json:"to"`
-	External bool   `json:"external"`
-	Weight   int    `json:"weight,omitempty"`
+	From       string `json:"from"`
+	To         string `json:"to"`
+	External   bool   `json:"external"`
+	Weight     int    `json:"weight,omitempty"`
+	CallSites  int    `json:"call_sites,omitempty"`
+	LOCSurface int    `json:"loc_surface,omitempty"`
 }

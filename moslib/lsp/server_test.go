@@ -8,8 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/dpopsuev/mos/moslib/linter"
 )
 
 // --- test helpers ---
@@ -420,8 +418,8 @@ func TestHoverFieldDoc(t *testing.T) {
 }
 
 func TestHoverVocabularyTerm(t *testing.T) {
-	ctx := &linter.ProjectContext{
-		Lexicon: &linter.MergedLexicon{
+	ctx := &ProjectContext{
+		Lexicon: &Lexicon{
 			Terms: map[string]string{
 				"governance": "the process of governing",
 			},
@@ -438,7 +436,7 @@ func TestHoverVocabularyTerm(t *testing.T) {
 }
 
 func TestHoverRuleID(t *testing.T) {
-	ctx := &linter.ProjectContext{
+	ctx := &ProjectContext{
 		RuleIDs: map[string]string{
 			"R-001": "/project/.mos/rules/mechanical/no-binaries.mos",
 		},
@@ -456,7 +454,7 @@ func TestHoverRuleID(t *testing.T) {
 // --- Definition tests ---
 
 func TestDefinitionRuleID(t *testing.T) {
-	ctx := &linter.ProjectContext{
+	ctx := &ProjectContext{
 		RuleIDs: map[string]string{
 			"R-001": "/project/.mos/rules/mechanical/no-binaries.mos",
 		},
@@ -472,7 +470,7 @@ func TestDefinitionRuleID(t *testing.T) {
 }
 
 func TestDefinitionInclude(t *testing.T) {
-	ctx := &linter.ProjectContext{}
+	ctx := &ProjectContext{}
 	content := "spec {\n  include \"spec.feature\"\n}\n"
 	loc := Definition("/project/.mos/rules/mechanical/test.mos", content, 1, 12, ctx)
 	if loc == nil {

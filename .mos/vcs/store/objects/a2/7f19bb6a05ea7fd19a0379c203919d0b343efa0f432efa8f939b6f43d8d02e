@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-037" {
-  status = "complete"
-  title = "Harness DX: Agent Experience Fixes"
-  goal = "Fix six agent-experience gaps surfaced by dogfood session SPR-2026-036"
-  contracts = "CON-2026-238,CON-2026-239,CON-2026-240,CON-2026-241,CON-2026-242,CON-2026-243"
-}
-

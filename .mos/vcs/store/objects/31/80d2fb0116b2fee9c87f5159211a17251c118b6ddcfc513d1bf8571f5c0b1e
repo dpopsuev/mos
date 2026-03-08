@@ -1,8 +1,0 @@
-blob
-sprint "SPR-2026-022" {
-  status = "complete"
-  title = "Tier 3: Strategic Infrastructure"
-  goal = "Build strategic infrastructure foundational to future work."
-  contracts = "CON-2026-186,CON-2026-093,CON-2026-098,CON-2026-089"
-}
-

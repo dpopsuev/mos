@@ -1,8 +1,0 @@
-sprint "SPR-2026-004" {
-  status = "complete"
-  goal = "The minimum contracts that make mos usable by AI agents as a primary workflow tool. After this sprint, an agent can orient itself (status), discover commands (help), read artifacts (show), and create them efficiently (from-file). This is the Console First principle applied to its most demanding user: the agent. Dogfood gate: this sprint must be planned, executed, and verified entirely through mos CLI by an AI agent."
-  title = "Agentic Dogfood — teach mos to serve its operators"
-  slug = "agentic-dogfood"
-  contracts = "CON-2026-111,CON-2026-114,CON-2026-115,CON-2026-119,CON-2026-120,CON-2026-122,BUG-2026-006"
-}
-

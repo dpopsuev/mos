@@ -1,7 +1,0 @@
-sprint "SPR-2026-034" {
-  title = "Trajectory Pipeline: Snapshot → Analysis → Sparklines"
-  status = "closed"
-  goal = "Deliver the end-to-end trajectory pipeline as a vertical slice. Phase 0 commit state snapshots (CON-2026-217), trajectory analysis detecting convergence/stall/oscillation/drift (CON-2026-228), and Tier 1 ASCII sparkline visualization in mos audit --trajectory (CON-2026-229). Result: every mos commit captures governance state, the analysis engine classifies the trajectory, and the contributor sees colored sparklines in the terminal."
-  contracts = "CON-2026-217,CON-2026-228,CON-2026-229"
-}
-

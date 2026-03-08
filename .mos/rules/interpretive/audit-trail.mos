@@ -1,7 +1,0 @@
-rule "audit-trail" {
-  name = "Audit Trail Completeness"
-  type = "interpretive"
-  scope = "project"
-  enforcement = "info"
-}
-

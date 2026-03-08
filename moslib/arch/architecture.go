@@ -2,12 +2,10 @@ package arch
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 
-	"github.com/dpopsuev/mos/moslib/dsl"
 	"github.com/dpopsuev/mos/moslib/model"
 )
 
@@ -29,6 +27,8 @@ type ArchEdge struct {
 	Protocol string
 	Trigger  string
 	Weight   int
+	CallSites int
+	LOCSurface int
 }
 
 // ArchForbidden represents a forbidden dependency in an architecture artifact.
@@ -49,122 +49,6 @@ type ArchModel struct {
 	Services   []ArchService
 	Edges      []ArchEdge
 	Forbidden  []ArchForbidden
-}
-
-// ParseArchModel extracts the structural model from an architecture artifact AST.
-func ParseArchModel(ab *dsl.ArtifactBlock) ArchModel {
-	m := ArchModel{Title: ab.Name}
-
-	m.Resolution, _ = dsl.FieldString(ab.Items, "resolution")
-	m.Implements, _ = dsl.FieldString(ab.Items, "implements")
-	if t, ok := dsl.FieldString(ab.Items, "title"); ok && t != "" {
-		m.Title = t
-	}
-
-	dsl.WalkBlocks(ab.Items, func(b *dsl.Block) bool {
-		switch b.Name {
-		case "service", "component":
-			m.Services = append(m.Services, parseArchService(b))
-		case "edge":
-			m.Edges = append(m.Edges, parseArchEdge(b))
-		case "forbidden":
-			m.Forbidden = append(m.Forbidden, parseArchForbidden(b))
-		}
-		return false // don't descend into nested blocks
-	})
-
-	return m
-}
-
-func parseArchService(blk *dsl.Block) ArchService {
-	s := ArchService{Name: blk.Title}
-	s.Package, _ = dsl.FieldString(blk.Items, "package")
-	s.TrustZone, _ = dsl.FieldString(blk.Items, "trust_zone")
-	s.Exposes = dsl.FieldStringSlice(blk.Items, "exposes")
-	s.Symbols = dsl.FieldStringSlice(blk.Items, "symbols")
-	return s
-}
-
-func parseArchEdge(blk *dsl.Block) ArchEdge {
-	e := ArchEdge{Name: blk.Title}
-	e.From, _ = dsl.FieldString(blk.Items, "from")
-	e.To, _ = dsl.FieldString(blk.Items, "to")
-	e.Protocol, _ = dsl.FieldString(blk.Items, "protocol")
-	e.Trigger, _ = dsl.FieldString(blk.Items, "trigger")
-	return e
-}
-
-func parseArchForbidden(blk *dsl.Block) ArchForbidden {
-	f := ArchForbidden{Name: blk.Title}
-	f.From, _ = dsl.FieldString(blk.Items, "from")
-	f.To, _ = dsl.FieldString(blk.Items, "to")
-	f.FromTrustZone, _ = dsl.FieldString(blk.Items, "from_trust_zone")
-	f.ToTrustZone, _ = dsl.FieldString(blk.Items, "to_trust_zone")
-	f.Reason, _ = dsl.FieldString(blk.Items, "reason")
-	return f
-}
-
-// RenderMermaid generates a Mermaid graph from an architecture model.
-func RenderMermaid(m ArchModel) string {
-	var b strings.Builder
-	b.WriteString("graph TD\n")
-
-	for _, s := range m.Services {
-		id := mermaidID(s.Name)
-		label := s.Name
-		if s.Package != "" {
-			label += fmt.Sprintf("\\n(%s)", s.Package)
-		}
-		if s.TrustZone != "" {
-			label += fmt.Sprintf("\\n[%s]", s.TrustZone)
-		}
-		fmt.Fprintf(&b, "    %s[\"%s\"]\n", id, label)
-	}
-
-	for _, e := range m.Edges {
-		fromID := mermaidID(e.From)
-		toID := mermaidID(e.To)
-		edgeLabel := e.Protocol
-		if edgeLabel == "" {
-			edgeLabel = e.Trigger
-		}
-		if e.Weight > 0 {
-			edgeLabel = fmt.Sprintf("%s(%d)", edgeLabel, e.Weight)
-		}
-		isExternal := e.Protocol == "external"
-		if edgeLabel != "" {
-			if isExternal {
-				fmt.Fprintf(&b, "    %s -.->|\"%s\"| %s\n", fromID, edgeLabel, toID)
-			} else {
-				fmt.Fprintf(&b, "    %s -->|\"%s\"| %s\n", fromID, edgeLabel, toID)
-			}
-		} else {
-			if isExternal {
-				fmt.Fprintf(&b, "    %s -.-> %s\n", fromID, toID)
-			} else {
-				fmt.Fprintf(&b, "    %s --> %s\n", fromID, toID)
-			}
-		}
-	}
-
-	for _, f := range m.Forbidden {
-		if f.From != "" && f.To != "" {
-			fromID := mermaidID(f.From)
-			toID := mermaidID(f.To)
-			label := "FORBIDDEN"
-			if f.Reason != "" {
-				label = f.Reason
-			}
-			fmt.Fprintf(&b, "    %s -.-x|\"%s\"| %s\n", fromID, label, toID)
-		}
-	}
-
-	return b.String()
-}
-
-func mermaidID(name string) string {
-	r := strings.NewReplacer(" ", "_", "-", "_", ".", "_", "/", "_")
-	return r.Replace(name)
 }
 
 // ComponentGroup maps a logical component name to a set of package import paths.
@@ -367,6 +251,12 @@ func shortImportPath(modPath, importPath string) string {
 	return importPath
 }
 
+// LoadComponentGroups reads component_group blocks from config. With DSL removed,
+// returns nil (no groups) so InferDefaultGroups is used when --grouped is set.
+func LoadComponentGroups(root string) ([]ComponentGroup, error) {
+	return nil, nil
+}
+
 // RenderArchMos serializes an ArchModel into .mos DSL format.
 func RenderArchMos(m ArchModel) string {
 	var b strings.Builder
@@ -507,64 +397,65 @@ func RenderArchMarkdown(m ArchModel) string {
 	return b.String()
 }
 
-// CheckForbiddenEdges compares the live import graph against declared
-// forbidden edges. Returns one violation string per infraction.
-func CheckForbiddenEdges(live ArchModel, declared ArchModel) []string {
-	liveEdges := make(map[[2]string]bool, len(live.Edges))
-	for _, e := range live.Edges {
-		liveEdges[[2]string{e.From, e.To}] = true
+// RenderMermaid generates a Mermaid graph from an architecture model.
+func RenderMermaid(m ArchModel) string {
+	var b strings.Builder
+	b.WriteString("graph TD\n")
+
+	for _, s := range m.Services {
+		id := mermaidID(s.Name)
+		label := s.Name
+		if s.Package != "" {
+			label += fmt.Sprintf("\\n(%s)", s.Package)
+		}
+		if s.TrustZone != "" {
+			label += fmt.Sprintf("\\n[%s]", s.TrustZone)
+		}
+		fmt.Fprintf(&b, "    %s[\"%s\"]\n", id, label)
 	}
 
-	var violations []string
-	for _, f := range declared.Forbidden {
-		key := [2]string{f.From, f.To}
-		if liveEdges[key] {
-			reason := f.Reason
-			if reason == "" {
-				reason = "forbidden dependency"
+	for _, e := range m.Edges {
+		fromID := mermaidID(e.From)
+		toID := mermaidID(e.To)
+		edgeLabel := e.Protocol
+		if edgeLabel == "" {
+			edgeLabel = e.Trigger
+		}
+		if e.Weight > 0 {
+			edgeLabel = fmt.Sprintf("%s(%d)", edgeLabel, e.Weight)
+		}
+		isExternal := e.Protocol == "external"
+		if edgeLabel != "" {
+			if isExternal {
+				fmt.Fprintf(&b, "    %s -.->|\"%s\"| %s\n", fromID, edgeLabel, toID)
+			} else {
+				fmt.Fprintf(&b, "    %s -->|\"%s\"| %s\n", fromID, edgeLabel, toID)
 			}
-			violations = append(violations, fmt.Sprintf("%s -> %s: %s", f.From, f.To, reason))
+		} else {
+			if isExternal {
+				fmt.Fprintf(&b, "    %s -.-> %s\n", fromID, toID)
+			} else {
+				fmt.Fprintf(&b, "    %s --> %s\n", fromID, toID)
+			}
 		}
 	}
-	return violations
-}
 
-// ReadConfigFn reads and parses the project config. Injected to avoid
-// import cycles between arch and artifact.
-var ReadConfigFn func(root string) (*dsl.File, error)
-
-// LoadComponentGroups reads component_group blocks from the config AST.
-func LoadComponentGroups(root string) ([]ComponentGroup, error) {
-	if ReadConfigFn == nil {
-		return nil, nil
-	}
-	f, err := ReadConfigFn(root)
-	if err != nil {
-		return nil, nil
-	}
-	ab, ok := f.Artifact.(*dsl.ArtifactBlock)
-	if !ok {
-		return nil, nil
-	}
-
-	var groups []ComponentGroup
-	dsl.WalkBlocks(ab.Items, func(b *dsl.Block) bool {
-		if b.Name == "component_group" {
-			g := ComponentGroup{Name: b.Title}
-			if pkgs, ok := dsl.FieldString(b.Items, "packages"); ok {
-				for _, p := range strings.Split(pkgs, ",") {
-					p = strings.TrimSpace(p)
-					if p != "" {
-						g.Packages = append(g.Packages, p)
-					}
-				}
+	for _, f := range m.Forbidden {
+		if f.From != "" && f.To != "" {
+			fromID := mermaidID(f.From)
+			toID := mermaidID(f.To)
+			label := "FORBIDDEN"
+			if f.Reason != "" {
+				label = f.Reason
 			}
-			groups = append(groups, g)
+			fmt.Fprintf(&b, "    %s -.-x|\"%s\"| %s\n", fromID, label, toID)
 		}
-		return false
-	})
-	return groups, nil
+	}
+
+	return b.String()
 }
 
-// ReadFileFunc is the file reader used by architecture helpers (retained for tests).
-var ReadFileFunc = os.ReadFile
+func mermaidID(name string) string {
+	r := strings.NewReplacer(" ", "_", "-", "_", ".", "_", "/", "_")
+	return r.Replace(name)
+}

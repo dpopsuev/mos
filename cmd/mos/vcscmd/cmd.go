@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/dpopsuev/mos/moslib/guard"
-	"github.com/dpopsuev/mos/moslib/harness"
-	"github.com/dpopsuev/mos/moslib/names"
 	"github.com/dpopsuev/mos/moslib/vcs"
 	"github.com/dpopsuev/mos/moslib/vcs/history"
 	"github.com/dpopsuev/mos/moslib/vcs/merge"
@@ -193,12 +190,6 @@ func runCommit(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("mos vcs commit: %w", err)
 	}
 	fmt.Printf("[%s] %s\n", h.Short(), message)
-
-	mosDir := filepath.Join(".", names.MosDir)
-	snap, scanErr := harness.LightweightScan(".", guard.LintResultFromDiags)
-	if scanErr == nil {
-		_ = harness.StoreCommitSnapshot(mosDir, h.String(), snap)
-	}
 
 	return nil
 }

@@ -1,6 +1,0 @@
-sprint "SPR-2026-045" {
-  status = "complete"
-  title = "Architecture Scanner Depth + Governance Decomposition"
-  goal = "Scanner enhancements (edge weight, external deps, auto-depth, change-impact, test topology), governance facade thinning, primitive audit"
-  contracts = "CON-2026-271,CON-2026-272,CON-2026-273,CON-2026-274,CON-2026-275,CON-2026-276,CON-2026-277"
-}
