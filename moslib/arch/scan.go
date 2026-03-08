@@ -18,6 +18,7 @@ type ScanOpts struct {
 	ScannerOverride string
 	ExcludeTests    bool
 	IncludeExternal bool
+	IncludeCoverage bool
 	Grouped         bool
 	Depth           int
 	ChurnDays       int
@@ -41,11 +42,17 @@ type ContextReport struct {
 	ModulePath     string                `json:"module_path"`
 	Scanner        string                `json:"scanner"`
 	SuggestedDepth int                   `json:"suggested_depth,omitempty"`
-	HotSpots       []HotSpot             `json:"hot_spots,omitempty"`
-	RecentCommits  []PackageCommit       `json:"recent_commits,omitempty"`
-	Authors        map[string][]Author   `json:"authors,omitempty"`
-	FileHotSpots   []HotFile             `json:"file_hot_spots,omitempty"`
-	Anchors        []SemanticAnchor      `json:"anchors,omitempty"`
+	HotSpots          []HotSpot             `json:"hot_spots,omitempty"`
+	Cycles            []Cycle               `json:"cycles,omitempty"`
+	ImportDepth       DepthMap              `json:"import_depth,omitempty"`
+	LayerViolations   []LayerViolation      `json:"layer_violations,omitempty"`
+	Coverage          []CoverageResult      `json:"coverage,omitempty"`
+	APISurfaces       []APISurface          `json:"api_surfaces,omitempty"`
+	BoundaryCrossings []BoundaryCrossing    `json:"boundary_crossings,omitempty"`
+	RecentCommits     []PackageCommit       `json:"recent_commits,omitempty"`
+	Authors           map[string][]Author   `json:"authors,omitempty"`
+	FileHotSpots      []HotFile             `json:"file_hot_spots,omitempty"`
+	Anchors           []SemanticAnchor      `json:"anchors,omitempty"`
 }
 
 // ScanAndBuild scans any repository and produces a ContextReport.
@@ -101,6 +108,14 @@ func ScanAndBuild(root string, opts ScanOpts) (*ContextReport, error) {
 
 	report.SuggestedDepth = computeSuggestedDepth(proj, modPath, len(archModel.Services))
 	report.HotSpots = computeHotSpots(archModel)
+	report.Cycles = DetectCycles(archModel.Edges)
+	report.ImportDepth = ComputeImportDepth(archModel.Edges)
+	report.APISurfaces = ComputeAPISurface(archModel)
+	report.BoundaryCrossings = DetectBoundaryCrossings(archModel, nil)
+
+	if opts.IncludeCoverage {
+		report.Coverage, _ = RunGoCoverage(root, modPath)
+	}
 
 	gitDays := opts.GitDays
 	if gitDays <= 0 {
